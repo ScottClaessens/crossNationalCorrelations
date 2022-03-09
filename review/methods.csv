@@ -1,0 +1,40 @@
+MethodNI,method_RegionalFixedEffects,method_Distance,method_SharedCulturalHistory,method_Other
+Distance from equator,0,1,0,0
+Continent fixed effects,1,0,0,0
+Eigenvector filtering,0,0,0,1
+Location outside Eastern Europe,1,0,0,0
+Residualised location outside Eastern Europe,1,0,0,0
+Dummy variables for sub-Saharan Africa and Latin America,1,0,0,0
+"Dummy variables for former British colony or UK, and never a colony",0,0,1,0
+"Dummy variables for UK, British crown colonies, British dominions, Indian states, never a colony",0,0,1,0
+"Dummy variables for never a colony, British heritage",0,0,1,0
+"Dummy variables for former British colony or UK, and never a colony; distance from equator",0,1,1,0
+"Dummy variables for former British colony or UK, and never a colony; distance from equator; continent fixed effects",1,1,1,0
+"Dummy variables for British heritage, never a colony",0,0,1,0
+Dummy variables for African countries and Latin American countries,1,0,0,0
+Predictors adjusted by trade-weightings between countries,0,0,0,1
+Cultural history control (French civil law tradition vs. British common law tradition),0,0,1,0
+"Cultural history control (French civil law tradition vs. British common law tradition), latitude",0,1,1,0
+Latitude,0,1,0,0
+Distance between capital cities,0,1,0,0
+Distance to three main markets,0,1,0,0
+Regional fixed effects,1,0,0,0
+"Cultural history control (French, British, and socialist legal origin)",0,0,1,0
+Income level fixed effects,0,0,0,1
+Separate analyses for subset of countries,0,0,0,1
+Cultural history control (French legal origin),0,0,1,0
+"Cultural history control (French legal origin), regional fixed effects",1,0,1,0
+"Separate analyses for subset of countries, cultural history control (French legal origin)",0,0,1,0
+"Separate analyses for subset of countries, cultural history control (French legal origin), regional fixed effects",1,0,1,0
+"Distance from equator, cultural history control (French legal origin)",0,1,1,0
+"Distance from equator, cultural history control (French legal origin), regional fixed effects",1,1,1,0
+Cultural history control (British cultural influence),0,0,1,0
+Regional fixed effect,1,0,0,0
+Cultural history control (Spanish colony) and regional fixed effects,1,0,1,0
+Dummy variable for African countries,1,0,0,0
+Cultural history control (Spanish colony) and dummy variable for African countries,1,0,1,0
+Regional fixed effects in first-stage regression equation,1,0,0,0
+Cross-sectional dependence test,0,0,0,1
+"Regional fixed effects, latitude",1,1,0,0
+"Latitude, linguistic history",0,1,1,0
+Cultural history control,0,0,1,0

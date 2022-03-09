@@ -1,0 +1,330 @@
+\clearpage
+\makeatletter
+\efloat@restorefloats
+\makeatother
+
+
+\begin{appendix}
+\renewcommand{\appendixname}{\bf{Supplementary Material}}
+\renewcommand{\figurename}{Supplementary Figure}
+\renewcommand{\tablename}{Supplementary Table}
+\renewcommand{\thefigure}{S\arabic{figure}} \setcounter{figure}{0}
+\renewcommand{\thetable}{S\arabic{table}} \setcounter{table}{0}
+\renewcommand{\theequation}{S\arabic{table}} \setcounter{equation}{0}
+
+\hypertarget{section}{%
+\section{}\label{section}}
+
+\hypertarget{supplementary-methods}{%
+\subsection{Supplementary Methods}\label{supplementary-methods}}
+
+\hypertarget{calculating-global-geographic-and-linguistic-proximity-matrices}{%
+\subsubsection{Calculating global geographic and linguistic proximity
+matrices}\label{calculating-global-geographic-and-linguistic-proximity-matrices}}
+
+Geographic distance between two nations was calculated as the logged
+geodesic distance between country capital cities (data from the R
+package \emph{maps}\textsuperscript{1}) using the R package
+\emph{geosphere}\textsuperscript{2}. The geographic proximity matrix was
+computed as one minus the log geographic distance matrix scaled between
+0 and 1.
+
+Linguistic proximity between two nations was calculated as the cultural
+proximity between all languages spoken within those nations, weighted by
+speaker percentages. We acquired cultural proximity data by combining
+the language family trees provided by Glottolog v3.0\textsuperscript{3}
+into one global language tree (undated and unresolved). We calculated
+cultural proximity \(s\) between two languages \(j\) and \(k\) as the
+distance (in number of nodes traversed) of their most recent common
+ancestor \(i\) to the root of the tree, through the formula:
+
+\[
+s_{jk} = \frac{n_{r}-n_{i}}{n_{r}}
+\]
+
+where \(n_{r}\) is the maximum path length (in number of nodes
+traversed) leading to the pan-human root \(r\), and \(n_{i}\) is the
+maximum path length leading to node \(i\). We then combined these
+proximities with speaker data from Ethnologue 21\textsuperscript{4} and
+compared every language spoken within those nations by at least 1
+permille of the population, weighted by speaker percentages, through the
+formula:
+
+\[
+w_{lm} = {\Sigma}{\Sigma}p_{lj}p_{mk}s_{jk}
+\]
+
+where \(p_{lj}\) is the percentage of the population in nation \(l\)
+speaking language \(j\), \(p_{mk}\) is the percentage of the population
+in nation \(m\) speaking language \(k\), and \(s_{jk}\) is the proximity
+measure between languages \(j\) and \(k\)\textsuperscript{5}. The
+resulting linguistic proximity matrix was also scaled between 0 and 1
+before analysis.
+
+\hypertarget{bayesian-models-for-reanalysis}{%
+\subsubsection{Bayesian models for
+reanalysis}\label{bayesian-models-for-reanalysis}}
+
+We provide model formulae for our reanalyses of cross-national
+correlations, for a general bivariate case with standardised outcome
+\(Y\) and predictor \(X\) variables. In the naive regression model
+without controls for non-independence:
+
+\[
+\begin{aligned}
+Y_{i} &\sim \text{Normal}(\mu_{i},\sigma) \\
+\mu_{i} &= \alpha + \beta X_{i} \\
+\alpha &\sim \text{Normal}(0, 0.4) \\
+\beta &\sim \text{Normal}(0, 0.4) \\
+\sigma &\sim \text{Exponential}(5)
+\end{aligned}
+\] The priors in this model were arrived at by prior predictive checks,
+with wider priors making predictions beyond the scale of standardised
+outcome variables and narrower priors being too informative.
+
+\newpage
+
+To control for spatial non-independence, we add a Gaussian process to
+this model and feed it a scaled geographic distance matrix \(D\) based
+on Euclidean distances between latitude and longitude coordinates. This
+distance matrix is computed internally by the R package
+\emph{brms}\textsuperscript{6}. The Gaussian process uses an
+exponentiated quadratic covariance kernel, the only covariance kernel
+currently supported by \emph{brms}. The model formula is:
+
+\[
+\begin{aligned}
+Y_{i} &\sim \text{Normal}(\mu_{i},\sigma) \\
+\mu_{i} &= \alpha + \kappa_{\text{NATION}[i]} + \beta X_{i} \\
+\begin{pmatrix}
+\kappa_{1} \\ \kappa_{2} \\ \kappa_{3} \\ ... \\ \kappa_{n}
+\end{pmatrix} &\sim \text{MVNormal}
+\begin{pmatrix}
+\begin{pmatrix}
+0 \\ 0 \\ 0 \\ ... \\ 0
+\end{pmatrix},\textbf{K}
+\end{pmatrix}\\
+\textbf{K}_{ij} &= sdgp^2 \text{exp} \big (-D_{ij}^2 / (2 lscale^2) \big )\\
+\alpha &\sim \text{Normal}(0, 0.4) \\
+\beta &\sim \text{Normal}(0, 0.4) \\
+\sigma &\sim \text{Exponential}(5) \\
+sdgp &\sim \text{Exponential}(5) \\
+lscale &\sim \text{InverseGamma}(?,?)
+\end{aligned}
+\] where \(n\) is the number of nations, and \(D^2_{ij}\) reflects the
+squared Euclidean distances between latitude and longitude coordinates
+for the \(i\)-th and \(j\)-th nations. Notice that the inverse gamma
+prior on \(lscale\) is left undetermined. This is because the
+\emph{brms} package intelligently tunes the prior for this parameter
+based on the covariates of the Gaussian process (see
+https://betanalpha.github.io/assets/case\_studies/gp\_part3/part3.html).
+
+\newpage
+
+To control for cultural phylogenetic non-independence, we manually
+specify the covariance structure for nation random intercepts using a
+pre-computed linguistic proximity matrix \(L\) (see previous section).
+The covariance between two nations is assumed to be linearly
+proportional to the linguistic proximity between those nations. This
+assumption is justified if we assume that cultural traits evolve via
+Brownian motion along a language phylogeny. The non-centered
+parameterisation of this model is:
+
+\[
+\begin{aligned}
+Y_{i} &\sim \text{Normal}(\mu_{i},\sigma) \\
+\mu_{i} &= \alpha + z_{\text{NATION}[i]}\sigma_{\alpha}L + \beta X_{i} \\
+\alpha &\sim \text{Normal}(0, 0.4) \\
+\beta &\sim \text{Normal}(0, 0.4) \\
+z_{j} &\sim \text{Normal}(0, 1)\\
+\sigma_{\alpha} &\sim \text{Exponential}(5) \\
+\sigma &\sim \text{Exponential}(5)
+\end{aligned}
+\] \newpage
+
+Finally, we can control for spatial and cultural phylogenetic
+non-independence simultaneously by including both a Gaussian process
+over latitude and longitude coordinates \emph{and} nation random
+intercepts that covary according to linguistic proximity. The resulting
+model is as follows:
+
+\[
+\begin{aligned}
+Y_{i} &\sim \text{Normal}(\mu_{i},\sigma) \\
+\mu_{i} &= \alpha + \kappa_{\text{NATION}[i]} + z_{\text{NATION}[i]}\sigma_{\alpha}L + \beta X_{i} \\
+\begin{pmatrix}
+\kappa_{1} \\ \kappa_{2} \\ \kappa_{3} \\ ... \\ \kappa_{n}
+\end{pmatrix} &\sim \text{MVNormal}
+\begin{pmatrix}
+\begin{pmatrix}
+0 \\ 0 \\ 0 \\ ... \\ 0
+\end{pmatrix},\textbf{K}
+\end{pmatrix}\\
+\textbf{K}_{ij} &= sdgp^2 \text{exp} \big (-D_{ij}^2 / (2 lscale^2) \big )\\
+\alpha &\sim \text{Normal}(0, 0.4) \\
+\beta &\sim \text{Normal}(0, 0.4) \\
+z_{j} &\sim \text{Normal}(0, 1)\\
+\sigma_{\alpha} &\sim \text{Exponential}(5) \\
+\sigma &\sim \text{Exponential}(5) \\
+sdgp &\sim \text{Exponential}(5) \\
+lscale &\sim \text{InverseGamma}(?,?)
+\end{aligned}
+\]
+
+\newpage
+
+\hypertarget{supplementary-results}{%
+\subsection{Supplementary Results}\label{supplementary-results}}
+
+\hypertarget{geographic-and-cultural-phylogenetic-signal-estimates-for-human-development-index-and-ingleharts-value-dimensions}{%
+\subsubsection{Geographic and cultural phylogenetic signal estimates for
+Human Development Index and Inglehart's value
+dimensions}\label{geographic-and-cultural-phylogenetic-signal-estimates-for-human-development-index-and-ingleharts-value-dimensions}}
+
+Controlling for shared cultural ancestry, the proportion of
+national-level variance explained by spatial proximity was 0.38 for the
+Human Development Index (95\% credible interval {[}0.20 0.60{]};
+\(\text{BF}_{\neq0}\) \textgreater{} 100), 0.43 for traditional values
+(95\% CI {[}0.18 0.72{]}; \(\text{BF}_{\neq0}\) \textgreater{} 100), and
+0.18 for survival values (95\% CI {[}0.00 0.44{]}; \(\text{BF}_{\neq0}\)
+= 1.45). Controlling for spatial proximity, the proportion of variance
+explained by shared cultural ancestry was 0.60 for the Human Development
+Index (95\% CI {[}0.39 0.79{]}; \(\text{BF}_{\neq0}\) \textgreater{}
+100), 0.55 for traditional values (95\% CI {[}0.26 0.79{]};
+\(\text{BF}_{\neq0}\) \textgreater{} 100), and 0.79 for survival values
+(95\% CI {[}0.53 0.97{]}; \(\text{BF}_{\neq0}\) \textgreater{} 100).
+
+\newpage
+
+\hypertarget{supplementary-figures}{%
+\subsection{Supplementary Figures}\label{supplementary-figures}}
+
+(ref:dagCaption) \emph{A causal directed acyclic graph of spatial and
+cultural phylogenetic non-independence in cross-national studies.} We
+are interested in estimating the direct effect of national-level
+exposure \(X\) on national-level outcome \(Y\). But these variables are
+confounded by their common unobserved cause \(U\). \(U\) is a stand-in
+for shared environmental, ecological, and geographic causes
+(e.g.~climate, biodiversity, physical topography) and cultural and
+institutional causes (e.g.~cultural norms, political systems). In this
+causal model, we cannot condition on \(U\) directly, as it is
+unobserved. However, geographic \(G\) and linguistic \(L\) relationships
+between societies influence \(U\), since changing a nation's spatial
+distance to or shared cultural ancestry with other nations will change
+its environmental and cultural traits. We can thus use \(G\) and \(L\)
+to model the covariation between \(X\) and \(Y\) induced by \(U\).
+Failing to do this and simply estimating the bivariate correlation
+between \(X\) and \(Y\) will produce spurious relationships and
+residuals that are spatially and culturally non-independent around the
+world (see Figure @ref(fig:spatialExample)).
+
+\begin{figure}
+\centering
+\includegraphics{manuscript_files/figure-latex/dag-1.pdf}
+\caption{(\#fig:dag)(ref:dagCaption)}
+\end{figure}
+
+\newpage
+
+(ref:plotSim1Caption) \emph{Distribution of cross-national correlations
+from simulation study under moderate spatial autocorrelation.} In these
+simulations, the strength of spatial autocorrelation is set to 0.5 for
+both outcome and predictor variables. For frequentist regression models,
+point ranges represent correlation estimates and 95\% confidence
+intervals. For Bayesian Gaussian process regression models, point ranges
+represent posterior means and 95\% credible intervals. Correlations are
+ordered by effect size independently in each panel. Red point ranges
+indicate that the slope is ``significant'' (i.e.~the 95\% confidence /
+credible interval excludes zero). Black point ranges indicate that the
+slope is ``not significant''.
+
+\begin{figure}
+\centering
+\includegraphics{manuscript_files/figure-latex/plotSim1-1.pdf}
+\caption{(\#fig:plotSim1)(ref:plotSim1Caption)}
+\end{figure}
+
+\newpage
+
+(ref:plotReplications2Caption) \emph{Reanalysis models fitted to raw
+data, for economic development (a) and cultural values (b) studies.}
+Data points are labelled using ISO 3166-1 alpha-2 letter country codes.
+In all reanalyses, outcome and predictor variables are standardised,
+making regression slopes comparable to Pearson's correlation
+coefficients. Lines and shaded areas represent posterior median
+regression lines and 95\% credible intervals. For models with covariates
+(Adamzyck and Pitt 2009; Gelfand et al.~2011), marginal effects are
+presented holding all covariates at zero or their reference categories.
+
+\begin{figure}
+\centering
+\includegraphics{manuscript_files/figure-latex/plotReplications2-1.pdf}
+\caption{(\#fig:plotReplications2)(ref:plotReplications2Caption)}
+\end{figure}
+
+\newpage
+
+(ref:plotReplications3Caption) \emph{Posterior estimates of Gaussian
+process functions mapping spatial autocorrelation onto geographic
+distance from our reanalyses of economic development (a) and cultural
+values (b) studies.} Estimates are from models additionally controlling
+for cultural phylogenetic non-independence. The y-axis represents the
+amount of spatial autocorrelation between data points with increasing
+distance between those points on the x-axis (logged distance in
+kilometres). Lines and shaded areas represent median posterior spatial
+autocorrelation functions and 50\% and 95\% credible intervals.
+
+\begin{figure}
+\centering
+\includegraphics{manuscript_files/figure-latex/plotReplications3-1.pdf}
+\caption{(\#fig:plotReplications3)(ref:plotReplications3Caption)}
+\end{figure}
+
+\newpage
+
+(ref:plotReplications4Caption) \emph{Posterior estimates of cultural
+phylogenetic signal from our reanalyses.} Estimates are from models
+additionally controlling for spatial non-independence. Cultural
+phylogenetic signal is operationalised as the proportion of
+national-level variance explained by linguistic proximity between
+nations. Ridges are full posterior distributions, and point ranges are
+posterior medians and 95\% credible intervals.
+
+\begin{figure}
+\centering
+\includegraphics{manuscript_files/figure-latex/plotReplications4-1.pdf}
+\caption{(\#fig:plotReplications4)(ref:plotReplications4Caption)}
+\end{figure}
+
+\newpage
+
+\hypertarget{supplementary-references}{%
+\subsection*{Supplementary References}\label{supplementary-references}}
+\addcontentsline{toc}{subsection}{Supplementary References}
+
+\hypertarget{refs}{}
+\leavevmode\hypertarget{ref-Brownrigg2018}{}%
+1. Brownrigg, R. \emph{maps: Draw geographical maps}. (2018).
+
+\leavevmode\hypertarget{ref-Hijmans2019}{}%
+2. Hijmans, R. J. \emph{geosphere: Spherical trigonometry}. (2019).
+
+\leavevmode\hypertarget{ref-Glottolog}{}%
+3. Hammarström, H., Forkel, R., Haspelmath, M. \& Bank, S.
+\emph{Glottolog 3.0}. (Max Planck Institute for the Science of Human
+History, 2017).
+doi:\href{https://doi.org/10.5281/zenodo.4061162}{10.5281/zenodo.4061162}.
+
+\leavevmode\hypertarget{ref-Ethnologue}{}%
+4. \emph{Ethnologue: Languages of the world}. (SIL International, 2018).
+
+\leavevmode\hypertarget{ref-Eff2008}{}%
+5. Eff, E. A. Weight matrices for cultural proximity: Deriving weights
+from a language phylogeny. \emph{Structure and Dynamics} \textbf{3},
+(2008).
+
+\leavevmode\hypertarget{ref-Burkner2017}{}%
+6. Bürkner, P.-C. brms: An R package for Bayesian multilevel models
+using Stan. \emph{Journal of Statistical Software} \textbf{80}, 1--28
+(2017).
+\end{appendix}
