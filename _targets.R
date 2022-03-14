@@ -86,11 +86,12 @@ list(
   # continent data (https://datahub.io/JohnSnowLabs/country-and-continent-codes-list#data)
   tar_target(continent, read.csv(fileContinent, na.strings = "")),
   # language family data (from glottolog)
-  tar_target(legal, read_xlsx(fileLegal)),
+  tar_target(langFam, read_xlsx(fileLangFam)),
   # isocodes (https://gist.github.com/tadast/8827699)
   tar_target(iso, loadISO(fileISO)),
-  # geographic distance matrix
-  tar_target(distGeo, loadDistanceMatrix(fileGeo, continent, iso, legal)),
+  # geographic and linguistic covariance matrices
+  tar_target(simGeoCov, loadSimCovMat(fileGeo, log = TRUE , continent, iso, langFam)),
+  tar_target(simLinCov, loadSimCovMat(fileLin, log = FALSE, continent, iso, langFam)),
   # map simulation over different values of lambda and rho
   tar_map(
     values = expand_grid(lambda = c(0.1, 0.5, 0.9), rho = c(0.1, 0.5, 0.9)),

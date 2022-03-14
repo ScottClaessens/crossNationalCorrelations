@@ -8,29 +8,28 @@ loadISO <- function(fileISO) {
     distinct(iso2, iso3, Latitude..average., Longitude..average.)
 }
 
-# load geographic distance matrix
-loadDistanceMatrix <- function(file, continent, iso, legal) {
+# load geographic and linguistic covariance matrices
+loadSimCovMat <- function(file, log, continent, iso, langFam) {
   # load distance matrix
   out <- 
     read_excel(file, na = "") %>%
     select(-ISO) %>%
     as.matrix()
-  # row and column names identical
   rownames(out) <- colnames(out)
-  # log
-  out <- log(out)
-  # diagonal = 0
-  diag(out) <- 0
-  # keep only countries with longitude, latitude, continent, and legal origin data
-  legalOriginISO <- iso$iso2[iso$iso3 %in% as.character(legal$countrycode)]
+  # keep only countries with longitude, latitude, continent, and language family data
   out <- out[rownames(out)[rownames(out) %in% iso$iso2],
              rownames(out)[rownames(out) %in% iso$iso2]]
   out <- out[rownames(out)[rownames(out) %in% continent$country],
              rownames(out)[rownames(out) %in% continent$country]]
-  out <- out[rownames(out)[rownames(out) %in% legalOriginISO],
-             rownames(out)[rownames(out) %in% legalOriginISO]]
-  # scale matrix
+  out <- out[rownames(out)[rownames(out) %in% langFam$iso],
+             rownames(out)[rownames(out) %in% langFam$iso]]
+  # log distances?
+  if (log) out <- log(out)
+  # distances between 0 and 1
   out <- out / max(out)
+  diag(out) <- 0
+  # 1 - distance = proximity (covariance)
+  out <- 1 - out
   return(out)
 }
 
