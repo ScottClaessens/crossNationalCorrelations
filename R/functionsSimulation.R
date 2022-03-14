@@ -34,30 +34,31 @@ loadSimCovMat <- function(file, log, continent, iso, langFam) {
 }
 
 # simulate data
-simulateData <- function(distGeo, continent, iso, legal, seed, lambda, rho) {
+simulateData <- function(covMat, continent, iso, langFam, seed, lambda, rho) {
   # set seed
   set.seed(seed)
   # parameters
-  ### lambda = amount of autocorrelation for dependent variable
-  ### rho = amount of autocorrelation for independent variable
-  # simulate x and y, modified from https://www.jstor.org/stable/644404 (p. 761)
-  n <- nrow(distGeo)
-  x <- ((1 - lambda*distGeo)^-1) %*% rnorm(n)
-  y <- ((1 -    rho*distGeo)^-1) %*% rnorm(n)
-  # add some random noise
-  x <- x + rnorm(n)
-  y <- y + rnorm(n)
+  ### lambda = amount of autocorrelation ("signal") for dependent variable
+  ### rho = amount of autocorrelation ("signal") for independent variable
+  # simulate x and y
+  n <- nrow(covMat)
+  x <- mvrnorm(1, rep(0, n), (rho    / (1 - rho   )) * covMat)
+  y <- mvrnorm(1, rep(0, n), (lambda / (1 - lambda)) * covMat)
+  # add error
+  x <- x + mvrnorm(1, rep(0, n), 1 * diag(n))
+  y <- y + mvrnorm(1, rep(0, n), 1 * diag(n))
   # standardise x and y
   x <- as.numeric(scale(x))
   y <- as.numeric(scale(y))
   # produce data frame and match longitude, latitude, continent, and legal origin data
   out <- 
-    tibble(x = x, y = y, country = rownames(distGeo), seed = seed) %>%
+    tibble(x = x, y = y, country = rownames(covMat), seed = seed) %>%
     left_join(iso, by = c("country" = "iso2")) %>%
     left_join(distinct(continent, country, .keep_all = TRUE), by = "country") %>%
-    left_join(select(legal, countrycode, LO), by = c("iso3" = "countrycode")) %>%
+    left_join(dplyr::select(langFam, iso, langFamily), by = c("country" = "iso")) %>%
     mutate(continent = factor(continent),
-           LO = factor(get_labels(LO)[LO])) %>%
+           langFamily = factor(langFamily),
+           rho = rho, lambda = lambda) %>%
     rename(latitude = Latitude..average.,
            longitude = Longitude..average.)
   return(out)
@@ -71,7 +72,10 @@ fitOLSModel <- function(formula, data) {
   tibble(
     bX = as.numeric(coef(m)["x"]),
     Q2.5 = confint(m)["x","2.5 %"],
-    Q97.5 = confint(m)["x","97.5 %"]
+    Q97.5 = confint(m)["x","97.5 %"],
+    seed = unique(data$seed),
+    rho = unique(data$rho),
+    lambda = unique(data$lambda)
   )
 }
 
@@ -96,7 +100,10 @@ fitBrmsModel <- function(brmsInitial, data) {
     Q2.5 = fixef(m)["x","Q2.5"],
     Q97.5 = fixef(m)["x","Q97.5"],
     rhat = rhat(m)["b_x"],
-    divergences = sum(rstan::get_divergent_iterations(m$fit))
+    divergences = sum(rstan::get_divergent_iterations(m$fit)),
+    seed = unique(data$seed),
+    rho = unique(data$rho),
+    lambda = unique(data$lambda)
   )
 }
 
@@ -109,7 +116,10 @@ fitConleyModel <- function(data, dist_cutoff) {
   tibble(
     bX = m["x","Estimate"],
     Q2.5 = confint(m)["x","2.5 %"],
-    Q97.5 = confint(m)["x","97.5 %"]
+    Q97.5 = confint(m)["x","97.5 %"],
+    seed = unique(data$seed),
+    rho = unique(data$rho),
+    lambda = unique(data$lambda)
   )
 }
 
@@ -158,25 +168,6 @@ plotSimulation1 <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel
   # save
   ggsave(out, filename = "figures/simulation1.pdf", width = 7.5, height = 5)
   return(out)
-}
-
-# combine simulation results
-combineResults <- function(results_0.1_0.1, results_0.1_0.5, results_0.1_0.9,
-                           results_0.5_0.1, results_0.5_0.5, results_0.5_0.9,
-                           results_0.9_0.1, results_0.9_0.5, results_0.9_0.9) {
-  # how many simulated datasets?
-  n <- nrow(results_0.1_0.1)
-  # combine results from different levels of autocorrelation
-  rbind(
-    results_0.1_0.1, results_0.1_0.5, results_0.1_0.9,
-    results_0.5_0.1, results_0.5_0.5, results_0.5_0.9,
-    results_0.9_0.1, results_0.9_0.5, results_0.9_0.9
-  ) %>%
-    # add variables
-    mutate(id = rep(1:n, times = 9),
-           lambda = rep(c(0.1, 0.5, 0.9), each = n*3),
-           rho = rep(rep(c(0.1, 0.5, 0.9), each = n), times = 3),
-           sig = (Q2.5 > 0 & Q97.5 > 0) | (Q2.5 < 0 & Q97.5 < 0))
 }
 
 # plot simulation results across all autocorrelation levels
