@@ -1,7 +1,7 @@
 library(targets)
 library(tarchetypes)
 library(tidyverse)
-source("R/functionsExamplePlot.R")
+source("R/functionsDAG.R")
 source("R/functionsSignal.R")
 source("R/functionsReview.R")
 source("R/functionsSimulation.R")
@@ -14,10 +14,6 @@ tar_option_set(packages = c("brms", "cowplot", "conleyreg", "countrycode",
 
 # pipeline
 list(
-  
-  #### Visual example of spatial autocorrelation ####
-  
-  tar_target(spatialExample, plotSpatialExample(simData_0.9_0.9[[56]])),
   
   #### Causal model ####
   
@@ -85,12 +81,12 @@ list(
   
   # files
   tar_target(fileContinent, "data/countryData/continent.csv", format = "file"),
-  tar_target(fileLegal, "data/countryData/Klerman_etal_LO_v_CO.dta", format = "file"),
+  tar_target(fileLangFam, "data/countryData/langFamily.xlsx", format = "file"),
   tar_target(fileISO, "data/countryData/countries_codes_and_coordinates.csv", format = "file"),
   # continent data (https://datahub.io/JohnSnowLabs/country-and-continent-codes-list#data)
   tar_target(continent, read.csv(fileContinent, na.strings = "")),
-  # legal origins data (https://academic.oup.com/jla/article/3/2/379/899816#supplementary-data)
-  tar_target(legal, read_dta(fileLegal)),
+  # language family data (from glottolog)
+  tar_target(legal, read_xlsx(fileLegal)),
   # isocodes (https://gist.github.com/tadast/8827699)
   tar_target(iso, loadISO(fileISO)),
   # geographic distance matrix
