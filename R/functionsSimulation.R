@@ -73,6 +73,7 @@ fitOLSModel <- function(formula, data) {
     bX = as.numeric(coef(m)["x"]),
     Q2.5 = confint(m)["x","2.5 %"],
     Q97.5 = confint(m)["x","97.5 %"],
+    sig = (Q2.5 > 0 & Q97.5 > 0) | (Q2.5 < 0 & Q97.5 < 0),
     seed = unique(data$seed),
     rho = unique(data$rho),
     lambda = unique(data$lambda)
@@ -80,25 +81,37 @@ fitOLSModel <- function(formula, data) {
 }
 
 # initialise brms model
-setupBrms <- function(data) {
-  brm(y ~ 0 + Intercept + x + gp(latitude, longitude), data = data,
-      prior = c(prior(normal(0, 0.5), class = b),
-                prior(exponential(5), class = sdgp),
-                prior(exponential(5), class = sigma)),
-      chains = 0)
+setupBrms <- function(data, covMat, type = "") {
+  # formula
+  if (type == "spatial")    f <- bf(y ~ 0 + Intercept + x + gp(latitude, longitude, k = 5, c = 5/4))
+  if (type == "linguistic") f <- bf(y ~ 0 + Intercept + x + (1 | gr(country, cov = covMat)))
+  if (type == "both")       f <- bf(y ~ 0 + Intercept + x + gp(latitude, longitude, k = 5, c = 5/4) +
+                                      (1 | gr(country, cov = covMat)))
+  # priors
+  priors <- c(prior(normal(0, 0.5), class = b),
+              prior(exponential(5), class = sigma))
+  if (type == "spatial")    priors <- c(priors, prior(exponential(5), class = sdgp))
+  if (type == "linguistic") priors <- c(priors, prior(exponential(5), class = sd))
+  if (type == "both")       priors <- c(priors, prior(exponential(5), class = sdgp),
+                                        prior(exponential(5), class = sd))
+  # ensure covariance matrix is positive definite by adding small constant to diagonal
+  diag(covMat) <- diag(covMat) + 1e-06
+  # fit model
+  brm(f, data = data, data2 = list(covMat = covMat), prior = priors, chains = 0)
 }
 
 # fit brms model
 fitBrmsModel <- function(brmsInitial, data) {
   # fit model
   m <- update(brmsInitial, newdata = data, chains = 4,
-              control = list(adapt_delta = 0.90, max_treedepth = 15),
+              control = list(adapt_delta = 0.999, max_treedepth = 15),
               cores = 4, seed = 2113, iter = 2000)
   # get coefficient on X and 95% CIs
   tibble(
     bX = fixef(m)["x","Estimate"],
     Q2.5 = fixef(m)["x","Q2.5"],
     Q97.5 = fixef(m)["x","Q97.5"],
+    sig = (Q2.5 > 0 & Q97.5 > 0) | (Q2.5 < 0 & Q97.5 < 0),
     rhat = rhat(m)["b_x"],
     divergences = sum(rstan::get_divergent_iterations(m$fit)),
     seed = unique(data$seed),
@@ -117,6 +130,7 @@ fitConleyModel <- function(data, dist_cutoff) {
     bX = m["x","Estimate"],
     Q2.5 = confint(m)["x","2.5 %"],
     Q97.5 = confint(m)["x","97.5 %"],
+    sig = (Q2.5 > 0 & Q97.5 > 0) | (Q2.5 < 0 & Q97.5 < 0),
     seed = unique(data$seed),
     rho = unique(data$rho),
     lambda = unique(data$lambda)

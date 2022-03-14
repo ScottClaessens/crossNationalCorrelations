@@ -20,8 +20,6 @@ simulationTargets <-
     # map simulation over different covariance matrices and different values of lambda and rho
     values = expand_grid(covMat = rlang::syms(c("simGeoCov", "simLinCov")),
                          lambda = c(0.2, 0.5, 0.8), rho = c(0.2, 0.5, 0.8)),
-    # simulation seed
-    tar_target(seed, 1:5),
     # simulate data
     tar_target(simData, simulateData(covMat = covMat, continent, iso, langFam, 
                                      seed = seed, lambda = lambda, rho = rho), 
@@ -35,10 +33,11 @@ simulationTargets <-
     # conley se analyses
     tar_target(conleyModel1, fitConleyModel(simData, dist_cutoff = 100), pattern = map(simData)),
     tar_target(conleyModel2, fitConleyModel(simData, dist_cutoff = 1000), pattern = map(simData)),
-    tar_target(conleyModel3, fitConleyModel(simData, dist_cutoff = 10000), pattern = map(simData))
-    # brms analysis
-    #tar_target(brmsInitial, setupBrms(simData[[1]])),
-    #tar_target(brmsModel, fitBrmsModel(brmsInitial, simData), pattern = map(simData))
+    tar_target(conleyModel3, fitConleyModel(simData, dist_cutoff = 10000), pattern = map(simData)),
+    # brms analyses
+    tar_target(brmsModel1, fitBrmsModel(brmsInitial1, simData), pattern = map(simData)),
+    tar_target(brmsModel2, fitBrmsModel(brmsInitial2, simData), pattern = map(simData)),
+    tar_target(brmsModel3, fitBrmsModel(brmsInitial3, simData), pattern = map(simData))
     )
 
 # pipeline
@@ -121,6 +120,12 @@ list(
   # geographic and linguistic covariance matrices
   tar_target(simGeoCov, loadSimCovMat(fileGeo, log = TRUE , continent, iso, langFam)),
   tar_target(simLinCov, loadSimCovMat(fileLin, log = FALSE, continent, iso, langFam)),
+  # initialise brms models
+  tar_target(brmsInitial1, setupBrms(simData_simLinCov_0.8_0.8[[1]], simLinCov, type = "spatial")),
+  tar_target(brmsInitial2, setupBrms(simData_simLinCov_0.8_0.8[[1]], simLinCov, type = "linguistic")),
+  tar_target(brmsInitial3, setupBrms(simData_simLinCov_0.8_0.8[[1]], simLinCov, type = "both")),
+  # seed for simulation
+  tar_target(seed, 1:2),
   # simulation
   simulationTargets,
   # combine
@@ -140,8 +145,12 @@ list(
   tar_combine(conleyModel2_simLinCov, simulationTargets$conleyModel2[10:18], command = dplyr::bind_rows(!!!.x)),
   tar_combine(conleyModel3_simGeoCov, simulationTargets$conleyModel3[1:9]  , command = dplyr::bind_rows(!!!.x)),
   tar_combine(conleyModel3_simLinCov, simulationTargets$conleyModel3[10:18], command = dplyr::bind_rows(!!!.x)),
-  #tar_combine(brmsModel_simGeoCov, simulationTargets$brmsModel[1:9]  , command = dplyr::bind_rows(!!!.x)),
-  #tar_combine(brmsModel_simLinCov, simulationTargets$brmsModel[10:18], command = dplyr::bind_rows(!!!.x)),
+  tar_combine(brmsModel1_simGeoCov, simulationTargets$brmsModel1[1:9]  , command = dplyr::bind_rows(!!!.x)),
+  tar_combine(brmsModel1_simLinCov, simulationTargets$brmsModel1[10:18], command = dplyr::bind_rows(!!!.x)),
+  tar_combine(brmsModel2_simGeoCov, simulationTargets$brmsModel2[1:9]  , command = dplyr::bind_rows(!!!.x)),
+  tar_combine(brmsModel2_simLinCov, simulationTargets$brmsModel2[10:18], command = dplyr::bind_rows(!!!.x)),
+  tar_combine(brmsModel3_simGeoCov, simulationTargets$brmsModel3[1:9]  , command = dplyr::bind_rows(!!!.x)),
+  tar_combine(brmsModel3_simLinCov, simulationTargets$brmsModel3[10:18], command = dplyr::bind_rows(!!!.x)),
   # plot simulation results
   tar_target(plotSim1, plotSimulation1(olsModel1_0.5_0.5, olsModel2_0.5_0.5, olsModel3_0.5_0.5, 
                                        olsModel4_0.5_0.5, olsModel5_0.5_0.5, conleyModel1_0.5_0.5, 
