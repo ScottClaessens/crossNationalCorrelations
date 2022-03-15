@@ -50,7 +50,7 @@ simulateData <- function(covMat, continent, iso, langFam, seed, lambda, rho) {
   # standardise x and y
   x <- as.numeric(scale(x))
   y <- as.numeric(scale(y))
-  # produce data frame and match longitude, latitude, continent, and legal origin data
+  # produce data frame and match longitude, latitude, continent, and language family data
   out <- 
     tibble(x = x, y = y, country = rownames(covMat), seed = seed) %>%
     left_join(iso, by = c("country" = "iso2")) %>%
@@ -137,19 +137,24 @@ fitConleyModel <- function(data, dist_cutoff) {
   )
 }
 
-# plot simulation results for medium autocorrelation levels
-plotSimulation1 <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5, 
-                            conleyModel1, conleyModel2, conleyModel3, brmsModel) {
+# plot individual simulation results at medium autocorrelation levels
+plotSimInd <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5,
+                       conleyModel1, conleyModel2, conleyModel3, brmsModel1,
+                       brmsModel2, brmsModel3, type, file) {
   # plotting function
   plotFun <- function(results, title, ylab) {
     results %>%
-      mutate(sig = (Q2.5 > 0 & Q97.5 > 0) | (Q2.5 < 0 & Q97.5 < 0),
-             id = factor(1:nrow(.))) %>%
+      # medium autocorrelation levels
+      filter(rho == 0.5 & lambda == 0.5) %>%
+      # order by slope
+      mutate(id = factor(1:nrow(.))) %>%
       ggplot(aes(x = fct_reorder(id, bX, .desc = TRUE), 
                  y = bX, ymin = Q2.5, ymax = Q97.5, colour = sig)) +
+      # above or below is false positive
       geom_hline(yintercept = 0, linetype = "dashed") +
       geom_pointrange(size = 0.03) +
       scale_y_continuous(name = ylab, limits = c(-1, 1)) +
+      # red = sig, black = not sig
       scale_colour_manual(values = c("#000000", "#FF0000")) +
       ggtitle(title) +
       theme_classic() +
@@ -162,77 +167,98 @@ plotSimulation1 <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel
             axis.title.y = element_text(size = 9.5))
   }
   # plots
-  pA <- plotFun(olsModel1, "Standard linear regression", "")
-  pB <- plotFun(olsModel2, "Latitude control", "")
-  pC <- plotFun(olsModel3, "Longitude control", "")
-  pD <- plotFun(olsModel4, "Continent fixed effects", "Correlation")
-  pE <- plotFun(olsModel5, "Legal origin fixed effects", "")
-  pF <- plotFun(conleyModel1, "Conley SEs (100km)", "")
-  pG <- plotFun(conleyModel2, "Conley SEs (1000km)", "")
-  pH <- plotFun(conleyModel3, "Conley SEs (10000km)", "")
-  pI <- plotFun(brmsModel, "Bayesian w/ Gaussian Process", "")
+  pA <- plotFun(olsModel1, "No control", "")
+  pB <- plotFun(olsModel2, "Latitude", "")
+  pC <- plotFun(olsModel3, "Longitude", "")
+  pD <- plotFun(olsModel4, "Continent", "")
+  pE <- plotFun(olsModel5, "Language family", "Correlation")
+  pF <- plotFun(conleyModel1, "Conley SEs 100km", "")
+  pG <- plotFun(conleyModel2, "Conley SEs 1000km", "")
+  pH <- plotFun(conleyModel3, "Conley SEs 10000km", "")
+  pI <- plotFun(brmsModel1, "Bayesian spatial", "")
+  pJ <- plotFun(brmsModel2, "Bayesian linguistic", "")
+  pK <- plotFun(brmsModel3, "Bayesian spatial and linguistic", "")
   # put together
   out <-
     plot_grid(
-      plot_grid(pA, pB, pC, nrow = 1),
-      plot_grid(pD, pE, pF, nrow = 1),
-      plot_grid(pG, pH, pI, nrow = 1),
-      nrow = 3
+      plot_grid(ggdraw() + draw_label(paste0("Simulation with moderate ", type, " non-independence"), 
+                                      x = ifelse(type == "spatial", 0.295, 0.355), fontface = "bold")),
+      plot_grid(pA, pB, pC, pD, nrow = 1),
+      plot_grid(pE, pF, pG, pH, nrow = 1),
+      plot_grid(NULL, pI, pJ, pK, NULL, nrow = 1, 
+                rel_widths = c(0.5, 1, 1, 1, 0.5)),
+      nrow = 4, rel_heights = c(0.3, 1, 1, 1)
     )
   # save
-  ggsave(out, filename = "figures/simulation1.pdf", width = 7.5, height = 5)
+  ggsave(out, filename = file, width = 9.5, height = 5.5)
   return(out)
 }
 
 # plot simulation results across all autocorrelation levels
-plotSimulation2 <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5, 
-                            conleyModel1, conleyModel2, conleyModel3, brmsModel) {
+plotSimAll <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5,
+                       conleyModel1, conleyModel2, conleyModel3, brmsModel1,
+                       brmsModel2, brmsModel3, type, file) {
   # plotting function
   plotFun <- function(data, title, ylab, xlab) {
     data %>%
       group_by(lambda, rho) %>%
-      summarise(prop = sum(sig) / n()) %>%
-      mutate(lower = map(prop, function(x) getBootCIProp(x, 100, 1000)[1]), 
-             upper = map(prop, function(x) getBootCIProp(x, 100, 1000)[2])) %>%
+      summarise(prop = sum(sig) / n(), n = n()) %>%
+      mutate(lower = map2(prop, n, function(x, y) getBootCIProp(x, y, 1000)[1]), 
+             upper = map2(prop, n, function(x, y) getBootCIProp(x, y, 1000)[2])) %>%
       unnest(c(lower, upper)) %>%
       ggplot(aes(x = lambda, y = prop, group = factor(rho), colour = factor(rho))) +
       geom_hline(yintercept = 0.05, linetype = "dashed") +
       geom_pointrange(aes(x = lambda, y = prop, ymin = lower, ymax = upper), 
                       position = position_dodge(0.05), size = 0.15) +
       geom_line(position = position_dodge(0.05)) +
-      scale_x_continuous(name = xlab, limits = c(0, 1), breaks = c(0.1, 0.5, 0.9)) +
+      scale_x_continuous(name = xlab, limits = c(0.1, 0.9), breaks = c(0.2, 0.5, 0.8)) +
       scale_y_continuous(name = ylab, limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1)) +
-      guides(colour = guide_legend(title = "Strength of spatial\nautocorrelation for\npredictor variable")) +
+      guides(colour = guide_legend(title = "Strength of\nautocorrelation\nfor predictor\nvariable")) +
       ggtitle(title) +
       theme_classic()
   }
   # individual plots
-  pA <- plotFun(olsModel1, "Standard linear regression", "", "")
-  pB <- plotFun(olsModel2, "Latitude control", "", "")
-  pC <- plotFun(olsModel3, "Longitude control", "", "")
-  pD <- plotFun(olsModel4, "Continent fixed effects", "False positive rate", "")
-  pE <- plotFun(olsModel5, "Legal origin fixed effects", "", "")
-  pF <- plotFun(conleyModel1, "Conley SEs (100km)", "", "")
-  pG <- plotFun(conleyModel2, "Conley SEs (1000km)", "", " \n ")
-  pH <- plotFun(conleyModel3, "Conley SEs (10000km)", "", "Strength of spatial autocorrelation\nfor outcome variable")
-  pI <- plotFun(brmsModel, "Bayesian w/ Gaussian Process", "", " \n ")
+  pA <- plotFun(olsModel1, "No control", "", "")
+  pB <- plotFun(olsModel2, "Latitude", "", "")
+  pC <- plotFun(olsModel3, "Longitude", "", "")
+  pD <- plotFun(olsModel4, "Continent", "", "")
+  pE <- plotFun(olsModel5, "Language family", "False positive rate", "")
+  pF <- plotFun(conleyModel1, "Conley SEs 100km", "", "")
+  pG <- plotFun(conleyModel2, "Conley SEs 1000km", "", "")
+  pH <- plotFun(conleyModel3, "Conley SEs 10000km", "", "")
+  pI <- plotFun(brmsModel1, "Bayesian spatial", "", " \n ")
+  pJ <- plotFun(brmsModel2, "Bayesian linguistic", "", "Strength of autocorrelation\nfor outcome variable")
+  pK <- plotFun(brmsModel3, "Bayesian spatial and linguistic", "", " \n ")
   # put together
   out <-
     plot_grid(
-      pA + theme(legend.position = "none"),
-      pB + theme(legend.position = "none"),
-      pC + theme(legend.position = "none"),
-      pD + theme(legend.position = "none"),
-      pE + theme(legend.position = "none"),
-      pF + theme(legend.position = "none"),
-      pG + theme(legend.position = "none"),
-      pH + theme(legend.position = "none"),
-      pI + theme(legend.position = "none"),
-      nrow = 3, rel_heights = c(1, 1, 1.1)
+      plot_grid(ggdraw() + draw_label(paste0("Simulation with ", type, " non-independence"), 
+                                      x = ifelse(type == "spatial", 0.27, 0.35), fontface = "bold")),
+      plot_grid(
+        pA + theme(legend.position = "none"),
+        pB + theme(legend.position = "none"),
+        pC + theme(legend.position = "none"),
+        pD + theme(legend.position = "none"),
+        nrow = 1
+      ),
+      plot_grid(
+        pE + theme(legend.position = "none"),
+        pF + theme(legend.position = "none"),
+        pG + theme(legend.position = "none"),
+        pH + theme(legend.position = "none"),
+        nrow = 1
+      ),
+      plot_grid(
+        NULL, pI + theme(legend.position = "none"),
+        pJ + theme(legend.position = "none"),
+        pK + theme(legend.position = "none"), NULL,
+        nrow = 1, rel_widths = c(0.5, 1, 1, 1, 0.5)
+      ),
+      nrow = 4, rel_heights = c(0.3, 1, 1, 1.08)
     )
   # add legend
-  out <- plot_grid(out, get_legend(pA), nrow = 1, rel_widths = c(1, 0.2))
+  out <- plot_grid(out, NULL, get_legend(pA), nrow = 1, rel_widths = c(1, 0.02, 0.15))
   # save
-  ggsave(out, filename = "figures/simulation2.pdf", width = 10, height = 7)
+  ggsave(out, filename = file, width = 11, height = 7)
   return(out)
 }

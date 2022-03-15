@@ -152,11 +152,22 @@ list(
   tar_combine(brmsModel3_simGeoCov, simulationTargets$brmsModel3[1:9]  , command = dplyr::bind_rows(!!!.x)),
   tar_combine(brmsModel3_simLinCov, simulationTargets$brmsModel3[10:18], command = dplyr::bind_rows(!!!.x)),
   # plot simulation results
-  tar_target(plotSim1, plotSimulation1(olsModel1_0.5_0.5, olsModel2_0.5_0.5, olsModel3_0.5_0.5, 
-                                       olsModel4_0.5_0.5, olsModel5_0.5_0.5, conleyModel1_0.5_0.5, 
-                                       conleyModel2_0.5_0.5, conleyModel3_0.5_0.5, brmsModel_0.5_0.5)),
-  tar_target(plotSim2, plotSimulation2(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5, 
-                                       conleyModel1, conleyModel2, conleyModel3, brmsModel)),
+  tar_target(plotSim1, plotSimInd(olsModel1_simGeoCov, olsModel2_simGeoCov, olsModel3_simGeoCov, olsModel4_simGeoCov, 
+                                  olsModel5_simGeoCov, conleyModel1_simGeoCov, conleyModel2_simGeoCov, conleyModel3_simGeoCov,
+                                  brmsModel1_simGeoCov, brmsModel2_simGeoCov, brmsModel3_simGeoCov, 
+                                  type = "spatial", file = "figures/simIndGeo.pdf")),
+  tar_target(plotSim2, plotSimInd(olsModel1_simLinCov, olsModel2_simLinCov, olsModel3_simLinCov, olsModel4_simLinCov, 
+                                  olsModel5_simLinCov, conleyModel1_simLinCov, conleyModel2_simLinCov, conleyModel3_simLinCov,
+                                  brmsModel1_simLinCov, brmsModel2_simLinCov, brmsModel3_simLinCov, 
+                                  type = "cultural phylogenetic", file = "figures/simIndLin.pdf")),
+  tar_target(plotSim3, plotSimAll(olsModel1_simGeoCov, olsModel2_simGeoCov, olsModel3_simGeoCov, olsModel4_simGeoCov, 
+                                  olsModel5_simGeoCov, conleyModel1_simGeoCov, conleyModel2_simGeoCov, conleyModel3_simGeoCov,
+                                  brmsModel1_simGeoCov, brmsModel2_simGeoCov, brmsModel3_simGeoCov, 
+                                  type = "spatial", file = "figures/simAllGeo.pdf")),
+  tar_target(plotSim4, plotSimAll(olsModel1_simLinCov, olsModel2_simLinCov, olsModel3_simLinCov, olsModel4_simLinCov, 
+                                  olsModel5_simLinCov, conleyModel1_simLinCov, conleyModel2_simLinCov, conleyModel3_simLinCov,
+                                  brmsModel1_simLinCov, brmsModel2_simLinCov, brmsModel3_simLinCov, 
+                                  type = "cultural phylogenetic", file = "figures/simAllLin.pdf")),
   
   #### Replications ####
   
