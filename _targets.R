@@ -125,7 +125,7 @@ list(
   tar_target(brmsInitial2, setupBrms(simData_simLinCov_0.8_0.8[[1]], simLinCov, type = "linguistic")),
   tar_target(brmsInitial3, setupBrms(simData_simLinCov_0.8_0.8[[1]], simLinCov, type = "both")),
   # seed for simulation
-  tar_target(seed, 1:2),
+  tar_target(seed, 1:100),
   # simulation
   simulationTargets,
   # combine
@@ -413,9 +413,9 @@ list(
                                                              knackM1a, skidmoreM1a),
                                                         list(adamczykData, alesinaData, beckData1, beckData2, bockstetteData,
                                                              easterlyData1, easterlyData2, fincherData, gelfandData, inglehartData,
-                                                             knackData, skidmoreData))),
+                                                             knackData, skidmoreData)))
   
   #### Manuscript ####
   
-  tar_render(manuscript, "manuscript.Rmd")
+  #tar_render(manuscript, "manuscript.Rmd")
 )
