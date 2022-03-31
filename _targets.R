@@ -9,7 +9,7 @@ source("R/functionsReplications.R")
 options(tidyverse.quiet = TRUE)
 tar_option_set(packages = c("brms", "cowplot", "conleyreg", "countrycode", 
                             "dagitty", "geosphere", "ggdag", "ggrepel", "ggtext", 
-                            "haven", "lmtest", "MASS", "papaja", "psych", "readxl", 
+                            "haven", "lmtest", "papaja", "psych", "readxl", 
                             "rstan", "sjlabelled", "tidybayes", "tidyverse"))
 
 # targets for simulation (see below)
@@ -20,10 +20,12 @@ simulationTargets <-
     # map simulation over different covariance matrices and different values of lambda and rho
     values = expand_grid(covMat = rlang::syms(c("simGeoCov", "simLinCov")),
                          lambda = c(0.2, 0.5, 0.8), rho = c(0.2, 0.5, 0.8)),
+    # simulation model
+    tar_target(simModel, fitSimulationModel(covMat, lambda, rho, iter)),
     # simulate data
-    tar_target(simData, simulateData(covMat = covMat, continent, iso, langFam, 
-                                     seed = seed, lambda = lambda, rho = rho), 
-               pattern = map(seed), iteration = "list"),
+    tar_target(simData, simulateData(simModel, covMat, continent, iso, 
+                                     langFam, iter, rho, lambda), 
+               pattern = map(iter), iteration = "list"),
     # ols analyses
     tar_target(olsModel1, fitOLSModel(y ~ x,              data = simData), pattern = map(simData)),
     tar_target(olsModel2, fitOLSModel(y ~ x + latitude,   data = simData), pattern = map(simData)),
@@ -58,7 +60,7 @@ list(
   # hdi data
   tar_target(hdi, loadHDIData(fileHDI, fileISOHDI)),
   # wvs data
-  tar_target(wvs, read_sav(fileWVS)),
+  tar_target(wvs, haven::read_sav(fileWVS, encoding = "latin1")),
   # covariance matrices
   tar_target(geoCov, loadCovMat(fileGeo, log = TRUE)),
   tar_target(linCov, loadCovMat(fileLin, log = FALSE)),
@@ -118,14 +120,14 @@ list(
   # isocodes (https://gist.github.com/tadast/8827699)
   tar_target(iso, loadISO(fileISO)),
   # geographic and linguistic covariance matrices
-  tar_target(simGeoCov, loadSimCovMat(fileGeo, log = TRUE , continent, iso, langFam)),
-  tar_target(simLinCov, loadSimCovMat(fileLin, log = FALSE, continent, iso, langFam)),
+  tar_target(simGeoCov, loadSimCovMat(fileGeo, continent, iso, langFam)),
+  tar_target(simLinCov, loadSimCovMat(fileLin, continent, iso, langFam)),
   # initialise brms models
   tar_target(brmsInitial1, setupBrms(simData_simLinCov_0.8_0.8[[1]], simLinCov, type = "spatial")),
   tar_target(brmsInitial2, setupBrms(simData_simLinCov_0.8_0.8[[1]], simLinCov, type = "linguistic")),
   tar_target(brmsInitial3, setupBrms(simData_simLinCov_0.8_0.8[[1]], simLinCov, type = "both")),
-  # seed for simulation
-  tar_target(seed, 1:100),
+  # sim iteration
+  tar_target(iter, 1:100),
   # simulation
   simulationTargets,
   # combine
@@ -413,9 +415,9 @@ list(
                                                              knackM1a, skidmoreM1a),
                                                         list(adamczykData, alesinaData, beckData1, beckData2, bockstetteData,
                                                              easterlyData1, easterlyData2, fincherData, gelfandData, inglehartData,
-                                                             knackData, skidmoreData)))
+                                                             knackData, skidmoreData))),
   
   #### Manuscript ####
   
-  #tar_render(manuscript, "manuscript.Rmd")
+  tar_render(manuscript, "manuscript.Rmd")
 )

@@ -126,7 +126,7 @@ Controlling for shared cultural ancestry, the proportion of national-level varia
 
 ## Supplementary Figures
 
-(ref:dagCaption) _A causal directed acyclic graph of spatial and cultural phylogenetic non-independence in cross-national studies._ We are interested in estimating the direct effect of national-level exposure $X$ on national-level outcome $Y$. But these variables are confounded by their common unobserved cause $U$. $U$ is a stand-in for shared environmental, ecological, and geographic causes (e.g. climate, biodiversity, physical topography) and cultural and institutional causes (e.g. cultural norms, political systems). In this causal model, we cannot condition on $U$ directly, as it is unobserved. However, geographic $G$ and linguistic $L$ relationships between societies influence $U$, since changing a nation's spatial distance to or shared cultural ancestry with other nations will change its environmental and cultural traits. We can thus use $G$ and $L$ to model the covariation between $X$ and $Y$ induced by $U$. Failing to do this and simply estimating the bivariate correlation between $X$ and $Y$ will produce spurious relationships and residuals that are spatially and culturally non-independent around the world (see Figure \@ref(fig:spatialExample)).
+(ref:dagCaption) _A causal directed acyclic graph of spatial and cultural phylogenetic non-independence in cross-national studies._ We are interested in estimating the direct effect of national-level exposure $X$ on national-level outcome $Y$. But these variables are confounded by their common unobserved cause $U$. $U$ is a stand-in for shared environmental, ecological, and geographic causes (e.g. climate, biodiversity, physical topography) and cultural and institutional causes (e.g. cultural norms, political systems). In this causal model, we need to condition on $U$ to estimate the direct path from $X$ to $Y$, but we cannot since it is unobserved. However, geographic $G$ and linguistic $L$ relationships between societies influence $U$, since changing a nation's spatial distance to or shared cultural ancestry with other nations will change its environmental and cultural traits. We can thus use $G$ and $L$ to model the covariation between $X$ and $Y$ induced by $U$. Failing to do this and simply estimating the bivariate correlation between $X$ and $Y$ will produce spurious relationships and residuals that are spatially and culturally non-independent around the world.
 
 ```{r dag, fig.width=6, fig.height=3.5, fig.cap="(ref:dagCaption)"}
 tar_read(dag)
@@ -134,10 +134,18 @@ tar_read(dag)
 
 \newpage
 
-(ref:plotSim1Caption) _Distribution of cross-national correlations from simulation study under moderate spatial autocorrelation._ In these simulations, the strength of spatial autocorrelation is set to 0.5 for both outcome and predictor variables. For frequentist regression models, point ranges represent correlation estimates and 95% confidence intervals. For Bayesian Gaussian process regression models, point ranges represent posterior means and 95% credible intervals. Correlations are ordered by effect size independently in each panel. Red point ranges indicate that the slope is "significant" (i.e. the 95% confidence / credible interval excludes zero). Black point ranges indicate that the slope is "not significant".
+(ref:plotSim1Caption) _Distribution of cross-national correlations from simulation study under strong spatial autocorrelation._ In these simulations, the strength of spatial autocorrelation is set to 0.8 for both outcome and predictor variables. For frequentist regression models, point ranges represent correlation estimates and 95% confidence intervals. For Bayesian regression models, point ranges represent posterior means and 95% credible intervals. Correlations are ordered by effect size independently in each panel. Red point ranges indicate that the slope is "significant" (i.e. the 95% confidence / credible interval excludes zero). Black point ranges indicate that the slope is "not significant".
 
-```{r plotSim1, fig.width=7.5, fig.height=5, fig.cap="(ref:plotSim1Caption)"}
+```{r plotSim1, fig.width=9.5, fig.height=5.5, fig.cap="(ref:plotSim1Caption)"}
 tar_read(plotSim1)
+```
+
+\newpage
+
+(ref:plotSim2Caption) _Distribution of cross-national correlations from simulation study under strong cultural phylogenetic autocorrelation._ In these simulations, the strength of cultural phylogenetic autocorrelation is set to 0.8 for both outcome and predictor variables. For frequentist regression models, point ranges represent correlation estimates and 95% confidence intervals. For Bayesian regression models, point ranges represent posterior means and 95% credible intervals. Correlations are ordered by effect size independently in each panel. Red point ranges indicate that the slope is "significant" (i.e. the 95% confidence / credible interval excludes zero). Black point ranges indicate that the slope is "not significant".
+
+```{r plotSim2, fig.width=9.5, fig.height=5.5, fig.cap="(ref:plotSim2Caption)"}
+tar_read(plotSim2)
 ```
 
 \newpage
@@ -158,7 +166,7 @@ tar_read(plotReplications3)
 
 \newpage
 
-(ref:plotReplications4Caption) _Posterior estimates of cultural phylogenetic signal from our reanalyses._ Estimates are from models additionally controlling for spatial non-independence. Cultural phylogenetic signal is operationalised as the proportion of national-level variance explained by linguistic proximity between nations. Ridges are full posterior distributions, and point ranges are posterior medians and 95% credible intervals.
+(ref:plotReplications4Caption) _Posterior estimates of cultural phylogenetic signal from our reanalyses._ Estimates are from models additionally controlling for spatial non-independence. Cultural phylogenetic signal is operationalised as the proportion of national-level variance explained by linguistic proximity between nations. Ridges are full posterior distributions, and points are posterior medians, and lines represent 50% and 95% credible intervals.
 
 ```{r plotReplications4, fig.width=5, fig.height=5, fig.cap="(ref:plotReplications4Caption)"}
 tar_read(plotReplications4)

@@ -9,11 +9,11 @@ loadISO <- function(fileISO) {
 }
 
 # load geographic and linguistic covariance matrices
-loadSimCovMat <- function(file, log, continent, iso, langFam) {
+loadSimCovMat <- function(file, continent, iso, langFam) {
   # load distance matrix
   out <- 
     read_excel(file, na = "") %>%
-    select(-ISO) %>%
+    dplyr::select(-ISO) %>%
     as.matrix()
   rownames(out) <- colnames(out)
   # keep only countries with longitude, latitude, continent, and language family data
@@ -23,36 +23,58 @@ loadSimCovMat <- function(file, log, continent, iso, langFam) {
              rownames(out)[rownames(out) %in% continent$country]]
   out <- out[rownames(out)[rownames(out) %in% langFam$iso],
              rownames(out)[rownames(out) %in% langFam$iso]]
-  # log distances?
-  if (log) out <- log(out)
   # distances between 0 and 1
   out <- out / max(out)
   diag(out) <- 0
   # 1 - distance = proximity (covariance)
   out <- 1 - out
+  # ensure covariance matrix is positive definite by adding small constant to diagonal
+  diag(out) <- diag(out) + 1e-06
   return(out)
 }
 
+# brms model to simulate data
+fitSimulationModel <- function(covMat, lambda, rho, iter) {
+  # signal for dependent variable = lambda
+  # signal for independent variable = rho
+  signalY <- lambda
+  signalX <- rho
+  # calculate sd and sigma values, assuming total variance sd^2 + sigma^2 = 1
+  # signal = sd^2 / (sd^2 + sigma^2)
+  # signal = sd^2 / 1
+  # sd = sqrt(signal)
+  sdY <- sqrt(signalY)
+  sdX <- sqrt(signalX)
+  # sd^2 + sigma^2 = 1
+  # sigma = sqrt(1 - sd^2)
+  sigmaY <- sqrt(1 - sdY^2)
+  sigmaX <- sqrt(1 - sdX^2)
+  # mock data for simulation (just to feed to stan so model can run)
+  d <- data.frame(y = rnorm(nrow(covMat)), x = rnorm(nrow(covMat)), id = rownames(covMat))
+  # simulation
+  mSim <- brm(bf(y ~ 0 + (1 | gr(id, cov = covMat))) +
+              bf(x ~ 0 + (1 | gr(id, cov = covMat))) + set_rescor(FALSE),
+              data = d, data2 = list(covMat = covMat),
+              prior = c(prior_string(paste0("constant(", sdY, ")"), class = "sd", resp = "y"),
+                        prior_string(paste0("constant(", sigmaY, ")"), class = "sigma", resp = "y"),
+                        prior_string(paste0("constant(", sdX, ")"), class = "sd", resp = "x"),
+                        prior_string(paste0("constant(", sigmaX, ")"), class = "sigma", resp = "x")),
+              sample_prior = "only", warmup = 0, iter = 1, chains = 1)
+  return(mSim)
+}
+
 # simulate data
-simulateData <- function(covMat, continent, iso, langFam, seed, lambda, rho) {
-  # set seed
-  set.seed(seed)
-  # parameters
-  ### lambda = amount of autocorrelation ("signal") for dependent variable
-  ### rho = amount of autocorrelation ("signal") for independent variable
-  # simulate x and y
-  n <- nrow(covMat)
-  x <- mvrnorm(1, rep(0, n), (rho    / (1 - rho   )) * covMat)
-  y <- mvrnorm(1, rep(0, n), (lambda / (1 - lambda)) * covMat)
-  # add error
-  x <- x + mvrnorm(1, rep(0, n), 1 * diag(n))
-  y <- y + mvrnorm(1, rep(0, n), 1 * diag(n))
-  # standardise x and y
-  x <- as.numeric(scale(x))
-  y <- as.numeric(scale(y))
+simulateData <- function(simModel, covMat, continent, iso, langFam, iter, rho, lambda) {
+  # fit model again with seed
+  mSim <- update(simModel, sample_prior = "only", warmup = 0, iter = 1, chains = 1, seed = iter)
+  # get simulated data
+  pred <- posterior_predict(mSim)
+  # standardise simulated x and y
+  y <- as.numeric(scale(pred[1,,"y"]))
+  x <- as.numeric(scale(pred[1,,"x"]))
   # produce data frame and match longitude, latitude, continent, and language family data
   out <- 
-    tibble(x = x, y = y, country = rownames(covMat), seed = seed) %>%
+    tibble(x = x, y = y, country = rownames(covMat), iter = iter) %>%
     left_join(iso, by = c("country" = "iso2")) %>%
     left_join(distinct(continent, country, .keep_all = TRUE), by = "country") %>%
     left_join(dplyr::select(langFam, iso, langFamily), by = c("country" = "iso")) %>%
@@ -94,8 +116,6 @@ setupBrms <- function(data, covMat, type = "") {
   if (type == "linguistic") priors <- c(priors, prior(exponential(5), class = sd))
   if (type == "both")       priors <- c(priors, prior(exponential(5), class = sdgp),
                                         prior(exponential(5), class = sd))
-  # ensure covariance matrix is positive definite by adding small constant to diagonal
-  diag(covMat) <- diag(covMat) + 1e-06
   # fit model
   brm(f, data = data, data2 = list(covMat = covMat), prior = priors, chains = 0)
 }
@@ -137,15 +157,15 @@ fitConleyModel <- function(data, dist_cutoff) {
   )
 }
 
-# plot individual simulation results at medium autocorrelation levels
+# plot individual simulation results at strong autocorrelation levels
 plotSimInd <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5,
                        conleyModel1, conleyModel2, conleyModel3, brmsModel1,
                        brmsModel2, brmsModel3, type, file) {
   # plotting function
   plotFun <- function(results, title, ylab) {
     results %>%
-      # medium autocorrelation levels
-      filter(rho == 0.5 & lambda == 0.5) %>%
+      # strong autocorrelation levels
+      filter(rho == 0.8 & lambda == 0.8) %>%
       # order by slope
       mutate(id = factor(1:nrow(.))) %>%
       ggplot(aes(x = fct_reorder(id, bX, .desc = TRUE), 
@@ -181,7 +201,7 @@ plotSimInd <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5,
   # put together
   out <-
     plot_grid(
-      plot_grid(ggdraw() + draw_label(paste0("Simulation with moderate ", type, " non-independence"), 
+      plot_grid(ggdraw() + draw_label(paste0("Simulation with strong ", type, " non-independence"), 
                                       x = ifelse(type == "spatial", 0.295, 0.355), fontface = "bold")),
       plot_grid(pA, pB, pC, pD, nrow = 1),
       plot_grid(pE, pF, pG, pH, nrow = 1),

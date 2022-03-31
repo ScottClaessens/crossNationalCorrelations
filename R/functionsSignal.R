@@ -5,7 +5,7 @@ loadCovMat <- function(file, log) {
   # load distance matrix
   out <- 
     read_excel(file, na = "") %>%
-    select(-ISO) %>%
+    dplyr::select(-ISO) %>%
     as.matrix()
   rownames(out) <- colnames(out)
   # log distances?
@@ -27,8 +27,8 @@ loadHDIData <- function(fileHDI, fileISOHDI) {
     skip = 4
   ) %>%
     drop_na("HDI rank") %>%
-    select(c("Country", "1990", "2000", "2010", 
-             "2014", "2015", "2017", "2018", "2019")) %>%
+    dplyr::select(c("Country", "1990", "2000", "2010", 
+                    "2014", "2015", "2017", "2018", "2019")) %>%
     # get data in long form
     pivot_longer(cols = !Country, names_to = "year", values_to = "hdi") %>%
     filter(hdi != "..") %>%
@@ -67,7 +67,7 @@ fitWVSSignal <- function(wvs, outcome = "", geoCov, linCov) {
   wvs <-
     wvs %>%
     # select vars
-    select(
+    dplyr::select(
       # country code
       S009,
       # traditional vs. secular-rational values
