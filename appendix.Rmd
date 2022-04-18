@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 \renewcommand{\appendixname}{\bf{Supplementary Material}}
 \renewcommand{\figurename}{Supplementary Figure}
 \renewcommand{\tablename}{Supplementary Table}
@@ -11,21 +16,21 @@
 
 ### Calculating global geographic and linguistic proximity matrices
 
-Geographic distance between two nations was calculated as the logged geodesic distance between country capital cities (data from the R package _maps_[@Brownrigg2018]) using the R package _geosphere_[@Hijmans2019]. The geographic proximity matrix was computed as one minus the log geographic distance matrix scaled between 0 and 1.
+Geographic distance between two nations was calculated as the logged geodesic distance between country capital cities (data from the R package _maps_; Brownrigg, 2018) using the R package _geosphere_ (Hijmans, 2019). The geographic proximity matrix was computed as one minus the log geographic distance matrix scaled between 0 and 1.
 
-Linguistic proximity between two nations was calculated as the cultural proximity between all languages spoken within those nations, weighted by speaker percentages. We acquired cultural proximity data by combining the language family trees provided by Glottolog v3.0[@Glottolog] into one global language tree (undated and unresolved). We calculated cultural proximity $s$ between two languages $j$ and $k$ as the distance (in number of nodes traversed) of their most recent common ancestor $i$ to the root of the tree, through the formula:
+Linguistic proximity between two nations was calculated as the cultural proximity between all languages spoken within those nations, weighted by speaker percentages. We acquired cultural proximity data by combining the language family trees provided by Glottolog v3.0 (Hammarström et al., 2017) into one global language tree (undated and unresolved). We calculated cultural proximity $s$ between two languages $j$ and $k$ as the distance (in number of nodes traversed) of their most recent common ancestor $i$ to the root of the tree, through the formula:
 
 $$
 s_{jk} = \frac{n_{r}-n_{i}}{n_{r}}
 $$
 
-where $n_{r}$ is the maximum path length (in number of nodes traversed) leading to the pan-human root $r$, and $n_{i}$ is the maximum path length leading to node $i$. We then combined these proximities with speaker data from Ethnologue 21[@Ethnologue] and compared every language spoken within those nations by at least 1 permille of the population, weighted by speaker percentages, through the formula:
+where $n_{r}$ is the maximum path length (in number of nodes traversed) leading to the pan-human root $r$, and $n_{i}$ is the maximum path length leading to node $i$. We then combined these proximities with speaker data from Ethnologue 21 (Ethnologue, 2018) and compared every language spoken within those nations by at least 1 permille of the population, weighted by speaker percentages, through the formula:
 
 $$
 w_{lm} = {\Sigma}{\Sigma}p_{lj}p_{mk}s_{jk}
 $$
 
-where $p_{lj}$ is the percentage of the population in nation $l$ speaking language $j$, $p_{mk}$ is the percentage of the population in nation $m$ speaking language $k$, and $s_{jk}$ is the proximity measure between languages $j$ and $k$[@Eff2008]. The resulting linguistic proximity matrix was also scaled between 0 and 1 before analysis.
+where $p_{lj}$ is the percentage of the population in nation $l$ speaking language $j$, $p_{mk}$ is the percentage of the population in nation $m$ speaking language $k$, and $s_{jk}$ is the proximity measure between languages $j$ and $k$ (Eff, 2008). The resulting linguistic proximity matrix was also scaled between 0 and 1 before analysis.
 
 ### Bayesian models for reanalysis
 
@@ -44,7 +49,7 @@ The priors in this model were arrived at by prior predictive checks, with wider 
 
 \newpage
 
-To control for spatial non-independence, we add a Gaussian process to this model and feed it a scaled geographic distance matrix $D$ based on Euclidean distances between latitude and longitude coordinates. This distance matrix is computed internally by the R package _brms_[@Burkner2017]. The Gaussian process uses an exponentiated quadratic covariance kernel, the only covariance kernel currently supported by _brms_. The model formula is:
+To control for spatial non-independence, we add a Gaussian process to this model and feed it a scaled geographic distance matrix $D$ based on Euclidean distances between latitude and longitude coordinates. This distance matrix is computed internally by the R package _brms_ (Bürkner, 2017). The Gaussian process uses an exponentiated quadratic covariance kernel, the only covariance kernel currently supported by _brms_. The model formula is:
 
 $$
 \begin{aligned}
@@ -175,3 +180,15 @@ tar_read(plotReplications4)
 \newpage
 
 ## Supplementary References
+
+Brownrigg, R. _maps: Draw geographical maps._ (2018).
+
+Bürkner, P.-C. brms: An R package for Bayesian multilevel models using Stan. _Journal of Statistical Software_ **80**, 1---28 (2017).
+
+Eff, E. A. Weight matrices for cultural proximity: Deriving weights from a language phylogeny. _Structure and Dynamics_ **3**, (2008).
+
+_Ethnologue: Languages of the world._ (SIL International, 2018).
+
+Hammarström, H., Forkel, R., Haspelmath, M. & Bank, S. _Glottolog 3.0._ (Max Planck Institute for the Science of Human History, 2017). doi:[10.5281/zenodo.4061162](https://doi.org/10.5281/zenodo.4061162)
+
+Hijmans, R. J. _geosphere: Spherical trigonometry._ (2019).
