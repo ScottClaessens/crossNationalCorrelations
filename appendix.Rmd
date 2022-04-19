@@ -189,6 +189,6 @@ Eff, E. A. Weight matrices for cultural proximity: Deriving weights from a langu
 
 _Ethnologue: Languages of the world._ (SIL International, 2018).
 
-Hammarström, H., Forkel, R., Haspelmath, M. & Bank, S. _Glottolog 3.0._ (Max Planck Institute for the Science of Human History, 2017). doi:[10.5281/zenodo.4061162](https://doi.org/10.5281/zenodo.4061162)
+Hammarström, H., Forkel, R., Haspelmath, M. & Bank, S. _Glottolog 3.0._ (Max Planck Institute for the Science of Human History, 2017). doi: [10.5281/zenodo.4061162](https://doi.org/10.5281/zenodo.4061162)
 
 Hijmans, R. J. _geosphere: Spherical trigonometry._ (2019).
