@@ -53,6 +53,9 @@ data/wvs/_old/
 # manuscript_files folder
 manuscript_files/
 
+# vignette_files folder
+vignette_files/
+
 # unneeded files in review folder
 review/_old/
 

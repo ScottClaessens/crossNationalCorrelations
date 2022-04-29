@@ -419,5 +419,9 @@ list(
   
   #### Manuscript ####
   
-  tar_render(manuscript, "manuscript.Rmd")
+  tar_render(manuscript, "manuscript.Rmd"),
+  
+  #### Vignette ####
+  
+  tar_render(vignette, "vignette.Rmd")
 )
