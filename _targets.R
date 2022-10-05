@@ -114,12 +114,15 @@ list(
   tar_target(fileContinent, "data/countryData/continent.csv", format = "file"),
   tar_target(fileLangFam, "data/countryData/langFamily.xlsx", format = "file"),
   tar_target(fileISO, "data/countryData/countries_codes_and_coordinates.csv", format = "file"),
+  tar_target(fileGenetic, "data/geneticDistance/alldata.dta", format = "file"),
   # continent data (https://datahub.io/JohnSnowLabs/country-and-continent-codes-list#data)
   tar_target(continent, read.csv(fileContinent, na.strings = "")),
   # language family data (from glottolog)
   tar_target(langFam, read_xlsx(fileLangFam)),
   # isocodes (https://gist.github.com/tadast/8827699)
   tar_target(iso, loadISO(fileISO)),
+  # genetic distances
+  tar_target(geneticDistances, loadGeneticDistances(fileGenetic, iso)),
   # geographic and linguistic covariance matrices
   tar_target(simGeoCov, loadSimCovMat(fileGeo, continent, iso, langFam)),
   tar_target(simLinCov, loadSimCovMat(fileLin, continent, iso, langFam)),
@@ -144,10 +147,6 @@ list(
   tar_combine(olsModel5_simLinCov, simulationTargets$olsModel5[10:18], command = dplyr::bind_rows(!!!.x)),
   tar_combine(conleyModel1_simGeoCov, simulationTargets$conleyModel1[1:9]  , command = dplyr::bind_rows(!!!.x)),
   tar_combine(conleyModel1_simLinCov, simulationTargets$conleyModel1[10:18], command = dplyr::bind_rows(!!!.x)),
-  tar_combine(conleyModel2_simGeoCov, simulationTargets$conleyModel2[1:9]  , command = dplyr::bind_rows(!!!.x)),
-  tar_combine(conleyModel2_simLinCov, simulationTargets$conleyModel2[10:18], command = dplyr::bind_rows(!!!.x)),
-  tar_combine(conleyModel3_simGeoCov, simulationTargets$conleyModel3[1:9]  , command = dplyr::bind_rows(!!!.x)),
-  tar_combine(conleyModel3_simLinCov, simulationTargets$conleyModel3[10:18], command = dplyr::bind_rows(!!!.x)),
   tar_combine(brmsModel1_simGeoCov, simulationTargets$brmsModel1[1:9]  , command = dplyr::bind_rows(!!!.x)),
   tar_combine(brmsModel1_simLinCov, simulationTargets$brmsModel1[10:18], command = dplyr::bind_rows(!!!.x)),
   tar_combine(brmsModel2_simGeoCov, simulationTargets$brmsModel2[1:9]  , command = dplyr::bind_rows(!!!.x)),

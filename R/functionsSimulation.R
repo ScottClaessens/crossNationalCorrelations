@@ -8,6 +8,14 @@ loadISO <- function(fileISO) {
     distinct(iso2, iso3, Latitude..average., Longitude..average.)
 }
 
+# load genetic distance data
+loadGeneticDistances <- function(fileGenetic, iso) {
+  read_dta(fileGenetic) %>%
+    dplyr::select(js_code, gendist_coord1, gendist_coord2) %>%
+    full_join(iso %>% dplyr::select(iso3, iso2), by = c("js_code" = "iso3")) %>%
+    dplyr::select(iso2, gendist_coord1, gendist_coord2)
+}
+
 # load geographic and linguistic covariance matrices
 loadSimCovMat <- function(file, continent, iso, langFam) {
   # load distance matrix
@@ -161,7 +169,9 @@ fitConleyModel1 <- function(data) {
     tibble(dist_cutoff = seq(from = 100, to = 10000, by = 100)) %>%
     mutate(
       model = map(dist_cutoff, function(x) 
-        conleyreg(y ~ x, data = data, dist_cutoff = x, lat = "latitude", lon = "longitude")),
+        conleyreg(y ~ x, data = data, dist_cutoff = x,
+                  lat = "latitude", lon = "longitude",
+                  kernel = "uniform")),
       SE = map(model, function(x) x["x","Std. Error"])
       ) %>%
     unnest(c(SE))
