@@ -1,6 +1,6 @@
 library(brms)
 
-n <- 300
+n <- 200
 
 # create proximity matrix
 distMat <- as.matrix(dist(rnorm(n)))
@@ -12,8 +12,10 @@ proxMat <- 1 - distMat
 d <- data.frame(y = rnorm(n), x = rnorm(n), id = 1:n)
 
 # signal for each variable
-signalY <- 0.2
-signalX <- 0.5
+signalY <- 0.9
+signalX <- 0.9
+# true effect
+r <- 0.8
 
 # calculate sd and sigma values, assuming total variance sd^2 + sigma^2 = 1
 # signal = sd^2 / sd^2 + sigma^2
@@ -31,12 +33,14 @@ d <- data.frame(y = rnorm(n), x = rnorm(n), id = 1:n)
 
 # simulation
 mSim <- brm(bf(y ~ 0 + (1 | gr(id, cov = proxMat))) +
-            bf(x ~ 0 + (1 | gr(id, cov = proxMat))) + set_rescor(FALSE),
+            bf(x ~ 0 + (1 | gr(id, cov = proxMat))) + set_rescor(TRUE),
             data = d, data2 = list(proxMat = proxMat),
             prior = c(prior_string(paste0("constant(", sdY, ")"), class = "sd", resp = "y"),
                       prior_string(paste0("constant(", sigmaY, ")"), class = "sigma", resp = "y"),
                       prior_string(paste0("constant(", sdX, ")"), class = "sd", resp = "x"),
-                      prior_string(paste0("constant(", sigmaX, ")"), class = "sigma", resp = "x")),
+                      prior_string(paste0("constant(", sigmaX, ")"), class = "sigma", resp = "x"),
+                      prior_string(paste0("constant(cholesky_decompose([[1,", r, "],[", r, ",1]]))"), 
+                                   class = "rescor")),
             sample_prior = "only", iter = 1, chains = 1)
 
 # simulate data
@@ -49,10 +53,14 @@ x <- as.numeric(scale(out[,,"x"]))
 # data frame
 d <- data.frame(y, x, id = 1:n)
 
+# raw correlation
+cor(d$y, d$x)
+
 # get signal back
-m1 <- brm(y ~ 1 + (1 | gr(id, cov = proxMat)),
+m1 <- brm(y ~ 1 + x + (1 | gr(id, cov = proxMat)),
           data = d, data2 = list(proxMat = proxMat),
           prior = c(prior(normal(0, 0.5), class = Intercept),
+                    prior(normal(0, 0.5), class = b),
                     prior(exponential(1), class = sd),
                     prior(exponential(1), class = sigma)),
           cores = 4)
