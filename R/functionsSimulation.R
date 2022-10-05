@@ -78,7 +78,7 @@ simulateData <- function(simModel, covMat, continent, iso, langFam, iter, lambda
   x <- as.numeric(scale(pred[1,,"x"]))
   # produce data frame and match longitude, latitude, continent, and language family data
   out <- 
-    tibble(x = x, y = y, country = rownames(covMat), iter = iter) %>%
+    tibble(x = x, y = y, country = rownames(covMat), seed = iter) %>%
     left_join(iso, by = c("country" = "iso2")) %>%
     left_join(distinct(continent, country, .keep_all = TRUE), by = "country") %>%
     left_join(dplyr::select(langFam, iso, langFamily), by = c("country" = "iso")) %>%
@@ -149,15 +149,24 @@ fitBrmsModel <- function(brmsInitial, data) {
     divergences = sum(rstan::get_divergent_iterations(m$fit)),
     seed = unique(data$seed),
     rho = unique(data$rho),
-    lambda = unique(data$lambda)
+    lambda = unique(data$lambda),
+    r = unique(data$r)
   )
 }
 
-# fit conley se model
-fitConleyModel <- function(data, dist_cutoff) {
-  # fit model
-  m <- conleyreg(y ~ x, data = data, dist_cutoff = dist_cutoff, 
-                 lat = "latitude", lon = "longitude")
+# fit conley se model with geographic distances
+fitConleyModel1 <- function(data) {
+  # fit models across a range of distance cutoffs in km
+  models <-
+    tibble(dist_cutoff = seq(from = 100, to = 10000, by = 100)) %>%
+    mutate(
+      model = map(dist_cutoff, function(x) 
+        conleyreg(y ~ x, data = data, dist_cutoff = x, lat = "latitude", lon = "longitude")),
+      SE = map(model, function(x) x["x","Std. Error"])
+      ) %>%
+    unnest(c(SE))
+  # select model with the largest SE
+  m <- models$model[which.max(models$SE)][[1]]
   # get coefficient on X and 95% CIs
   tibble(
     bX = m["x","Estimate"],
@@ -166,7 +175,8 @@ fitConleyModel <- function(data, dist_cutoff) {
     sig = (Q2.5 > 0 & Q97.5 > 0) | (Q2.5 < 0 & Q97.5 < 0),
     seed = unique(data$seed),
     rho = unique(data$rho),
-    lambda = unique(data$lambda)
+    lambda = unique(data$lambda),
+    r = unique(data$r)
   )
 }
 

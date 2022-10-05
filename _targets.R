@@ -36,9 +36,7 @@ simulationTargets <-
     tar_target(olsModel5, fitOLSModel(y ~ x + langFamily, data = simData), pattern = map(simData)),
     tar_target(olsModel6, fitOLSModel(y ~ x + surroundingMean2000km, data = simData), pattern = map(simData)),
     # conley se analyses
-    tar_target(conleyModel1, fitConleyModel(simData, dist_cutoff = 100), pattern = map(simData)),
-    tar_target(conleyModel2, fitConleyModel(simData, dist_cutoff = 1000), pattern = map(simData)),
-    tar_target(conleyModel3, fitConleyModel(simData, dist_cutoff = 10000), pattern = map(simData)),
+    tar_target(conleyModel1, fitConleyModel1(simData), pattern = map(simData)),
     # brms analyses
     tar_target(brmsModel1, fitBrmsModel(brmsInitial1, simData), pattern = map(simData)),
     tar_target(brmsModel2, fitBrmsModel(brmsInitial2, simData), pattern = map(simData)),
