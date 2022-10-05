@@ -4,7 +4,15 @@ This repository contains the R code for the manuscript "The non-independence of 
 
 ## Getting Started
 
-### Installing
+### Cloning this repository
+
+To clone this repository using Git, you will need to first install [Git LFS](https://git-lfs.github.com/) to download large data files. Once Git LFS is installed, run:
+
+```
+git clone https://github.com/ScottClaessens/crossNationalCorrelations
+```
+
+### Installing required packages
 
 To run this code, you will need to [install R](https://www.r-project.org/) and the following R packages:
 
@@ -13,8 +21,10 @@ install.packages(c("brms", "cowplot", "conleyreg", "countrycode",
                    "dagitty", "geosphere", "ggcorrplot", "ggdag", "ggrepel", 
                    "ggtext", "haven", "lmtest", "papaja", "psych", "readxl", 
                    "rstan", "sjlabelled", "targets", "tarchetypes",
-		   "tidybayes", "tidyverse"))
+		               "tidybayes", "tidyverse"))
 ```
+
+If you run into issues with the pipeline, try installing the specific R version or package versions outlined in `sessionInfo.txt`.
 
 ### Executing code
 

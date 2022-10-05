@@ -19,12 +19,14 @@ simulationTargets <-
     unlist = FALSE,
     # map simulation over different covariance matrices and different values of lambda and rho
     values = expand_grid(covMat = rlang::syms(c("simGeoCov", "simLinCov")),
-                         lambda = c(0.2, 0.5, 0.8), rho = c(0.2, 0.5, 0.8)),
+                         lambda = c(0.2, 0.5, 0.8), 
+                         rho = c(0.2, 0.5, 0.8),
+                         r = c(0, 0.1, 0.3, 0.5)),
     # simulation model
-    tar_target(simModel, fitSimulationModel(covMat, lambda, rho, iter)),
+    tar_target(simModel, fitSimulationModel(covMat, lambda, rho, r, iter)),
     # simulate data
     tar_target(simData, simulateData(simModel, covMat, continent, iso, 
-                                     langFam, iter, rho, lambda), 
+                                     langFam, iter, lambda, rho, r), 
                pattern = map(iter), iteration = "list"),
     # ols analyses
     tar_target(olsModel1, fitOLSModel(y ~ x,              data = simData), pattern = map(simData)),
@@ -123,9 +125,9 @@ list(
   tar_target(simGeoCov, loadSimCovMat(fileGeo, continent, iso, langFam)),
   tar_target(simLinCov, loadSimCovMat(fileLin, continent, iso, langFam)),
   # initialise brms models
-  tar_target(brmsInitial1, setupBrms(simData_simLinCov_0.8_0.8[[1]], simLinCov, type = "spatial")),
-  tar_target(brmsInitial2, setupBrms(simData_simLinCov_0.8_0.8[[1]], simLinCov, type = "linguistic")),
-  tar_target(brmsInitial3, setupBrms(simData_simLinCov_0.8_0.8[[1]], simLinCov, type = "both")),
+  tar_target(brmsInitial1, setupBrms(simData_simLinCov_0.8_0.8_0[[1]], simLinCov, type = "spatial")),
+  tar_target(brmsInitial2, setupBrms(simData_simLinCov_0.8_0.8_0[[1]], simLinCov, type = "linguistic")),
+  tar_target(brmsInitial3, setupBrms(simData_simLinCov_0.8_0.8_0[[1]], simLinCov, type = "both")),
   # sim iteration
   tar_target(iter, 1:100),
   # simulation
@@ -423,5 +425,9 @@ list(
   
   #### Vignette ####
   
-  tar_render(vignette, "vignette.Rmd")
+  tar_render(vignette, "vignette.Rmd"),
+  
+  #### Session Info ####
+  
+  tar_target(sessionInfo, writeLines(capture.output(sessionInfo()), "sessionInfo.txt"))
 )

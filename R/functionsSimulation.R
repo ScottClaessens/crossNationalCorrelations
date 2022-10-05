@@ -34,7 +34,7 @@ loadSimCovMat <- function(file, continent, iso, langFam) {
 }
 
 # brms model to simulate data
-fitSimulationModel <- function(covMat, lambda, rho, iter) {
+fitSimulationModel <- function(covMat, lambda, rho, r, iter) {
   # signal for dependent variable = lambda
   # signal for independent variable = rho
   signalY <- lambda
@@ -49,26 +49,30 @@ fitSimulationModel <- function(covMat, lambda, rho, iter) {
   # sigma = sqrt(1 - sd^2)
   sigmaY <- sqrt(1 - sdY^2)
   sigmaX <- sqrt(1 - sdX^2)
+  # true correlation between x and y (beyond autocorrelation)
+  r <- r
   # mock data for simulation (just to feed to stan so model can run)
   d <- data.frame(y = rnorm(nrow(covMat)), x = rnorm(nrow(covMat)), id = rownames(covMat))
   # simulation
   mSim <- brm(bf(y ~ 0 + (1 | gr(id, cov = covMat))) +
-              bf(x ~ 0 + (1 | gr(id, cov = covMat))) + set_rescor(FALSE),
+              bf(x ~ 0 + (1 | gr(id, cov = covMat))) + set_rescor(TRUE),
               data = d, data2 = list(covMat = covMat),
               prior = c(prior_string(paste0("constant(", sdY, ")"), class = "sd", resp = "y"),
                         prior_string(paste0("constant(", sigmaY, ")"), class = "sigma", resp = "y"),
                         prior_string(paste0("constant(", sdX, ")"), class = "sd", resp = "x"),
-                        prior_string(paste0("constant(", sigmaX, ")"), class = "sigma", resp = "x")),
-              sample_prior = "only", warmup = 0, iter = 1, chains = 1)
+                        prior_string(paste0("constant(", sigmaX, ")"), class = "sigma", resp = "x"),
+                        prior_string(paste0("constant(cholesky_decompose([[1,", r, "],[", r, ",1]]))"),
+                                     class = "rescor")),
+              sample_prior = "only", warmup = 0, iter = 1, chains = 1,
+              algorithm = "fixed_param")
   return(mSim)
 }
 
 # simulate data
-simulateData <- function(simModel, covMat, continent, iso, langFam, iter, rho, lambda) {
-  # fit model again with seed
-  mSim <- update(simModel, sample_prior = "only", warmup = 0, iter = 1, chains = 1, seed = iter)
+simulateData <- function(simModel, covMat, continent, iso, langFam, iter, lambda, rho, r) {
   # get simulated data
-  pred <- posterior_predict(mSim)
+  set.seed(iter)
+  pred <- posterior_predict(simModel)
   # standardise simulated x and y
   y <- as.numeric(scale(pred[1,,"y"]))
   x <- as.numeric(scale(pred[1,,"x"]))
@@ -80,7 +84,7 @@ simulateData <- function(simModel, covMat, continent, iso, langFam, iter, rho, l
     left_join(dplyr::select(langFam, iso, langFamily), by = c("country" = "iso")) %>%
     mutate(continent = factor(continent),
            langFamily = factor(langFamily),
-           rho = rho, lambda = lambda) %>%
+           rho = rho, lambda = lambda, r = r) %>%
     rename(latitude = Latitude..average.,
            longitude = Longitude..average.)
   return(out)
