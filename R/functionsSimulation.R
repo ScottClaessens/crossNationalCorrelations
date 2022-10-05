@@ -87,6 +87,14 @@ simulateData <- function(simModel, covMat, continent, iso, langFam, iter, lambda
            rho = rho, lambda = lambda, r = r) %>%
     rename(latitude = Latitude..average.,
            longitude = Longitude..average.)
+  # add outcome variable averages for nations within a 2000km radius
+  # first get distance matrix in km
+  distMat <- distm(as.matrix(out %>% dplyr::select(longitude, latitude))) / 1000
+  # are two countries within a 2000km radius? (not including oneself)
+  radiusMat <- distMat < 2000
+  diag(radiusMat) <- FALSE
+  # for each nation, get outcome variable averages for surrounding nations
+  out$surroundingMean2000km <- apply(radiusMat, 1, function(x) mean(out$y[x]))
   return(out)
 }
 
@@ -102,7 +110,8 @@ fitOLSModel <- function(formula, data) {
     sig = (Q2.5 > 0 & Q97.5 > 0) | (Q2.5 < 0 & Q97.5 < 0),
     seed = unique(data$seed),
     rho = unique(data$rho),
-    lambda = unique(data$lambda)
+    lambda = unique(data$lambda),
+    r = unique(data$r)
   )
 }
 

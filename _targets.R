@@ -29,11 +29,12 @@ simulationTargets <-
                                      langFam, iter, lambda, rho, r), 
                pattern = map(iter), iteration = "list"),
     # ols analyses
-    tar_target(olsModel1, fitOLSModel(y ~ x,              data = simData), pattern = map(simData)),
-    tar_target(olsModel2, fitOLSModel(y ~ x + latitude,   data = simData), pattern = map(simData)),
-    tar_target(olsModel3, fitOLSModel(y ~ x + longitude,  data = simData), pattern = map(simData)),
-    tar_target(olsModel4, fitOLSModel(y ~ x + continent,  data = simData), pattern = map(simData)),
+    tar_target(olsModel1, fitOLSModel(y ~ x, data = simData), pattern = map(simData)),
+    tar_target(olsModel2, fitOLSModel(y ~ x + latitude, data = simData), pattern = map(simData)),
+    tar_target(olsModel3, fitOLSModel(y ~ x + longitude, data = simData), pattern = map(simData)),
+    tar_target(olsModel4, fitOLSModel(y ~ x + continent, data = simData), pattern = map(simData)),
     tar_target(olsModel5, fitOLSModel(y ~ x + langFamily, data = simData), pattern = map(simData)),
+    tar_target(olsModel6, fitOLSModel(y ~ x + surroundingMean2000km, data = simData), pattern = map(simData)),
     # conley se analyses
     tar_target(conleyModel1, fitConleyModel(simData, dist_cutoff = 100), pattern = map(simData)),
     tar_target(conleyModel2, fitConleyModel(simData, dist_cutoff = 1000), pattern = map(simData)),
