@@ -224,7 +224,7 @@ fitConleyModel2 <- function(data) {
 
 # plot individual simulation results at strong autocorrelation levels
 plotSimInd <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5,
-                       conleyModel1, conleyModel2, conleyModel3, brmsModel1,
+                       olsModel6, conleyModel1, conleyModel2, brmsModel1,
                        brmsModel2, brmsModel3, type, file) {
   # plotting function
   plotFun <- function(results, title, ylab) {
@@ -257,9 +257,9 @@ plotSimInd <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5,
   pC <- plotFun(olsModel3, "Longitude", "")
   pD <- plotFun(olsModel4, "Continent", "")
   pE <- plotFun(olsModel5, "Language family", "Correlation")
-  pF <- plotFun(conleyModel1, "Conley SEs 100km", "")
-  pG <- plotFun(conleyModel2, "Conley SEs 1000km", "")
-  pH <- plotFun(conleyModel3, "Conley SEs 10000km", "")
+  pF <- plotFun(olsModel6, "Mean 2000km radius", "")
+  pG <- plotFun(conleyModel1, "Conley SEs spatial", "")
+  pH <- plotFun(conleyModel2, "Conley SEs genetic", "")
   pI <- plotFun(brmsModel1, "Bayesian spatial", "")
   pJ <- plotFun(brmsModel2, "Bayesian linguistic", "")
   pK <- plotFun(brmsModel3, "Bayesian spatial and linguistic", "")
@@ -281,7 +281,7 @@ plotSimInd <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5,
 
 # plot simulation results across all autocorrelation levels
 plotSimAll <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5,
-                       conleyModel1, conleyModel2, conleyModel3, brmsModel1,
+                       olsModel6, conleyModel1, conleyModel2, brmsModel1,
                        brmsModel2, brmsModel3, type, file) {
   # plotting function
   plotFun <- function(data, title, ylab, xlab) {
@@ -308,9 +308,9 @@ plotSimAll <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5,
   pC <- plotFun(olsModel3, "Longitude", "", "")
   pD <- plotFun(olsModel4, "Continent", "", "")
   pE <- plotFun(olsModel5, "Language family", "False positive rate", "")
-  pF <- plotFun(conleyModel1, "Conley SEs 100km", "", "")
-  pG <- plotFun(conleyModel2, "Conley SEs 1000km", "", "")
-  pH <- plotFun(conleyModel3, "Conley SEs 10000km", "", "")
+  pF <- plotFun(olsModel6, "Mean 2000km radius", "", "")
+  pG <- plotFun(conleyModel1, "Conley SEs spatial", "", "")
+  pH <- plotFun(conleyModel2, "Conley SEs genetic", "", "")
   pI <- plotFun(brmsModel1, "Bayesian spatial", "", " \n ")
   pJ <- plotFun(brmsModel2, "Bayesian linguistic", "", "Strength of autocorrelation\nfor outcome variable")
   pK <- plotFun(brmsModel3, "Bayesian spatial and linguistic", "", " \n ")
