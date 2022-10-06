@@ -10,7 +10,7 @@ options(tidyverse.quiet = TRUE)
 tar_option_set(packages = c("brms", "cowplot", "conleyreg", "countrycode", 
                             "dagitty", "geosphere", "ggdag", "ggrepel", "ggtext", 
                             "haven", "lmtest", "papaja", "psych", "readxl", 
-                            "rstan", "sjlabelled", "tidybayes", "tidyverse"))
+                            "rstan", "sf", "sjlabelled", "tidybayes", "tidyverse"))
 
 # targets for simulation (see below)
 simulationTargets <-
@@ -25,8 +25,8 @@ simulationTargets <-
     # simulation model
     tar_target(simModel, fitSimulationModel(covMat, lambda, rho, r, iter)),
     # simulate data
-    tar_target(simData, simulateData(simModel, covMat, continent, iso, 
-                                     langFam, iter, lambda, rho, r), 
+    tar_target(simData, simulateData(simModel, covMat, continent, iso, langFam, 
+                                     geneticDistances, lambda, rho, r, iter), 
                pattern = map(iter), iteration = "list"),
     # ols analyses
     tar_target(olsModel1, fitOLSModel(y ~ x, data = simData), pattern = map(simData)),
@@ -37,6 +37,7 @@ simulationTargets <-
     tar_target(olsModel6, fitOLSModel(y ~ x + surroundingMean2000km, data = simData), pattern = map(simData)),
     # conley se analyses
     tar_target(conleyModel1, fitConleyModel1(simData), pattern = map(simData)),
+    tar_target(conleyModel2, fitConleyModel2(simData), pattern = map(simData)),
     # brms analyses
     tar_target(brmsModel1, fitBrmsModel(brmsInitial1, simData), pattern = map(simData)),
     tar_target(brmsModel2, fitBrmsModel(brmsInitial2, simData), pattern = map(simData)),

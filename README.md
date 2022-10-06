@@ -20,7 +20,7 @@ To run this code, you will need to [install R](https://www.r-project.org/) and t
 install.packages(c("brms", "cowplot", "conleyreg", "countrycode", 
                    "dagitty", "geosphere", "ggcorrplot", "ggdag", "ggrepel", 
                    "ggtext", "haven", "lmtest", "papaja", "psych", "readxl", 
-                   "rstan", "sjlabelled", "targets", "tarchetypes",
+                   "rstan", "sf", "sjlabelled", "targets", "tarchetypes",
 		               "tidybayes", "tidyverse"))
 ```
 

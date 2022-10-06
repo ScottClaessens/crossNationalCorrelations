@@ -12,7 +12,7 @@ loadISO <- function(fileISO) {
 loadGeneticDistances <- function(fileGenetic, iso) {
   read_dta(fileGenetic) %>%
     dplyr::select(js_code, gendist_coord1, gendist_coord2) %>%
-    full_join(iso %>% dplyr::select(iso3, iso2), by = c("js_code" = "iso3")) %>%
+    right_join(iso %>% dplyr::select(iso3, iso2), by = c("js_code" = "iso3")) %>%
     dplyr::select(iso2, gendist_coord1, gendist_coord2)
 }
 
@@ -77,7 +77,8 @@ fitSimulationModel <- function(covMat, lambda, rho, r, iter) {
 }
 
 # simulate data
-simulateData <- function(simModel, covMat, continent, iso, langFam, iter, lambda, rho, r) {
+simulateData <- function(simModel, covMat, continent, iso, langFam, 
+                         geneticDistances, lambda, rho, r, iter) {
   # get simulated data
   set.seed(iter)
   pred <- posterior_predict(simModel)
@@ -90,6 +91,7 @@ simulateData <- function(simModel, covMat, continent, iso, langFam, iter, lambda
     left_join(iso, by = c("country" = "iso2")) %>%
     left_join(distinct(continent, country, .keep_all = TRUE), by = "country") %>%
     left_join(dplyr::select(langFam, iso, langFamily), by = c("country" = "iso")) %>%
+    left_join(geneticDistances, by = c("country" = "iso2")) %>%
     mutate(continent = factor(continent),
            langFamily = factor(langFamily),
            rho = rho, lambda = lambda, r = r) %>%
@@ -166,7 +168,7 @@ fitBrmsModel <- function(brmsInitial, data) {
 fitConleyModel1 <- function(data) {
   # fit models across a range of distance cutoffs in km
   models <-
-    tibble(dist_cutoff = seq(from = 100, to = 10000, by = 100)) %>%
+    tibble(dist_cutoff = seq(from = 100, to = 20000, by = 100)) %>%
     mutate(
       model = map(dist_cutoff, function(x) 
         conleyreg(y ~ x, data = data, dist_cutoff = x,
@@ -174,6 +176,36 @@ fitConleyModel1 <- function(data) {
                   kernel = "uniform")),
       SE = map(model, function(x) x["x","Std. Error"])
       ) %>%
+    unnest(c(SE))
+  # select model with the largest SE
+  m <- models$model[which.max(models$SE)][[1]]
+  # get coefficient on X and 95% CIs
+  tibble(
+    bX = m["x","Estimate"],
+    Q2.5 = confint(m)["x","2.5 %"],
+    Q97.5 = confint(m)["x","97.5 %"],
+    sig = (Q2.5 > 0 & Q97.5 > 0) | (Q2.5 < 0 & Q97.5 < 0),
+    seed = unique(data$seed),
+    rho = unique(data$rho),
+    lambda = unique(data$lambda),
+    r = unique(data$r)
+  )
+}
+
+# fit conley se model with genetic distances
+fitConleyModel2 <- function(data) {
+  # subset only to nations with genetic distance data (n = 177)
+  data <- drop_na(data, gendist_coord1, gendist_coord2)
+  # fit models across a range of distance cutoffs (max distance = 0.086)
+  models <-
+    tibble(dist_cutoff = seq(from = 0.001, to = 0.086, by = 0.001)) %>%
+    mutate(
+      model = map(dist_cutoff, function(x) 
+        conleyreg(y ~ x, data = data, dist_cutoff = x,
+                  lon = "gendist_coord1", lat = "gendist_coord2",
+                  dist_comp = "planar", kernel = "uniform")),
+      SE = map(model, function(x) x["x","Std. Error"])
+    ) %>%
     unnest(c(SE))
   # select model with the largest SE
   m <- models$model[which.max(models$SE)][[1]]
