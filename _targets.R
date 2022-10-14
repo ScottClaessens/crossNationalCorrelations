@@ -103,11 +103,13 @@ list(
   tar_target(postRM3, as_draws_array(rM3, variable = "^b_", regex = TRUE)),
   tar_target(postRM4, as_draws_array(rM4, variable = "^b_", regex = TRUE)),
   tar_target(postRM5, as_draws_array(rM5, variable = "^b_", regex = TRUE)),
-  # fit spline model
-  tar_target(spline, fitSpline(review)),
+  # fit year spline model
+  tar_target(yearSpline, fitYearSpline(review)),
+  # fit impact factor model
+  tar_target(ifModel, fitIFModel(review)),
   # plot review summary
-  tar_target(plotReview, plotReviewSummary(review, spline, postRM1, postRM2, 
-                                           postRM3, postRM4, postRM5)),
+  tar_target(plotReview, plotReviewSummary(review, yearSpline, ifModel, postRM1, 
+                                           postRM2, postRM3, postRM4, postRM5)),
   
   #### Simulation ####
   

@@ -23,8 +23,8 @@ fitReviewMLM <- function(review, outcome) {
   )
 }
 
-# spline model
-fitSpline <- function(review) {
+# year spline model
+fitYearSpline <- function(review) {
   # prepare data
   review <-
     review %>%
@@ -44,6 +44,19 @@ fitSpline <- function(review) {
       control = list(adapt_delta = 0.99))
 }
 
+# impact factor model
+fitIFModel <- function(review) {
+  # prepare data
+  review <- mutate(review, Review = factor(Review))
+  # fit model
+  brm(ControlNI ~ 0 + Review + Review:log(IF) + (1 | Review:Citation),
+      data = review, family = bernoulli,
+      prior = c(prior(normal(0, 0.5), class = b),
+                prior(exponential(2), class = sd)),
+      cores = 4, seed = 2113, iter = 3000,
+      control = list(adapt_delta = 0.99))
+}
+
 # function to get bootstrapped confidence intervals for proportion
 getBootCIProp <- function(prop, n, nboot) {
   set.seed(1)
@@ -55,8 +68,8 @@ getBootCIProp <- function(prop, n, nboot) {
 }
 
 # summary of review results
-plotReviewSummary <- function(review, spline, postRM1, postRM2, 
-                              postRM3, postRM4, postRM5) {
+plotReviewSummary <- function(review, yearSpline, ifModel, postRM1, 
+                              postRM2, postRM3, postRM4, postRM5) {
   # prepare data
   review <-
     review %>%
@@ -147,20 +160,18 @@ plotReviewSummary <- function(review, spline, postRM1, postRM2,
           axis.text.y = element_blank(),
           axis.ticks.y = element_blank(),
           axis.line.y = element_blank())
+  # impact factor results
+  pC <-
+    plot(conditional_effects(ifModel, resolution = 500, prob = 0.50), plot = FALSE)[[2]] +
+    scale_y_continuous(name = "Probability of controlling\nfor non-independence", 
+                       limits = c(0, 1)) +
+    scale_x_log10(name = "Journal impact factor (log scale)") +
+    theme_classic()
   # years published
   years <- c(1995, 2000, 2005, 2010, 2015, 2020)
-  pC <-
-    review %>%
-    group_by(Review, Citation) %>%
-    summarise(Year = mean(Year)) %>%
-    ggplot(aes(x = Year, fill = Review)) +
-    geom_histogram(position = "dodge") +
-    ylab("Number of articles") +
-    scale_x_continuous(breaks = years) +
-    theme_classic()
   # spline results
   pD <-
-    plot(conditional_effects(spline, prob = 0.50), plot = FALSE)[[3]] +
+    plot(conditional_effects(yearSpline, prob = 0.50), plot = FALSE)[[3]] +
     scale_y_continuous(name = "Probability of controlling\nfor non-independence", 
                        limits = c(0, 1)) +
     scale_x_continuous(name = "Year", labels = function(x) round((x*sd(review$Year)) + mean(review$Year), 0),
@@ -175,11 +186,11 @@ plotReviewSummary <- function(review, spline, postRM1, postRM2,
                   pB2 + theme(legend.position = "none"),
                   align = "h", rel_widths = c(0.5, 1),
                   labels = c("b", ""))
-  top <- plot_grid(pA, pB, nrow = 1)
-  bottom <- plot_grid(NULL,
-                      pC + theme(legend.position = "none"),
+  top <- plot_grid(NULL, pA, NULL, pB, nrow = 1,
+                   rel_widths = c(0.055, 1, 0.055, 1))
+  bottom <- plot_grid(pC + theme(legend.position = "none"),
                       pD + theme(legend.position = "none"),
-                      nrow = 1, rel_widths = c(0.045, 0.87, 1), labels = c("","c","d"))
+                      nrow = 1, labels = c("c","d"))
   out <- plot_grid(top, bottom, rel_heights = c(1, 0.95), nrow = 2)
   legend <-
     get_legend(pA1 +
