@@ -42,6 +42,29 @@ loadHDIData <- function(fileHDI, fileISOHDI) {
     mutate(iso = ifelse(is.na(iso), "CI", iso))
 }
 
+# load gdp data
+loadGDPData <- function(fileGDP, iso) {
+  read_csv(fileGDP, skip = 4) %>%
+    # join iso2 data
+    left_join(iso, by = c("Country Code" = "iso3")) %>%
+    # drop countries without iso2 codes
+    drop_na(iso2) %>%
+    # relevant columns
+    dplyr::select(-`Indicator Name`, -`Indicator Code`, -`...67`, -`Country Code`) %>%
+    # pivot longer
+    pivot_longer(
+      cols = !c(`Country Name`, iso2),
+      names_to = "year",
+      values_to = "GDPPerCapita"
+    ) %>%
+    # drop empty cases
+    drop_na(GDPPerCapita) %>%
+    # log gdp per capita
+    mutate(logGDPPerCapita = log(GDPPerCapita + 176), # positive values only
+           # standardise
+           logGDPPerCapitaStd = as.numeric(scale(logGDPPerCapita)))
+}
+
 # signal for hdi
 fitHDISignal <- function(hdi, geoCov, linCov) {
   # add iso variables for modelling
@@ -101,6 +124,26 @@ fitWVSSignal <- function(wvs, outcome = "", geoCov, linCov) {
                 prior(exponential(8), class = sigma)),
       seed = 2113, iter = 2000, cores = 4, sample_prior = "yes",
       control = list(adapt_delta = 0.95, max_treedepth = 15))
+}
+
+# signal for gdp
+fitGDPSignal <- function(gdp, geoCov, linCov) {
+  # add iso variables for modelling
+  gdp$isoGeo <- gdp$iso2
+  gdp$isoLin <- gdp$iso2
+  # subset matrices
+  geoCov <- geoCov[rownames(geoCov)[rownames(geoCov) %in% gdp$iso2],
+                   colnames(geoCov)[colnames(geoCov) %in% gdp$iso2]]
+  linCov <- linCov[rownames(linCov)[rownames(linCov) %in% gdp$iso2],
+                   colnames(linCov)[colnames(linCov) %in% gdp$iso2]]
+  # fit model
+  brm(logGDPPerCapitaStd ~ 0 + Intercept + (1 | gr(isoGeo, cov = geoCov)) + (1 | gr(isoLin, cov = linCov)) + (1 | iso2),
+      data = gdp, data2 = list(geoCov = geoCov, linCov = linCov),
+      prior = c(prior(normal(0, 0.5), class = b),
+                prior(exponential(3), class = sd),
+                prior(exponential(3), class = sigma)),
+      seed = 2113, cores = 4, sample_prior = "yes",
+      control = list(adapt_delta = 0.9))
 }
 
 # plot signal

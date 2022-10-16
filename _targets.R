@@ -54,22 +54,29 @@ list(
   #### Geographic and linguistic signal ####
   
   # files
+  tar_target(fileISO, "data/countryData/countries_codes_and_coordinates.csv", format = "file"),
   tar_target(fileGeo, "data/networks/1F Population Distance.xlsx", format = "file"),
   tar_target(fileLin, "data/networks/2F Country Distance 1pml adj.xlsx", format = "file"),
   tar_target(fileHDI, "data/hdi/2020_statistical_annex_all.xlsx", format = "file"),
   tar_target(fileISOHDI, "data/hdi/iso.csv", format = "file"),
   tar_target(fileWVS, "data/wvs/Integrated_values_surveys_1981-2021.sav", format = "file"),
+  tar_target(fileGDP, "data/gdp/API_NY.GDP.PCAP.CD_DS2_en_csv_v2_4666475.csv", format = "file"),
+  # isocodes (https://gist.github.com/tadast/8827699)
+  tar_target(iso, loadISO(fileISO)),
   # hdi data
   tar_target(hdi, loadHDIData(fileHDI, fileISOHDI)),
   # wvs data
   tar_target(wvs, haven::read_sav(fileWVS, encoding = "latin1")),
+  # gdp data
+  tar_target(gdp, loadGDPData(fileGDP, iso)),
   # covariance matrices
   tar_target(geoCov, loadCovMat(fileGeo, log = TRUE)),
   tar_target(linCov, loadCovMat(fileLin, log = FALSE)),
   # geographic and linguistic signal
-  tar_target(hdiSignal, fitHDISignal(hdi, geoCov, linCov)),
+  tar_target(hdiSignal,  fitHDISignal(hdi, geoCov, linCov)),
   tar_target(tradSignal, fitWVSSignal(wvs, outcome = "trad", geoCov, linCov)),
   tar_target(survSignal, fitWVSSignal(wvs, outcome = "surv", geoCov, linCov)),
+  tar_target(gdpSignal,  fitGDPSignal(gdp, geoCov, linCov)),
   # posterior samples
   tar_target(postHDI,  as_draws_array(hdiSignal , variable = "^sd_", regex = TRUE)),
   tar_target(postTrad, as_draws_array(tradSignal, variable = "^sd_", regex = TRUE)),
@@ -103,27 +110,27 @@ list(
   tar_target(postRM3, as_draws_array(rM3, variable = "^b_", regex = TRUE)),
   tar_target(postRM4, as_draws_array(rM4, variable = "^b_", regex = TRUE)),
   tar_target(postRM5, as_draws_array(rM5, variable = "^b_", regex = TRUE)),
-  # fit year spline model
-  tar_target(yearSpline, fitYearSpline(review)),
-  # fit impact factor model
-  tar_target(ifModel, fitIFModel(review)),
-  # plot review summary
-  tar_target(plotReview, plotReviewSummary(review, yearSpline, ifModel, postRM1, 
-                                           postRM2, postRM3, postRM4, postRM5)),
+  # fit article-level models
+  tar_target(yearArticle, fitYearArticle(review)),
+  tar_target(ifArticle, fitIFArticle(review)),
+  # fit analysis-level models
+  tar_target(yearAnalysis, fitYearAnalysis(review)),
+  tar_target(ifAnalysis, fitIFAnalysis(review)),
+  # plot review summaries
+  tar_target(plotReview1, plotReviewArticle(review, yearArticle, ifArticle)), 
+  tar_target(plotReview2, plotReviewAnalysis(review, yearAnalysis, ifAnalysis, 
+                                             postRM1, postRM2, postRM3, postRM4, postRM5)),
   
   #### Simulation ####
   
   # files
   tar_target(fileContinent, "data/countryData/continent.csv", format = "file"),
   tar_target(fileLangFam, "data/countryData/langFamily.xlsx", format = "file"),
-  tar_target(fileISO, "data/countryData/countries_codes_and_coordinates.csv", format = "file"),
   tar_target(fileGenetic, "data/geneticDistance/alldata.dta", format = "file"),
   # continent data (https://datahub.io/JohnSnowLabs/country-and-continent-codes-list#data)
   tar_target(continent, read.csv(fileContinent, na.strings = "")),
   # language family data (from glottolog)
   tar_target(langFam, read_xlsx(fileLangFam)),
-  # isocodes (https://gist.github.com/tadast/8827699)
-  tar_target(iso, loadISO(fileISO)),
   # genetic distances
   tar_target(geneticDistances, loadGeneticDistances(fileGenetic, iso)),
   # geographic and linguistic covariance matrices
