@@ -250,6 +250,28 @@ fitTightnessSignal <- function(tightness, geoCov, linCov) {
       control = list(adapt_delta = 0.9999, max_treedepth = 15))
 }
 
+# signal for individualism
+fitIndividualismSignal <- function(fincherData, geoCov, linCov) {
+  # add iso variables for modelling
+  fincherData$isoGeo <- fincherData$iso
+  fincherData$isoLin <- fincherData$iso
+  # subset matrices
+  geoCov <- geoCov[rownames(geoCov)[rownames(geoCov) %in% fincherData$iso],
+                   colnames(geoCov)[colnames(geoCov) %in% fincherData$iso]]
+  linCov <- linCov[rownames(linCov)[rownames(linCov) %in% fincherData$iso],
+                   colnames(linCov)[colnames(linCov) %in% fincherData$iso]]
+  # outcome variable between 0 and 1
+  fincherData <- mutate(fincherData, individualismHofstede = individualismHofstede / 100)
+  # fit model
+  brm(individualismHofstede ~ 0 + Intercept + (1 | gr(isoGeo, cov = geoCov)) + (1 | gr(isoLin, cov = linCov)),
+      data = fincherData, data2 = list(geoCov = geoCov, linCov = linCov),
+      prior = c(prior(normal(0.5, 0.1), class = b),
+                prior(exponential(8), class = sd),
+                prior(exponential(8), class = sigma)),
+      iter = 6000, seed = 2113, cores = 4, sample_prior = "yes",
+      control = list(adapt_delta = 0.9999, max_treedepth = 15))
+}
+
 # plot signal
 plotGeoLinSignal <- function(postHDI, postTrad, postSurv) {
   # plotting function

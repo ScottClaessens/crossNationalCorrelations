@@ -84,6 +84,7 @@ list(
   tar_target(signalTrad,  fitWVSSignal(wvs, outcome = "trad", geoCov, linCov)),
   tar_target(signalSurv,  fitWVSSignal(wvs, outcome = "surv", geoCov, linCov)),
   tar_target(signalTight, fitTightnessSignal(tightness, geoCov, linCov)),
+  tar_target(signalInd,   fitIndividualismSignal(fincherData, geoCov, linCov)),
   # posterior samples
   tar_target(postHDI,   as_draws_array(signalHDI, variable = "^sd_", regex = TRUE)),
   tar_target(postGDP,   as_draws_array(signalGDP, variable = "^sd_", regex = TRUE)),
@@ -92,6 +93,7 @@ list(
   tar_target(postTrad,  as_draws_array(signalTrad, variable = "^sd_", regex = TRUE)),
   tar_target(postSurv,  as_draws_array(signalSurv, variable = "^sd_", regex = TRUE)),
   tar_target(postTight, as_draws_array(signalTight, variable = c("^sd_", "sigma"), regex = TRUE)),
+  tar_target(postInd,   as_draws_array(signalInd, variable = c("^sd_", "sigma"), regex = TRUE)),
   # calculate geographic signal
   tar_target(geoHDI,   hypothesis(signalHDI,   "(sd_isoGeo__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_iso__Intercept^2))=0",  class = NULL)),
   tar_target(geoGDP,   hypothesis(signalGDP,   "(sd_isoGeo__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_iso2__Intercept^2))=0",  class = NULL)),
@@ -100,6 +102,7 @@ list(
   tar_target(geoTrad,  hypothesis(signalTrad,  "(sd_isoGeo__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_S009__Intercept^2))=0", class = NULL)),
   tar_target(geoSurv,  hypothesis(signalSurv,  "(sd_isoGeo__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_S009__Intercept^2))=0", class = NULL)),
   tar_target(geoTight, hypothesis(signalTight, "(sd_isoGeo__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sigma^2))=0", class = NULL)),
+  tar_target(geoInd,   hypothesis(signalInd,   "(sd_isoGeo__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sigma^2))=0", class = NULL)),
   # calculate geographic signal
   tar_target(linHDI,   hypothesis(signalHDI,   "(sd_isoLin__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_iso__Intercept^2))=0",  class = NULL)),
   tar_target(linGDP,   hypothesis(signalGDP,   "(sd_isoLin__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_iso2__Intercept^2))=0",  class = NULL)),
@@ -108,6 +111,7 @@ list(
   tar_target(linTrad,  hypothesis(signalTrad,  "(sd_isoLin__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_S009__Intercept^2))=0", class = NULL)),
   tar_target(linSurv,  hypothesis(signalSurv,  "(sd_isoLin__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_S009__Intercept^2))=0", class = NULL)),
   tar_target(linTight, hypothesis(signalTight, "(sd_isoLin__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sigma^2))=0", class = NULL)),
+  tar_target(linInd,   hypothesis(signalInd,   "(sd_isoLin__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sigma^2))=0", class = NULL)),
   # plot signal
   #tar_target(plotSignal, plotGeoLinSignal(postHDI, postTrad, postSurv)),
   
@@ -161,7 +165,7 @@ list(
   tar_target(brmsInitial2, setupBrms(simData_simLinCov_0.8_0.8_0[[1]], simLinCov, type = "linguistic")),
   tar_target(brmsInitial3, setupBrms(simData_simLinCov_0.8_0.8_0[[1]], simLinCov, type = "both")),
   # sim iteration
-  tar_target(iter, 1:100),
+  tar_target(iter, 1:5), #1:100
   # simulation
   simulationTargets,
   # combine
@@ -188,22 +192,22 @@ list(
   tar_combine(brmsModel3_simGeoCov,   simulationTargets$brmsModel3[1:36],    command = dplyr::bind_rows(!!!.x)),
   tar_combine(brmsModel3_simLinCov,   simulationTargets$brmsModel3[37:72],   command = dplyr::bind_rows(!!!.x)),
   # plot simulation results
-  tar_target(plotSim1, plotSimInd(olsModel1_simGeoCov, olsModel2_simGeoCov, olsModel3_simGeoCov, olsModel4_simGeoCov, 
-                                  olsModel5_simGeoCov, olsModel6_simGeoCov, conleyModel1_simGeoCov, conleyModel2_simGeoCov,
-                                  brmsModel1_simGeoCov, brmsModel2_simGeoCov, brmsModel3_simGeoCov, 
-                                  type = "spatial", file = "figures/simIndGeo.pdf")),
-  tar_target(plotSim2, plotSimInd(olsModel1_simLinCov, olsModel2_simLinCov, olsModel3_simLinCov, olsModel4_simLinCov, 
-                                  olsModel5_simLinCov, olsModel6_simLinCov, conleyModel1_simLinCov, conleyModel2_simLinCov,
-                                  brmsModel1_simLinCov, brmsModel2_simLinCov, brmsModel3_simLinCov, 
-                                  type = "cultural phylogenetic", file = "figures/simIndLin.pdf")),
-  tar_target(plotSim3, plotSimAll(olsModel1_simGeoCov, olsModel2_simGeoCov, olsModel3_simGeoCov, olsModel4_simGeoCov, 
-                                  olsModel5_simGeoCov, olsModel6_simGeoCov, conleyModel1_simGeoCov, conleyModel2_simGeoCov,
-                                  brmsModel1_simGeoCov, brmsModel2_simGeoCov, brmsModel3_simGeoCov, 
-                                  type = "spatial", file = "figures/simAllGeo.pdf")),
-  tar_target(plotSim4, plotSimAll(olsModel1_simLinCov, olsModel2_simLinCov, olsModel3_simLinCov, olsModel4_simLinCov, 
-                                  olsModel5_simLinCov, olsModel6_simGeoCov, conleyModel1_simLinCov, conleyModel2_simLinCov,
-                                  brmsModel1_simLinCov, brmsModel2_simLinCov, brmsModel3_simLinCov, 
-                                  type = "cultural phylogenetic", file = "figures/simAllLin.pdf")),
+  #tar_target(plotSim1, plotSimInd(olsModel1_simGeoCov, olsModel2_simGeoCov, olsModel3_simGeoCov, olsModel4_simGeoCov, 
+  #                                olsModel5_simGeoCov, olsModel6_simGeoCov, conleyModel1_simGeoCov, conleyModel2_simGeoCov,
+  #                                brmsModel1_simGeoCov, brmsModel2_simGeoCov, brmsModel3_simGeoCov, 
+  #                                type = "spatial", file = "figures/simIndGeo.pdf")),
+  #tar_target(plotSim2, plotSimInd(olsModel1_simLinCov, olsModel2_simLinCov, olsModel3_simLinCov, olsModel4_simLinCov, 
+  #                                olsModel5_simLinCov, olsModel6_simLinCov, conleyModel1_simLinCov, conleyModel2_simLinCov,
+  #                                brmsModel1_simLinCov, brmsModel2_simLinCov, brmsModel3_simLinCov, 
+  #                                type = "cultural phylogenetic", file = "figures/simIndLin.pdf")),
+  #tar_target(plotSim3, plotSimAll(olsModel1_simGeoCov, olsModel2_simGeoCov, olsModel3_simGeoCov, olsModel4_simGeoCov, 
+  #                                olsModel5_simGeoCov, olsModel6_simGeoCov, conleyModel1_simGeoCov, conleyModel2_simGeoCov,
+  #                                brmsModel1_simGeoCov, brmsModel2_simGeoCov, brmsModel3_simGeoCov, 
+  #                                type = "spatial", file = "figures/simAllGeo.pdf")),
+  #tar_target(plotSim4, plotSimAll(olsModel1_simLinCov, olsModel2_simLinCov, olsModel3_simLinCov, olsModel4_simLinCov, 
+  #                                olsModel5_simLinCov, olsModel6_simGeoCov, conleyModel1_simLinCov, conleyModel2_simLinCov,
+  #                                brmsModel1_simLinCov, brmsModel2_simLinCov, brmsModel3_simLinCov, 
+  #                                type = "cultural phylogenetic", file = "figures/simAllLin.pdf")),
   
   #### Replications ####
   
@@ -453,11 +457,11 @@ list(
   
   #### Manuscript ####
   
-  tar_render(manuscript, "manuscript.Rmd"),
+  #tar_render(manuscript, "manuscript.Rmd"),
   
   #### Vignette ####
   
-  tar_render(vignette, "vignette.Rmd"),
+  #tar_render(vignette, "vignette.Rmd"),
   
   #### Session Info ####
   
