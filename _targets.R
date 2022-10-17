@@ -61,24 +61,28 @@ list(
   tar_target(fileISOHDI, "data/hdi/iso.csv", format = "file"),
   tar_target(fileWVS, "data/wvs/Integrated_values_surveys_1981-2021.sav", format = "file"),
   tar_target(fileGDP, "data/gdp/API_NY.GDP.PCAP.CD_DS2_en_csv_v2_4666475.csv", format = "file"),
+  tar_target(fileGDPGrowth, "data/gdpGrowth/API_NY.GDP.PCAP.KD.ZG_DS2_en_csv_v2_4666256.csv", format = "file"),
+  tar_target(fileGini, "data/gini/API_SI.POV.GINI_DS2_en_csv_v2_4666600.csv", format = "file"),
   # isocodes (https://gist.github.com/tadast/8827699)
   tar_target(iso, loadISO(fileISO)),
-  # hdi data
+  # load datasets
   tar_target(hdi, loadHDIData(fileHDI, fileISOHDI)),
-  # wvs data
   tar_target(wvs, haven::read_sav(fileWVS, encoding = "latin1")),
-  # gdp data
   tar_target(gdp, loadGDPData(fileGDP, iso)),
+  tar_target(gdpGrowth, loadGDPGrowthData(fileGDPGrowth, iso)),
+  tar_target(gini, loadGiniData(fileGini, iso)),
   # covariance matrices
   tar_target(geoCov, loadCovMat(fileGeo, log = TRUE)),
   tar_target(linCov, loadCovMat(fileLin, log = FALSE)),
   # geographic and linguistic signal
-  tar_target(hdiSignal,  fitHDISignal(hdi, geoCov, linCov)),
+  tar_target(hdiSignal, fitHDISignal(hdi, geoCov, linCov)),
   tar_target(tradSignal, fitWVSSignal(wvs, outcome = "trad", geoCov, linCov)),
   tar_target(survSignal, fitWVSSignal(wvs, outcome = "surv", geoCov, linCov)),
-  tar_target(gdpSignal,  fitGDPSignal(gdp, geoCov, linCov)),
+  tar_target(gdpSignal, fitGDPSignal(gdp, geoCov, linCov)),
+  tar_target(gdpGrowthSignal, fitGDPGrowthSignal(gdpGrowth, geoCov, linCov)),
+  tar_target(giniSignal, fitGiniSignal(gini, geoCov, linCov)),
   # posterior samples
-  tar_target(postHDI,  as_draws_array(hdiSignal , variable = "^sd_", regex = TRUE)),
+  tar_target(postHDI,  as_draws_array(hdiSignal,  variable = "^sd_", regex = TRUE)),
   tar_target(postTrad, as_draws_array(tradSignal, variable = "^sd_", regex = TRUE)),
   tar_target(postSurv, as_draws_array(survSignal, variable = "^sd_", regex = TRUE)),
   # calculate signal

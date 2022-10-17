@@ -46,7 +46,7 @@ loadHDIData <- function(fileHDI, fileISOHDI) {
 loadGDPData <- function(fileGDP, iso) {
   read_csv(fileGDP, skip = 4) %>%
     # join iso2 data
-    left_join(iso, by = c("Country Code" = "iso3")) %>%
+    left_join(dplyr::select(iso, iso3, iso2), by = c("Country Code" = "iso3")) %>%
     # drop countries without iso2 codes
     drop_na(iso2) %>%
     # relevant columns
@@ -59,10 +59,54 @@ loadGDPData <- function(fileGDP, iso) {
     ) %>%
     # drop empty cases
     drop_na(GDPPerCapita) %>%
-    # log gdp per capita
-    mutate(logGDPPerCapita = log(GDPPerCapita + 176), # positive values only
-           # standardise
-           logGDPPerCapitaStd = as.numeric(scale(logGDPPerCapita)))
+    mutate(
+      # log gdp per capita
+      logGDPPerCapita = log(GDPPerCapita),
+      # standardise
+      logGDPPerCapitaStd = as.numeric(scale(logGDPPerCapita))
+      )
+}
+
+# load gdp growth data
+loadGDPGrowthData <- function(fileGDPGrowth, iso) {
+  read_csv(fileGDPGrowth, skip = 4) %>%
+    # join iso2 data
+    left_join(dplyr::select(iso, iso3, iso2), by = c("Country Code" = "iso3")) %>%
+    # drop countries without iso2 codes
+    drop_na(iso2) %>%
+    # relevant columns
+    dplyr::select(-`Indicator Name`, -`Indicator Code`, -`...67`, -`Country Code`) %>%
+    # pivot longer
+    pivot_longer(
+      cols = !c(`Country Name`, iso2),
+      names_to = "year",
+      values_to = "gdpPerCapitaGrowth"
+    ) %>%
+    # drop empty cases
+    drop_na(gdpPerCapitaGrowth) %>%
+    # standardised
+    mutate(gdpPerCapitaGrowthStd = as.numeric(scale(gdpPerCapitaGrowth)))
+}
+
+# load gini data
+loadGiniData <- function(fileGini, iso) {
+  read_csv(fileGini, skip = 4) %>%
+    # join iso2 data
+    left_join(dplyr::select(iso, iso3, iso2), by = c("Country Code" = "iso3")) %>%
+    # drop countries without iso2 codes
+    drop_na(iso2) %>%
+    # relevant columns
+    dplyr::select(-`Indicator Name`, -`Indicator Code`, -`...67`, -`Country Code`) %>%
+    # pivot longer
+    pivot_longer(
+      cols = !c(`Country Name`, iso2),
+      names_to = "year",
+      values_to = "gini"
+    ) %>%
+    # drop empty cases
+    drop_na(gini) %>%
+    # gini between 0 and 1
+    mutate(gini = gini / 100) -> d
 }
 
 # signal for hdi
@@ -142,6 +186,46 @@ fitGDPSignal <- function(gdp, geoCov, linCov) {
       prior = c(prior(normal(0, 0.5), class = b),
                 prior(exponential(3), class = sd),
                 prior(exponential(3), class = sigma)),
+      seed = 2113, cores = 4, sample_prior = "yes",
+      control = list(adapt_delta = 0.9))
+}
+
+# signal for gdp growth
+fitGDPGrowthSignal <- function(gdpGrowth, geoCov, linCov) {
+  # add iso variables for modelling
+  gdpGrowth$isoGeo <- gdpGrowth$iso2
+  gdpGrowth$isoLin <- gdpGrowth$iso2
+  # subset matrices
+  geoCov <- geoCov[rownames(geoCov)[rownames(geoCov) %in% gdpGrowth$iso2],
+                   colnames(geoCov)[colnames(geoCov) %in% gdpGrowth$iso2]]
+  linCov <- linCov[rownames(linCov)[rownames(linCov) %in% gdpGrowth$iso2],
+                   colnames(linCov)[colnames(linCov) %in% gdpGrowth$iso2]]
+  # fit model
+  brm(gdpPerCapitaGrowthStd ~ 0 + Intercept + (1 | gr(isoGeo, cov = geoCov)) + (1 | gr(isoLin, cov = linCov)) + (1 | iso2),
+      data = gdpGrowth, data2 = list(geoCov = geoCov, linCov = linCov),
+      prior = c(prior(normal(0, 0.5), class = b),
+                prior(exponential(3), class = sd),
+                prior(exponential(3), class = sigma)),
+      seed = 2113, cores = 4, sample_prior = "yes",
+      control = list(adapt_delta = 0.9))
+}
+
+# signal for gini
+fitGiniSignal <- function(gini, geoCov, linCov) {
+  # add iso variables for modelling
+  gini$isoGeo <- gini$iso2
+  gini$isoLin <- gini$iso2
+  # subset matrices
+  geoCov <- geoCov[rownames(geoCov)[rownames(geoCov) %in% gini$iso2],
+                   colnames(geoCov)[colnames(geoCov) %in% gini$iso2]]
+  linCov <- linCov[rownames(linCov)[rownames(linCov) %in% gini$iso2],
+                   colnames(linCov)[colnames(linCov) %in% gini$iso2]]
+  # fit model
+  brm(gini ~ 0 + Intercept + (1 | gr(isoGeo, cov = geoCov)) + (1 | gr(isoLin, cov = linCov)) + (1 | iso2),
+      data = gini, data2 = list(geoCov = geoCov, linCov = linCov),
+      prior = c(prior(normal(0.5, 0.1), class = b),
+                prior(exponential(8), class = sd),
+                prior(exponential(8), class = sigma)),
       seed = 2113, cores = 4, sample_prior = "yes",
       control = list(adapt_delta = 0.9))
 }
