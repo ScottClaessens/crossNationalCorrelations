@@ -63,37 +63,53 @@ list(
   tar_target(fileGDP, "data/gdp/API_NY.GDP.PCAP.CD_DS2_en_csv_v2_4666475.csv", format = "file"),
   tar_target(fileGDPGrowth, "data/gdpGrowth/API_NY.GDP.PCAP.KD.ZG_DS2_en_csv_v2_4666256.csv", format = "file"),
   tar_target(fileGini, "data/gini/API_SI.POV.GINI_DS2_en_csv_v2_4666600.csv", format = "file"),
+  tar_target(fileTightness, "data/tightness/Tightness_Scores.xlsx", format = "file"),
   # isocodes (https://gist.github.com/tadast/8827699)
   tar_target(iso, loadISO(fileISO)),
-  # load datasets
+  # load datasets for signal models
   tar_target(hdi, loadHDIData(fileHDI, fileISOHDI)),
   tar_target(wvs, haven::read_sav(fileWVS, encoding = "latin1")),
   tar_target(gdp, loadGDPData(fileGDP, iso)),
   tar_target(gdpGrowth, loadGDPGrowthData(fileGDPGrowth, iso)),
   tar_target(gini, loadGiniData(fileGini, iso)),
+  tar_target(tightness, read_xlsx(fileTightness)),
   # covariance matrices
   tar_target(geoCov, loadCovMat(fileGeo, log = TRUE)),
   tar_target(linCov, loadCovMat(fileLin, log = FALSE)),
-  # geographic and linguistic signal
-  tar_target(hdiSignal, fitHDISignal(hdi, geoCov, linCov)),
-  tar_target(tradSignal, fitWVSSignal(wvs, outcome = "trad", geoCov, linCov)),
-  tar_target(survSignal, fitWVSSignal(wvs, outcome = "surv", geoCov, linCov)),
-  tar_target(gdpSignal, fitGDPSignal(gdp, geoCov, linCov)),
-  tar_target(gdpGrowthSignal, fitGDPGrowthSignal(gdpGrowth, geoCov, linCov)),
-  tar_target(giniSignal, fitGiniSignal(gini, geoCov, linCov)),
+  # fit geographic and linguistic signal models
+  tar_target(signalHDI,   fitHDISignal(hdi, geoCov, linCov)),
+  tar_target(signalGDP,   fitGDPSignal(gdp, geoCov, linCov)),
+  tar_target(signalGrow,  fitGDPGrowthSignal(gdpGrowth, geoCov, linCov)),
+  tar_target(signalGini,  fitGiniSignal(gini, geoCov, linCov)),
+  tar_target(signalTrad,  fitWVSSignal(wvs, outcome = "trad", geoCov, linCov)),
+  tar_target(signalSurv,  fitWVSSignal(wvs, outcome = "surv", geoCov, linCov)),
+  tar_target(signalTight, fitTightnessSignal(tightness, geoCov, linCov)),
   # posterior samples
-  tar_target(postHDI,  as_draws_array(hdiSignal,  variable = "^sd_", regex = TRUE)),
-  tar_target(postTrad, as_draws_array(tradSignal, variable = "^sd_", regex = TRUE)),
-  tar_target(postSurv, as_draws_array(survSignal, variable = "^sd_", regex = TRUE)),
-  # calculate signal
-  tar_target(hdiGeo,  hypothesis(hdiSignal,  "(sd_isoGeo__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_iso__Intercept^2))=0",  class = NULL)),
-  tar_target(hdiLin,  hypothesis(hdiSignal,  "(sd_isoLin__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_iso__Intercept^2))=0",  class = NULL)),
-  tar_target(tradGeo, hypothesis(tradSignal, "(sd_isoGeo__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_S009__Intercept^2))=0", class = NULL)),
-  tar_target(tradLin, hypothesis(tradSignal, "(sd_isoLin__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_S009__Intercept^2))=0", class = NULL)),
-  tar_target(survGeo, hypothesis(survSignal, "(sd_isoGeo__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_S009__Intercept^2))=0", class = NULL)),
-  tar_target(survLin, hypothesis(survSignal, "(sd_isoLin__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_S009__Intercept^2))=0", class = NULL)),
+  tar_target(postHDI,   as_draws_array(signalHDI, variable = "^sd_", regex = TRUE)),
+  tar_target(postGDP,   as_draws_array(signalGDP, variable = "^sd_", regex = TRUE)),
+  tar_target(postGrow,  as_draws_array(signalGrow, variable = "^sd_", regex = TRUE)),
+  tar_target(postGini,  as_draws_array(signalGini, variable = "^sd_", regex = TRUE)),
+  tar_target(postTrad,  as_draws_array(signalTrad, variable = "^sd_", regex = TRUE)),
+  tar_target(postSurv,  as_draws_array(signalSurv, variable = "^sd_", regex = TRUE)),
+  tar_target(postTight, as_draws_array(signalTight, variable = c("^sd_", "sigma"), regex = TRUE)),
+  # calculate geographic signal
+  tar_target(geoHDI,   hypothesis(signalHDI,   "(sd_isoGeo__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_iso__Intercept^2))=0",  class = NULL)),
+  tar_target(geoGDP,   hypothesis(signalGDP,   "(sd_isoGeo__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_iso2__Intercept^2))=0",  class = NULL)),
+  tar_target(geoGrow,  hypothesis(signalGrow,  "(sd_isoGeo__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_iso2__Intercept^2))=0",  class = NULL)),
+  tar_target(geoGini,  hypothesis(signalGini,  "(sd_isoGeo__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_iso2__Intercept^2))=0",  class = NULL)),
+  tar_target(geoTrad,  hypothesis(signalTrad,  "(sd_isoGeo__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_S009__Intercept^2))=0", class = NULL)),
+  tar_target(geoSurv,  hypothesis(signalSurv,  "(sd_isoGeo__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_S009__Intercept^2))=0", class = NULL)),
+  tar_target(geoTight, hypothesis(signalTight, "(sd_isoGeo__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sigma^2))=0", class = NULL)),
+  # calculate geographic signal
+  tar_target(linHDI,   hypothesis(signalHDI,   "(sd_isoLin__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_iso__Intercept^2))=0",  class = NULL)),
+  tar_target(linGDP,   hypothesis(signalGDP,   "(sd_isoLin__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_iso2__Intercept^2))=0",  class = NULL)),
+  tar_target(linGrow,  hypothesis(signalGrow,  "(sd_isoLin__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_iso2__Intercept^2))=0",  class = NULL)),
+  tar_target(linGini,  hypothesis(signalGini,  "(sd_isoLin__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_iso2__Intercept^2))=0",  class = NULL)),
+  tar_target(linTrad,  hypothesis(signalTrad,  "(sd_isoLin__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_S009__Intercept^2))=0", class = NULL)),
+  tar_target(linSurv,  hypothesis(signalSurv,  "(sd_isoLin__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_S009__Intercept^2))=0", class = NULL)),
+  tar_target(linTight, hypothesis(signalTight, "(sd_isoLin__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sigma^2))=0", class = NULL)),
   # plot signal
-  tar_target(plotSignal, plotGeoLinSignal(postHDI, postTrad, postSurv)),
+  #tar_target(plotSignal, plotGeoLinSignal(postHDI, postTrad, postSurv)),
   
   #### Review ####
   

@@ -129,47 +129,6 @@ fitHDISignal <- function(hdi, geoCov, linCov) {
       control = list(adapt_delta = 0.9))
 }
 
-# signal for wvs
-fitWVSSignal <- function(wvs, outcome = "", geoCov, linCov) {
-  wvs <-
-    wvs %>%
-    # select vars
-    dplyr::select(
-      # country code
-      S009,
-      # traditional vs. secular-rational values
-      F063, Y003, F120, G006, E018,
-      # survival vs. self-expression values
-      Y002, A008, F118, E025, A165
-    ) %>%
-      # remove missings
-      drop_na() %>%
-      filter(Y003 != -5)
-  # get cultural map
-  # https://www.worldvaluessurvey.org/WVSContents.jsp?CMSID=Findings
-  m <- pca(select(wvs, -S009), nfactors = 2, rotate = "varimax")
-  # summarise and prepare for modelling
-  wvs <-
-    wvs %>%
-    mutate(trad = as.numeric(scale(m$scores[,2])),
-           surv = as.numeric(scale(m$scores[,1])),
-           isoGeo = S009, 
-           isoLin = S009)
-  # subset matrices
-  geoCov <- geoCov[rownames(geoCov)[rownames(geoCov) %in% wvs$S009],
-                   colnames(geoCov)[colnames(geoCov) %in% wvs$S009]]
-  linCov <- linCov[rownames(linCov)[rownames(linCov) %in% wvs$S009],
-                   colnames(linCov)[colnames(linCov) %in% wvs$S009]]
-  # fit model
-  bf1 <- bf(paste0(outcome, " ~ 0 + Intercept + (1 | gr(isoGeo, cov = geoCov)) + (1 | gr(isoLin, cov = linCov)) + (1 | S009)"))
-  brm(formula = bf1, data = wvs, data2 = list(geoCov = geoCov, linCov = linCov),
-      prior = c(prior(normal(0, 0.1), class = b),
-                prior(exponential(8), class = sd),
-                prior(exponential(8), class = sigma)),
-      seed = 2113, iter = 2000, cores = 4, sample_prior = "yes",
-      control = list(adapt_delta = 0.95, max_treedepth = 15))
-}
-
 # signal for gdp
 fitGDPSignal <- function(gdp, geoCov, linCov) {
   # add iso variables for modelling
@@ -228,6 +187,67 @@ fitGiniSignal <- function(gini, geoCov, linCov) {
                 prior(exponential(8), class = sigma)),
       seed = 2113, cores = 4, sample_prior = "yes",
       control = list(adapt_delta = 0.9))
+}
+
+# signal for wvs
+fitWVSSignal <- function(wvs, outcome = "", geoCov, linCov) {
+  wvs <-
+    wvs %>%
+    # select vars
+    dplyr::select(
+      # country code
+      S009,
+      # traditional vs. secular-rational values
+      F063, Y003, F120, G006, E018,
+      # survival vs. self-expression values
+      Y002, A008, F118, E025, A165
+    ) %>%
+    # remove missings
+    drop_na() %>%
+    filter(Y003 != -5)
+  # get cultural map
+  # https://www.worldvaluessurvey.org/WVSContents.jsp?CMSID=Findings
+  m <- pca(select(wvs, -S009), nfactors = 2, rotate = "varimax")
+  # summarise and prepare for modelling
+  wvs <-
+    wvs %>%
+    mutate(trad = as.numeric(scale(m$scores[,2])),
+           surv = as.numeric(scale(m$scores[,1])),
+           isoGeo = S009, 
+           isoLin = S009)
+  # subset matrices
+  geoCov <- geoCov[rownames(geoCov)[rownames(geoCov) %in% wvs$S009],
+                   colnames(geoCov)[colnames(geoCov) %in% wvs$S009]]
+  linCov <- linCov[rownames(linCov)[rownames(linCov) %in% wvs$S009],
+                   colnames(linCov)[colnames(linCov) %in% wvs$S009]]
+  # fit model
+  bf1 <- bf(paste0(outcome, " ~ 0 + Intercept + (1 | gr(isoGeo, cov = geoCov)) + (1 | gr(isoLin, cov = linCov)) + (1 | S009)"))
+  brm(formula = bf1, data = wvs, data2 = list(geoCov = geoCov, linCov = linCov),
+      prior = c(prior(normal(0, 0.1), class = b),
+                prior(exponential(8), class = sd),
+                prior(exponential(8), class = sigma)),
+      seed = 2113, iter = 2000, cores = 4, sample_prior = "yes",
+      control = list(adapt_delta = 0.95, max_treedepth = 15))
+}
+
+# signal for tightness
+fitTightnessSignal <- function(tightness, geoCov, linCov) {
+  # add iso variables for modelling
+  tightness$isoGeo <- tightness$iso
+  tightness$isoLin <- tightness$iso
+  # subset matrices
+  geoCov <- geoCov[rownames(geoCov)[rownames(geoCov) %in% tightness$iso],
+                   colnames(geoCov)[colnames(geoCov) %in% tightness$iso]]
+  linCov <- linCov[rownames(linCov)[rownames(linCov) %in% tightness$iso],
+                   colnames(linCov)[colnames(linCov) %in% tightness$iso]]
+  # fit model
+  brm(Tightness ~ 0 + Intercept + (1 | gr(isoGeo, cov = geoCov)) + (1 | gr(isoLin, cov = linCov)),
+      data = tightness, data2 = list(geoCov = geoCov, linCov = linCov),
+      prior = c(prior(normal(0, 0.1), class = b),
+                prior(exponential(9), class = sd),
+                prior(exponential(9), class = sigma)),
+      iter = 6000, seed = 2113, cores = 4, sample_prior = "yes",
+      control = list(adapt_delta = 0.9999, max_treedepth = 15))
 }
 
 # plot signal
