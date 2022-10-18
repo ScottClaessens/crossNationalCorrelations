@@ -230,7 +230,7 @@ plotSimInd <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5,
   plotFun <- function(results, title, ylab) {
     results %>%
       # strong autocorrelation levels
-      filter(rho == 0.8 & lambda == 0.8) %>%
+      filter(rho == 0.8 & lambda == 0.8 & r == 0) %>%
       # order by slope
       mutate(id = factor(1:nrow(.))) %>%
       ggplot(aes(x = fct_reorder(id, bX, .desc = TRUE), 
@@ -286,6 +286,7 @@ plotSimAll <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5,
   # plotting function
   plotFun <- function(data, title, ylab, xlab) {
     data %>%
+      filter(r == 0) %>%
       group_by(lambda, rho) %>%
       summarise(prop = sum(sig) / n(), n = n()) %>%
       mutate(lower = map2(prop, n, function(x, y) getBootCIProp(x, y, 1000)[1]), 
