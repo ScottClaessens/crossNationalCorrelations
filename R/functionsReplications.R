@@ -771,6 +771,74 @@ fitModelSkidmore2002 <- function(skidmoreData, linCov, control) {
         prior = priors, control = list(adapt_delta = 0.999))
 }
 
+# calculate spatial autocorrelation at 1000km distance
+getSpatialAutocorrelation1000km <- function(model, data) {
+  # get posterior
+  post <- posterior_samples(model, pars = c("lscale_gpLongitude..average.Latitude..average."))
+  # calculate maximum distance in dataset
+  data <- data %>% group_by(iso2lin) %>% summarise_if(is.numeric, mean)
+  maxDist <- max(as.matrix(distm(data[data$iso2lin %in% model$data$iso2lin, c("Longitude..average.","Latitude..average.")])))
+  # get spatial autocorrelation at 1000km distance
+  out <- exp(-(1 / (2 * post$lscale_gpLongitude..average.Latitude..average.^2)) * (1000*1000 / maxDist)^2)
+  return(out)
+}
+
+# calculate cultural phylogenetic signal
+getCulturalPhylogeneticSignal <- function(model) {
+  # get posterior
+  post <- posterior_samples(model, pars = c("sd_", "sigma"))
+  # get total variance
+  total <- post$sd_iso2lin__Intercept^2 + post$sigma^2
+  # include additional random effect in total variance if necessary
+  if ("sd_S009__Intercept" %in% names(post)) total <- total + post$sd_S009__Intercept^2
+  # calculate cultural phylogenetic signal as ICC
+  signal <- post$sd_iso2lin__Intercept^2 / total
+  return(signal)
+}
+
+# ratio of original to "control" effect size
+getRatioEffectSize <- function(modelOriginal, modelControl) {
+  # get posterior samples
+  postOriginal <- posterior_samples(modelOriginal)
+  postControl  <- posterior_samples(modelControl)
+  # calculate posterior eff size ratio
+  if (nrow(fixef(modelOriginal)) == 29) {
+    ratio <- postControl[,29] / median(postOriginal[,29])
+  } else {
+    ratio <- postControl[,2] / median(postOriginal[,2])
+  }
+  return(ratio)
+}
+
+# fit effect size ratio model
+fitEffSizeRatioModel <- function(formula, ratioList, saList, signalList, nsamps = 1000) {
+  # set seed
+  set.seed(2113)
+  # get indexes to sample iterations
+  id <- sample(1:2000, size = nsamps, replace = FALSE)
+  # fit first model and add to list
+  modelList <- list()
+  d <- tibble(
+    effRatio    = as.numeric(lapply(ratioList,  function(x) x[id[1]])),
+    corAt1000km = as.numeric(lapply(saList,     function(x) x[id[1]])),
+    signal      = as.numeric(lapply(signalList, function(x) x[id[1]]))
+  )
+  modelList[[1]] <- brm(formula, data = d, chains = 1, cores = 1, seed = 2113)
+  # repeat for remaining models without recompiling
+  for (i in 2:nsamps) {
+    d <- tibble(
+      effRatio    = as.numeric(lapply(ratioList,  function(x) x[id[i]])),
+      corAt1000km = as.numeric(lapply(saList,     function(x) x[id[i]])),
+      signal      = as.numeric(lapply(signalList, function(x) x[id[i]]))
+    )
+    modelList[[i]] <- update(modelList[[1]], newdata = d, 
+                             chains = 1, cores = 1, seed = 2113)
+  }
+  # combine all models
+  out <- combine_models(mlist = modelList, check_data = FALSE)
+  return(out)
+}
+
 # plot replication results - densities
 plotReplicationResults1 <- function(slopeList) {
   # type vector
@@ -983,85 +1051,61 @@ plotReplicationResults4 <- function(modelList) {
   return(out)
 }
 
-# plot replication results - autocorrelation at attenuated effect sizes
-plotReplicationResults5 <- function(modelListD, modelListA, dataList) {
+# plot replication results - autocorrelation and attenuated effect sizes
+plotReplicationResults5 <- function(effSizeRatioModel1, effSizeRatioModel2,
+                                    ratioList, saList, signalList) {
   # list of papers
   papers <- c("Adamczyk and Pitt (2009)", "Alesina et al. (2013)", 
               "Beck et al. (2003)", "Beck et al. (2005)", "Bockstette et al. (2002)", 
               "Easterly and Levine (2003)", "Easterly (2007)", "Fincher et al. (2008)", 
               "Gelfand et al. (2011)", "Inglehart and Baker (2000)", 
               "Knack and Keefer (1997)", "Skidmore and Toya (2002)")
-  # calculate spatial autocorrelation at 1000km distance
-  calculateSpatial1000 <- function(model, data) {
-    post <- posterior_samples(model, pars = c("lscale_gpLongitude..average.Latitude..average."))
-    data <- data %>% group_by(iso2lin) %>% summarise_if(is.numeric, mean)
-    maxDist <- max(as.matrix(distm(data[data$iso2lin %in% model$data$iso2lin, c("Longitude..average.","Latitude..average.")])))
-    out <- median(exp(-(1 / (2 * post$lscale_gpLongitude..average.Latitude..average.^2)) * (1000*1000 / maxDist)^2))
-    return(out)
-  }
-  # calculate cultural phylogenetic signal
-  calculateSignal <- function(model, data) {
-    post <- posterior_samples(model, pars = c("sd_", "sigma"))
-    total <- post$sd_iso2lin__Intercept^2 + post$sigma^2
-    if ("sd_S009__Intercept" %in% names(post)) total <- total + post$sd_S009__Intercept^2
-    signal <- median(post$sd_iso2lin__Intercept^2 / total)
-    return(signal)
-  }
-  # ratio of original to "control" effect size
-  calculateRatioEffectSize <- function(modelA, modelD) {
-    if (nrow(fixef(modelA)) == 29) {
-      original <- fixef(modelA)[29,1]
-      control  <- fixef(modelD)[29,1]
-    } else {
-      original <- fixef(modelA)[2,1]
-      control  <- fixef(modelD)[2,1]
-    }
-    ratio <- control / original
-    return(ratio)
-  }
-  # data
-  d <-
-    tibble(modelD = modelListD, modelA = modelListA, data = dataList, paper = papers) %>%
-    mutate(corAt1000km = map2(modelD, data, calculateSpatial1000),
-           culturalSignal = map2(modelD, data, calculateSignal),
-           effRatio = map2(modelA, modelD, calculateRatioEffectSize)) %>%
-    unnest(c(corAt1000km, culturalSignal, effRatio)) %>%
-    select(-starts_with("model"), -data)
+  # posterior averages for plotting
+  medianRatio  <- as.numeric(lapply(ratioList,  function(x) median(x)))
+  medianSA     <- as.numeric(lapply(saList,     function(x) median(x)))
+  medianSignal <- as.numeric(lapply(signalList, function(x) median(x)))
+  # points data
+  d <- tibble(
+    effRatio = medianRatio,
+    corAt1000km = medianSA,
+    culturalSignal = medianSignal,
+    paper = papers
+    )
+  # conditional effects data
+  condSA     <- conditional_effects(effSizeRatioModel1, plot = FALSE)$corAt1000km
+  condSignal <- conditional_effects(effSizeRatioModel2, plot = FALSE)$signal
   # plots
   pA <-
-    ggplot(d, aes(x = corAt1000km, y = effRatio, label = paper)) +
-    geom_hline(yintercept = 1, linetype = "dashed", colour = "grey", alpha = 0.3) +
-    geom_point() +
-    geom_smooth(method = "lm", formula = y ~ x) +
-    geom_text_repel(size = 2.4) +
+    ggplot() +
+    geom_ribbon(data = filter(condSA, corAt1000km >= 0.46), 
+                aes(x = corAt1000km, ymin = lower__, ymax = upper__),
+                fill = "grey") +
+    geom_line(data = filter(condSA, corAt1000km >= 0.46),
+              aes(x = corAt1000km, y = estimate__), colour = "blue") +
+    geom_hline(yintercept = 1, linetype = "dashed", colour = "darkgrey") +
+    geom_point(data = d, aes(x = corAt1000km, y = effRatio)) +
+    geom_text_repel(data = d, aes(x = corAt1000km, y = effRatio, label = paper), size = 2.4) +
     labs(x = "Spatial autocorrelation at 1000km",
          y = "Ratio of effect size with control\nto original effect size") +
-    ylim(c(0, 1.5)) +
+    scale_y_continuous(limits = c(0, 1.5)) +
+    scale_x_continuous(breaks = seq(0.5, 1, by = 0.1)) +
     theme_classic()
   pB <-
-    ggplot(d, aes(x = culturalSignal, y = effRatio, label = paper)) +
-    geom_hline(yintercept = 1, linetype = "dashed", colour = "grey", alpha = 0.3) +
-    geom_point() +
-    geom_smooth(method = "lm", formula = y ~ x) +
-    geom_text_repel(size = 2.4) +
-    labs(x = "Cultural phylogenetic signal", y = " \n ") +
-    ylim(c(0, 1.5)) +
+    ggplot() +
+    geom_ribbon(data = condSignal, aes(x = signal, ymin = lower__, ymax = upper__),
+                fill = "grey") +
+    geom_line(data = condSignal, aes(x = signal, y = estimate__), colour = "blue") +
+    geom_hline(yintercept = 1, linetype = "dashed", colour = "darkgrey") +
+    geom_point(data = d, aes(x = culturalSignal, y = effRatio)) +
+    geom_text_repel(data = d, aes(x = culturalSignal, y = effRatio, label = paper), size = 2.4) +
+    labs(x = "Cultural phylogenetic signal",
+         y = "Ratio of effect size with control\nto original effect size") +
+    scale_y_continuous(limits = c(0, 1.5)) +
+    scale_x_continuous(breaks = seq(0, 1, by = 0.25)) +
     theme_classic()
   # put together
   out <- plot_grid(pA, pB, nrow = 1, labels = c("a","b"))
   # save
   ggsave(out, filename = "figures/replications5.pdf", width = 8, height = 4)
   return(out)
-}
-
-getSpatialAutocorrelation1000km <- function(data, model) {
-  post <- posterior_samples(model, pars = c("lscale_gpLongitude..average.Latitude..average."))
-  maxDist <- max(as.matrix(distm(data[,c("Longitude..average.","Latitude..average.")])))
-  sa <- exp(-(1 / (2 * post[,1]^2)) * (1000*1000 / maxDist)^2)
-  return(sa)
-}
-
-getCulturalPhylogeneticSignal <- function(model) {
-  post <- posterior_samples(model)
-  signalG <- post$sd_iso2lin__Intercept^2 / (post$sd_iso2lin__Intercept^2 + post$sigma^2)
 }
