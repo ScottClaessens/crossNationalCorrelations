@@ -273,60 +273,49 @@ fitIndividualismSignal <- function(fincherData, geoCov, linCov) {
 }
 
 # plot signal
-plotGeoLinSignal <- function(postHDI, postTrad, postSurv) {
-  # plotting function
-  plotFun <- function(data, xlab, title) {
-    data %>%
-      pivot_longer(
-        cols = everything(),
-        names_to = "par",
-        values_to = "signal"
-      ) %>%
-      mutate(par = factor(par, levels = c("Residual", "Cultural", "Geographic"))) %>%
-      ggplot(aes(x = signal, y = par)) +
-      stat_halfeye(normalize = "xy") +
-      labs(x = xlab, y = NULL) +
-      xlim(c(0, 1)) +
-      ggtitle(title) +
-      theme_classic() +
-      theme(plot.title = element_text(size = 12))
-  }
-  # get data for plots
-  pA <-
+plotGeoLinSignal <- function(geoHDI, geoGDP, geoGrow, geoGini,
+                             geoTrad, geoSurv, geoTight, geoInd,
+                             linHDI, linGDP, linGrow, linGini,
+                             linTrad, linSurv, linTight, linInd) {
+  # vector of outcomes
+  outcomes <- c("HDI",
+                "GDP per capita",
+                "GDP per capita growth",
+                "Gini index",
+                "Traditional values",
+                "Survival values",
+                "Tightness",
+                "Individualism")
+  # plot
+  out <-
     tibble(
-      Geographic = as.numeric(postHDI[,,2]^2 / (postHDI[,,1]^2 + postHDI[,,2]^2 + postHDI[,,3]^2)),
-      Cultural   = as.numeric(postHDI[,,3]^2 / (postHDI[,,1]^2 + postHDI[,,2]^2 + postHDI[,,3]^2)),
-      Residual   = as.numeric(postHDI[,,1]^2 / (postHDI[,,1]^2 + postHDI[,,2]^2 + postHDI[,,3]^2))
-    )
-  pB <-
-    tibble(
-      Geographic = as.numeric(postTrad[,,1]^2 / (postTrad[,,1]^2 + postTrad[,,2]^2 + postTrad[,,3]^2)),
-      Cultural   = as.numeric(postTrad[,,2]^2 / (postTrad[,,1]^2 + postTrad[,,2]^2 + postTrad[,,3]^2)),
-      Residual   = as.numeric(postTrad[,,3]^2 / (postTrad[,,1]^2 + postTrad[,,2]^2 + postTrad[,,3]^2))
-    )
-  pC <-
-    tibble(
-      Geographic = as.numeric(postSurv[,,1]^2 / (postSurv[,,1]^2 + postSurv[,,2]^2 + postSurv[,,3]^2)),
-      Cultural   = as.numeric(postSurv[,,2]^2 / (postSurv[,,1]^2 + postSurv[,,2]^2 + postSurv[,,3]^2)),
-      Residual   = as.numeric(postSurv[,,3]^2 / (postSurv[,,1]^2 + postSurv[,,2]^2 + postSurv[,,3]^2))
-    )
-  # individual plots
-  pA <- plotFun(pA, xlab = " \n ", title = "Human Development\nIndex (HDI)")
-  pB <- plotFun(pB, xlab = "Proportion of national-level\nvariance explained", 
-                title = "Traditional vs.\nsecular values")
-  pC <- plotFun(pC, xlab = " \n ", title = "Survival vs.\nself-expression values")
-  # put together
-  out <- plot_grid(pA, 
-                   pB + theme(axis.title.y = element_blank(),
-                              axis.text.y = element_blank(),
-                              axis.line.y = element_blank(),
-                              axis.ticks.y = element_blank()), 
-                   pC + theme(axis.title.y = element_blank(),
-                              axis.text.y = element_blank(),
-                              axis.line.y = element_blank(),
-                              axis.ticks.y = element_blank()), 
-                   nrow = 1, rel_widths = c(1.35, 1, 1))
+      Geographic = list(geoHDI$samples$H1, geoGDP$samples$H1, 
+                        geoGrow$samples$H1, geoGini$samples$H1,
+                        geoTrad$samples$H1, geoSurv$samples$H1,
+                        geoTight$samples$H1, geoInd$samples$H1),
+      Cultural = list(linHDI$samples$H1, linGDP$samples$H1,
+                      linGrow$samples$H1, linGini$samples$H1,
+                      linTrad$samples$H1, linSurv$samples$H1,
+                      linTight$samples$H1, linInd$samples$H1),
+      Outcome = factor(outcomes, levels = outcomes)
+    ) %>%
+    unnest(c(Geographic, Cultural)) %>%
+    mutate(Residual = 1 - (Geographic + Cultural)) %>%
+    pivot_longer(
+      cols = !Outcome,
+      names_to = "par",
+      values_to = "signal"
+    ) %>%
+    mutate(par = factor(par, levels = c("Residual", "Cultural", "Geographic"))) %>%
+    ggplot(aes(x = signal, y = par)) +
+    stat_halfeye(normalize = "xy") +
+    facet_wrap(. ~ Outcome, nrow = 2) +
+    labs(x = "Proportion of national-level variance explained", y = NULL) +
+    xlim(c(0, 1)) +
+    theme_classic() +
+    theme(panel.spacing = unit(1.1, "lines"),
+          axis.title.x = element_text(margin = margin(7, 0, 0, 0)))
   # save
-  ggsave(out, filename = "figures/signal.pdf", width = 7, height = 3.5)
+  ggsave(out, filename = "figures/signal.pdf", width = 7, height = 5)
   return(out)
 }

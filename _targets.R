@@ -85,15 +85,6 @@ list(
   tar_target(signalSurv,  fitWVSSignal(wvs, outcome = "surv", geoCov, linCov)),
   tar_target(signalTight, fitTightnessSignal(tightness, geoCov, linCov)),
   tar_target(signalInd,   fitIndividualismSignal(fincherData, geoCov, linCov)),
-  # posterior samples
-  tar_target(postHDI,   as_draws_array(signalHDI, variable = "^sd_", regex = TRUE)),
-  tar_target(postGDP,   as_draws_array(signalGDP, variable = "^sd_", regex = TRUE)),
-  tar_target(postGrow,  as_draws_array(signalGrow, variable = "^sd_", regex = TRUE)),
-  tar_target(postGini,  as_draws_array(signalGini, variable = "^sd_", regex = TRUE)),
-  tar_target(postTrad,  as_draws_array(signalTrad, variable = "^sd_", regex = TRUE)),
-  tar_target(postSurv,  as_draws_array(signalSurv, variable = "^sd_", regex = TRUE)),
-  tar_target(postTight, as_draws_array(signalTight, variable = c("^sd_", "sigma"), regex = TRUE)),
-  tar_target(postInd,   as_draws_array(signalInd, variable = c("^sd_", "sigma"), regex = TRUE)),
   # calculate geographic signal
   tar_target(geoHDI,   hypothesis(signalHDI,   "(sd_isoGeo__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_iso__Intercept^2))=0",  class = NULL)),
   tar_target(geoGDP,   hypothesis(signalGDP,   "(sd_isoGeo__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sd_iso2__Intercept^2))=0",  class = NULL)),
@@ -113,7 +104,10 @@ list(
   tar_target(linTight, hypothesis(signalTight, "(sd_isoLin__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sigma^2))=0", class = NULL)),
   tar_target(linInd,   hypothesis(signalInd,   "(sd_isoLin__Intercept^2/(sd_isoGeo__Intercept^2+sd_isoLin__Intercept^2+sigma^2))=0", class = NULL)),
   # plot signal
-  #tar_target(plotSignal, plotGeoLinSignal(postHDI, postTrad, postSurv)),
+  tar_target(plotSignal, plotGeoLinSignal(geoHDI, geoGDP, geoGrow, geoGini,
+                                          geoTrad, geoSurv, geoTight, geoInd,
+                                          linHDI, linGDP, linGrow, linGini,
+                                          linTrad, linSurv, linTight, linInd)),
   
   #### Review ####
   
