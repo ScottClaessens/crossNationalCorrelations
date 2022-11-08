@@ -775,9 +775,23 @@ fitModelSkidmore2002 <- function(skidmoreData, linCov, control) {
 getSpatialAutocorrelation1000km <- function(model, data) {
   # get posterior
   post <- posterior_samples(model, pars = c("lscale_gpLongitude..average.Latitude..average."))
+  # if beck 2003
+  if ("Stock market development" %in% colnames(data)) {
+    data <- data %>% 
+      rename(stockMarketDev = `Stock market development`) %>% 
+      filter(iso2lin != "ZR")
+    # else if gelfand 2011
+  } else if ("DISCAS" %in% colnames(data)) {
+    data <- mutate(data, DISCAS = ifelse(iso2 == "VE", NA, DISCAS))
+    # else if knack 1997
+  } else if ("Confidence in government" %in% colnames(data)) {
+    data <- rename(data, conf = `Confidence in government`)
+  }
+  # keep only cases included in model
+  for (var in colnames(model$data)) data <- filter(data, !is.na(!!sym(var)))
   # calculate maximum distance in dataset
   data <- data %>% group_by(iso2lin) %>% summarise_if(is.numeric, mean)
-  maxDist <- max(as.matrix(distm(data[data$iso2lin %in% model$data$iso2lin, c("Longitude..average.","Latitude..average.")])))
+  maxDist <- max(as.matrix(distm(data[,c("Longitude..average.","Latitude..average.")])))
   # get spatial autocorrelation at 1000km distance
   out <- exp(-(1 / (2 * post$lscale_gpLongitude..average.Latitude..average.^2)) * (1000*1000 / maxDist)^2)
   return(out)
@@ -969,9 +983,26 @@ plotReplicationResults3 <- function(modelList, dataList) {
               "Knack and Keefer (1997)", "Skidmore and Toya (2002)")
   # plotting function
   plotFun <- function(model, data, title) {
+    # get posterior
     post <- posterior_samples(model, pars = c("lscale_gpLongitude..average.Latitude..average."))
+    # if beck 2003
+    if ("Stock market development" %in% colnames(data)) {
+      data <- data %>% 
+        rename(stockMarketDev = `Stock market development`) %>% 
+        filter(iso2lin != "ZR")
+      # else if gelfand 2011
+    } else if ("DISCAS" %in% colnames(data)) {
+      data <- mutate(data, DISCAS = ifelse(iso2 == "VE", NA, DISCAS))
+      # else if knack 1997
+    } else if ("Confidence in government" %in% colnames(data)) {
+      data <- rename(data, conf = `Confidence in government`)
+    }
+    # keep only cases included in model
+    for (var in colnames(model$data)) data <- filter(data, !is.na(!!sym(var)))
+    # calculate maximum distance in dataset
     data <- data %>% group_by(iso2lin) %>% summarise_if(is.numeric, mean)
-    maxDist <- max(as.matrix(distm(data[data$iso2lin %in% model$data$iso2lin, c("Longitude..average.","Latitude..average.")])))
+    maxDist <- max(as.matrix(distm(data[,c("Longitude..average.","Latitude..average.")])))
+    # calculate spatial autocorrelation
     tibble(x = seq(50*1000, 50000*1000, length.out = 1000)) %>%
       mutate(
         median = map(x, function(x) median(exp(-(1 / (2 * post$lscale_gpLongitude..average.Latitude..average.^2)) * (x / maxDist)^2))),
@@ -1053,7 +1084,7 @@ plotReplicationResults4 <- function(modelList) {
 
 # plot replication results - autocorrelation and attenuated effect sizes
 plotReplicationResults5 <- function(effSizeRatioModel1, effSizeRatioModel2,
-                                    ratioList, saList, signalList) {
+                                    ratioListB, ratioListC, saList, signalList) {
   # list of papers
   papers <- c("Adamczyk and Pitt (2009)", "Alesina et al. (2013)", 
               "Beck et al. (2003)", "Beck et al. (2005)", "Bockstette et al. (2002)", 
@@ -1061,12 +1092,14 @@ plotReplicationResults5 <- function(effSizeRatioModel1, effSizeRatioModel2,
               "Gelfand et al. (2011)", "Inglehart and Baker (2000)", 
               "Knack and Keefer (1997)", "Skidmore and Toya (2002)")
   # posterior averages for plotting
-  medianRatio  <- as.numeric(lapply(ratioList,  function(x) median(x)))
+  medianRatioB <- as.numeric(lapply(ratioListB, function(x) median(x)))
+  medianRatioC <- as.numeric(lapply(ratioListC, function(x) median(x)))
   medianSA     <- as.numeric(lapply(saList,     function(x) median(x)))
   medianSignal <- as.numeric(lapply(signalList, function(x) median(x)))
   # points data
   d <- tibble(
-    effRatio = medianRatio,
+    effRatioB = medianRatioB,
+    effRatioC = medianRatioC,
     corAt1000km = medianSA,
     culturalSignal = medianSignal,
     paper = papers
@@ -1083,11 +1116,12 @@ plotReplicationResults5 <- function(effSizeRatioModel1, effSizeRatioModel2,
     geom_line(data = filter(condSA, corAt1000km >= 0.46),
               aes(x = corAt1000km, y = estimate__), colour = "blue") +
     geom_hline(yintercept = 1, linetype = "dashed", colour = "darkgrey") +
-    geom_point(data = d, aes(x = corAt1000km, y = effRatio)) +
-    geom_text_repel(data = d, aes(x = corAt1000km, y = effRatio, label = paper), size = 2.4) +
+    geom_point(data = d, aes(x = corAt1000km, y = effRatioB)) +
+    geom_text_repel(data = d, aes(x = corAt1000km, y = effRatioB, label = paper), 
+                    size = 2.4, max.overlaps = 12, seed = 1) +
     labs(x = "Spatial autocorrelation at 1000km",
          y = "Ratio of effect size with control\nto original effect size") +
-    scale_y_continuous(limits = c(0, 1.5)) +
+    scale_y_continuous(limits = c(0, 1.7), breaks = c(0, 0.5, 1, 1.5)) +
     scale_x_continuous(breaks = seq(0.5, 1, by = 0.1)) +
     theme_classic()
   pB <-
@@ -1096,11 +1130,12 @@ plotReplicationResults5 <- function(effSizeRatioModel1, effSizeRatioModel2,
                 fill = "grey") +
     geom_line(data = condSignal, aes(x = signal, y = estimate__), colour = "blue") +
     geom_hline(yintercept = 1, linetype = "dashed", colour = "darkgrey") +
-    geom_point(data = d, aes(x = culturalSignal, y = effRatio)) +
-    geom_text_repel(data = d, aes(x = culturalSignal, y = effRatio, label = paper), size = 2.4) +
+    geom_point(data = d, aes(x = culturalSignal, y = effRatioC)) +
+    geom_text_repel(data = d, aes(x = culturalSignal, y = effRatioC, label = paper), 
+                    size = 2.4, seed = 1) +
     labs(x = "Cultural phylogenetic signal",
          y = "Ratio of effect size with control\nto original effect size") +
-    scale_y_continuous(limits = c(0, 1.5)) +
+    scale_y_continuous(limits = c(0, 1.7), breaks = c(0, 0.5, 1, 1.5)) +
     scale_x_continuous(breaks = seq(0, 1, by = 0.25)) +
     theme_classic()
   # put together

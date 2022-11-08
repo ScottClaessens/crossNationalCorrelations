@@ -71,17 +71,18 @@ fitSimulationModel <- function(covMat, lambda, rho, r, iter) {
                         prior_string(paste0("constant(", sigmaX, ")"), class = "sigma", resp = "x"),
                         prior_string(paste0("constant(cholesky_decompose([[1,", r, "],[", r, ",1]]))"),
                                      class = "rescor")),
-              sample_prior = "only", warmup = 0, iter = 1, chains = 1,
-              algorithm = "fixed_param")
+              sample_prior = "only", warmup = 0, iter = 1, chains = 1)
   return(mSim)
 }
 
 # simulate data
 simulateData <- function(simModel, covMat, continent, iso, langFam, 
                          geneticDistances, lambda, rho, r, iter) {
+  # fit model again with seed
+  mSim <- update(simModel, sample_prior = "only", warmup = 0, iter = 1, chains = 1, seed = iter)
   # get simulated data
   set.seed(iter)
-  pred <- posterior_predict(simModel)
+  pred <- posterior_predict(mSim)
   # standardise simulated x and y
   y <- as.numeric(scale(pred[1,,"y"]))
   x <- as.numeric(scale(pred[1,,"x"]))
@@ -320,6 +321,79 @@ plotSimAll <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5,
     plot_grid(
       plot_grid(ggdraw() + draw_label(paste0("Simulation with ", type, " non-independence"), 
                                       x = ifelse(type == "spatial", 0.27, 0.35), fontface = "bold")),
+      plot_grid(
+        pA + theme(legend.position = "none"),
+        pB + theme(legend.position = "none"),
+        pC + theme(legend.position = "none"),
+        pD + theme(legend.position = "none"),
+        nrow = 1
+      ),
+      plot_grid(
+        pE + theme(legend.position = "none"),
+        pF + theme(legend.position = "none"),
+        pG + theme(legend.position = "none"),
+        pH + theme(legend.position = "none"),
+        nrow = 1
+      ),
+      plot_grid(
+        NULL, pI + theme(legend.position = "none"),
+        pJ + theme(legend.position = "none"),
+        pK + theme(legend.position = "none"), NULL,
+        nrow = 1, rel_widths = c(0.5, 1, 1, 1, 0.5)
+      ),
+      nrow = 4, rel_heights = c(0.3, 1, 1, 1.08)
+    )
+  # add legend
+  out <- plot_grid(out, NULL, get_legend(pA), nrow = 1, rel_widths = c(1, 0.02, 0.15))
+  # save
+  ggsave(out, filename = file, width = 11, height = 7)
+  return(out)
+}
+
+# plot power analysis results across all autocorrelation levels
+plotPower <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5,
+                      olsModel6, conleyModel1, conleyModel2, brmsModel1,
+                      brmsModel2, brmsModel3, r, type, file) {
+  # true effect size
+  R <- r
+  # plotting function
+  plotFun <- function(data, title, ylab, xlab) {
+    data %>%
+      mutate(power = Q2.5 > 0) %>%
+      filter(r == R) %>%
+      group_by(lambda, rho) %>%
+      summarise(power = sum(power) / n(), n = n()) %>%
+      mutate(lower = map2(power, n, function(x, y) getBootCIProp(x, y, 1000)[1]), 
+             upper = map2(power, n, function(x, y) getBootCIProp(x, y, 1000)[2])) %>%
+      unnest(c(lower, upper)) %>%
+      ggplot(aes(x = lambda, y = power, group = factor(rho), colour = factor(rho))) +
+      geom_hline(yintercept = 0.8, linetype = "dashed") +
+      geom_pointrange(aes(x = lambda, y = power, ymin = lower, ymax = upper), 
+                      position = position_dodge(0.05), size = 0.15) +
+      geom_line(position = position_dodge(0.05)) +
+      scale_x_continuous(name = xlab, limits = c(0.1, 0.9), breaks = c(0.2, 0.5, 0.8)) +
+      scale_y_continuous(name = ylab, limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1)) +
+      guides(colour = guide_legend(title = "Strength of\nautocorrelation\nfor predictor\nvariable")) +
+      ggtitle(title) +
+      theme_classic()
+  }
+  # individual plots
+  pA <- plotFun(olsModel1, "No control", "", "")
+  pB <- plotFun(olsModel2, "Latitude", "", "")
+  pC <- plotFun(olsModel3, "Longitude", "", "")
+  pD <- plotFun(olsModel4, "Continent", "", "")
+  pE <- plotFun(olsModel5, "Language family", "Power", "")
+  pF <- plotFun(olsModel6, "Mean 2000km radius", "", "")
+  pG <- plotFun(conleyModel1, "Conley SEs spatial", "", "")
+  pH <- plotFun(conleyModel2, "Conley SEs genetic", "", "")
+  pI <- plotFun(brmsModel1, "Bayesian spatial", "", " \n ")
+  pJ <- plotFun(brmsModel2, "Bayesian linguistic", "", "Strength of autocorrelation\nfor outcome variable")
+  pK <- plotFun(brmsModel3, "Bayesian spatial and linguistic", "", " \n ")
+  # put together
+  out <-
+    plot_grid(
+      plot_grid(ggdraw() + draw_label(paste0("Simulation with ", type, " non-independence - r = ", r, ", n = 236"), 
+                                      x = ifelse(type == "spatial", 0.32, 0.42), fontface = "bold")),
       plot_grid(
         pA + theme(legend.position = "none"),
         pB + theme(legend.position = "none"),
