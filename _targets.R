@@ -27,25 +27,24 @@ simulationTargets <-
                          rho = c(0.2, 0.5, 0.8),
                          r = c(0, 0.1, 0.3, 0.5)),
     # simulation model
-    tar_target(simModel, fitSimulationModel(covMat, lambda, rho, r, iter)),
+    tar_target(simModel, fitSimulationModel(covMat, lambda, rho, r)),
     # simulate data
     tar_target(simData, simulateData(simModel, covMat, continent, iso, langFam, 
-                                     geneticDistances, lambda, rho, r, iter), 
-               pattern = map(iter), iteration = "list"),
+                                     geneticDistances, lambda, rho, r, iter)),
     # ols analyses
-    tar_target(olsModel1, fitOLSModel(y ~ x, data = simData), pattern = map(simData)),
-    tar_target(olsModel2, fitOLSModel(y ~ x + latitude, data = simData), pattern = map(simData)),
-    tar_target(olsModel3, fitOLSModel(y ~ x + longitude, data = simData), pattern = map(simData)),
-    tar_target(olsModel4, fitOLSModel(y ~ x + continent, data = simData), pattern = map(simData)),
-    tar_target(olsModel5, fitOLSModel(y ~ x + langFamily, data = simData), pattern = map(simData)),
-    tar_target(olsModel6, fitOLSModel(y ~ x + surroundingMean2000km, data = simData), pattern = map(simData)),
+    tar_target(olsModel1, fitOLSModel(y ~ x, data = simData)),
+    tar_target(olsModel2, fitOLSModel(y ~ x + latitude, data = simData)),
+    tar_target(olsModel3, fitOLSModel(y ~ x + longitude, data = simData)),
+    tar_target(olsModel4, fitOLSModel(y ~ x + continent, data = simData)),
+    tar_target(olsModel5, fitOLSModel(y ~ x + langFamily, data = simData)),
+    tar_target(olsModel6, fitOLSModel(y ~ x + surroundingMean2000km, data = simData)),
     # conley se analyses
-    tar_target(conleyModel1, fitConleyModel1(simData), pattern = map(simData)),
-    tar_target(conleyModel2, fitConleyModel2(simData), pattern = map(simData)),
+    tar_target(conleyModel1, fitConleyModel1(simData)),
+    tar_target(conleyModel2, fitConleyModel2(simData)),
     # brms analyses
-    tar_target(brmsModel1, fitBrmsModel(brmsInitial1, simData), pattern = map(simData)),
-    tar_target(brmsModel2, fitBrmsModel(brmsInitial2, simData), pattern = map(simData)),
-    tar_target(brmsModel3, fitBrmsModel(brmsInitial3, simData), pattern = map(simData))
+    tar_target(brmsModel1, fitBrmsModel(brmsInitial1, simData)),
+    tar_target(brmsModel2, fitBrmsModel(brmsInitial2, simData)),
+    tar_target(brmsModel3, fitBrmsModel(brmsInitial3, simData))
     )
 
 # pipeline
@@ -159,11 +158,11 @@ list(
   tar_target(simGeoCov, loadSimCovMat(fileGeo, continent, iso, langFam)),
   tar_target(simLinCov, loadSimCovMat(fileLin, continent, iso, langFam)),
   # initialise brms models
-  tar_target(brmsInitial1, setupBrms(simData_simLinCov_0.8_0.8_0[[1]], simLinCov, type = "spatial")),
-  tar_target(brmsInitial2, setupBrms(simData_simLinCov_0.8_0.8_0[[1]], simLinCov, type = "linguistic")),
-  tar_target(brmsInitial3, setupBrms(simData_simLinCov_0.8_0.8_0[[1]], simLinCov, type = "both")),
-  # sim iteration
-  tar_target(iter, 1:100),
+  tar_target(brmsInitial1, setupBrms(simData_simLinCov_0.8_0.8_0$simData[[1]], simLinCov, type = "spatial")),
+  tar_target(brmsInitial2, setupBrms(simData_simLinCov_0.8_0.8_0$simData[[1]], simLinCov, type = "linguistic")),
+  tar_target(brmsInitial3, setupBrms(simData_simLinCov_0.8_0.8_0$simData[[1]], simLinCov, type = "both")),
+  # sim iterations
+  tar_target(iter, 2),
   # simulation
   simulationTargets,
   # combine

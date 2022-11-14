@@ -42,7 +42,7 @@ loadSimCovMat <- function(file, continent, iso, langFam) {
 }
 
 # brms model to simulate data
-fitSimulationModel <- function(covMat, lambda, rho, r, iter) {
+fitSimulationModel <- function(covMat, lambda, rho, r) {
   # signal for dependent variable = lambda
   # signal for independent variable = rho
   signalY <- lambda
@@ -78,52 +78,128 @@ fitSimulationModel <- function(covMat, lambda, rho, r, iter) {
 # simulate data
 simulateData <- function(simModel, covMat, continent, iso, langFam, 
                          geneticDistances, lambda, rho, r, iter) {
-  # fit model again with seed
-  mSim <- update(simModel, sample_prior = "only", warmup = 0, iter = 1, chains = 1, seed = iter)
-  # get simulated data
-  set.seed(iter)
-  pred <- posterior_predict(mSim)
-  # standardise simulated x and y
-  y <- as.numeric(scale(pred[1,,"y"]))
-  x <- as.numeric(scale(pred[1,,"x"]))
-  # produce data frame and match longitude, latitude, continent, and language family data
-  out <- 
-    tibble(x = x, y = y, country = rownames(covMat), seed = iter) %>%
-    left_join(iso, by = c("country" = "iso2")) %>%
-    left_join(distinct(continent, country, .keep_all = TRUE), by = "country") %>%
-    left_join(dplyr::select(langFam, iso, langFamily), by = c("country" = "iso")) %>%
-    left_join(geneticDistances, by = c("country" = "iso2")) %>%
-    mutate(continent = factor(continent),
-           langFamily = factor(langFamily),
-           rho = rho, lambda = lambda, r = r) %>%
-    rename(latitude = Latitude..average.,
-           longitude = Longitude..average.)
-  # add outcome variable averages for nations within a 2000km radius
-  # first get distance matrix in km
-  distMat <- distm(as.matrix(out %>% dplyr::select(longitude, latitude))) / 1000
-  # are two countries within a 2000km radius? (not including oneself)
-  radiusMat <- distMat < 2000
-  diag(radiusMat) <- FALSE
-  # for each nation, get outcome variable averages for surrounding nations
-  out$surroundingMean2000km <- apply(radiusMat, 1, function(x) mean(out$y[x]))
-  return(out)
+  # function for simulating data
+  simDataFun <- function(simModel, covMat, continent, iso, langFam, 
+                         geneticDistances, lambda, rho, r, iter) {
+    # fit model again with seed
+    mSim <- update(simModel, sample_prior = "only", warmup = 0, iter = 1, chains = 1, seed = iter)
+    # get simulated data
+    set.seed(iter)
+    pred <- posterior_predict(mSim)
+    # standardise simulated x and y
+    y <- as.numeric(scale(pred[1,,"y"]))
+    x <- as.numeric(scale(pred[1,,"x"]))
+    # produce data frame and match longitude, latitude, continent, and language family data
+    out <- 
+      tibble(x = x, y = y, country = rownames(covMat), seed = iter) %>%
+      left_join(iso, by = c("country" = "iso2")) %>%
+      left_join(distinct(continent, country, .keep_all = TRUE), by = "country") %>%
+      left_join(dplyr::select(langFam, iso, langFamily), by = c("country" = "iso")) %>%
+      left_join(geneticDistances, by = c("country" = "iso2")) %>%
+      mutate(continent = factor(continent),
+             langFamily = factor(langFamily),
+             rho = rho, lambda = lambda, r = r) %>%
+      rename(latitude = Latitude..average.,
+             longitude = Longitude..average.)
+    # add outcome variable averages for nations within a 2000km radius
+    # first get distance matrix in km
+    distMat <- distm(as.matrix(out %>% dplyr::select(longitude, latitude))) / 1000
+    # are two countries within a 2000km radius? (not including oneself)
+    radiusMat <- distMat < 2000
+    diag(radiusMat) <- FALSE
+    # for each nation, get outcome variable averages for surrounding nations
+    out$surroundingMean2000km <- apply(radiusMat, 1, function(x) mean(out$y[x]))
+    return(out)
+  }
+  # map over iter
+  tibble(iter = 1:iter) %>%
+    mutate(simData = map(iter, function(x) simDataFun(simModel, covMat, continent, iso, langFam, 
+                                                      geneticDistances, lambda, rho, r, iter = x)),
+           lambda = lambda, rho = rho, r = r)
 }
 
 # ols model
 fitOLSModel <- function(formula, data) {
-  # fit model
-  m <- lm(formula, data = data)
-  # get coefficient on x and 95% CIs
-  tibble(
-    bX = as.numeric(coef(m)["x"]),
-    Q2.5 = confint(m)["x","2.5 %"],
-    Q97.5 = confint(m)["x","97.5 %"],
-    sig = (Q2.5 > 0 & Q97.5 > 0) | (Q2.5 < 0 & Q97.5 < 0),
-    seed = unique(data$seed),
-    rho = unique(data$rho),
-    lambda = unique(data$lambda),
-    r = unique(data$r)
-  )
+  data %>%
+    mutate(
+      # fit model
+      model = map(simData, function(x) lm(formula, data = x)),
+      # get coefficient on x and 95% CIs
+      bX = map(model, function(x) as.numeric(coef(x)["x"])),
+      Q2.5 = map(model, function(x) confint(x)["x","2.5 %"]), 
+      Q97.5 =  map(model, function(x) confint(x)["x","97.5 %"]),
+      sig = (Q2.5 > 0 & Q97.5 > 0) | (Q2.5 < 0 & Q97.5 < 0)
+    ) %>%
+    unnest(c(bX, Q2.5, Q97.5)) %>%
+    select(-c(simData, model))
+}
+
+# fit conley se model with geographic distances
+fitConleyModel1 <- function(data) {
+  # function for fitting and selecting models
+  fitModelFun <- function(data) {
+    # fit models across a range of distance cutoffs in km
+    models <-
+      tibble(dist_cutoff = seq(from = 100, to = 20000, by = 100)) %>%
+      mutate(
+        model = map(dist_cutoff, function(x) 
+          conleyreg(y ~ x, data = data, dist_cutoff = x,
+                    lat = "latitude", lon = "longitude",
+                    kernel = "uniform")),
+        SE = map(model, function(x) x["x","Std. Error"])
+      ) %>%
+      unnest(c(SE))
+    # select model with the largest SE
+    m <- models$model[which.max(models$SE)][[1]]
+    return(m)
+  }
+  data %>%
+    mutate(
+      # fit and select model
+      model = map(simData, function(x) fitModelFun(x)),
+      # get coefficients on X and 95% CIs
+      bX = map(model, function(x) x["x","Estimate"]),
+      Q2.5 = map(model, function(x) confint(x)["x","2.5 %"]),
+      Q97.5 = map(model, function(x) confint(x)["x","97.5 %"]),
+      sig = (Q2.5 > 0 & Q97.5 > 0) | (Q2.5 < 0 & Q97.5 < 0)
+    ) %>%
+    unnest(c(bX, Q2.5, Q97.5)) %>%
+    select(-c(simData, model))
+}
+
+# fit conley se model with genetic distances
+fitConleyModel2 <- function(data) {
+  # function for fitting and selecting models
+  fitModelFun <- function(data) {
+    # subset only to nations with genetic distance data (n = 177)
+    data <- drop_na(data, gendist_coord1, gendist_coord2)
+    # fit models across a range of distance cutoffs (max distance = 0.086)
+    models <-
+      tibble(dist_cutoff = seq(from = 0.001, to = 0.086, by = 0.001)) %>%
+      mutate(
+        model = map(dist_cutoff, function(x) 
+          conleyreg(y ~ x, data = data, dist_cutoff = x,
+                    lon = "gendist_coord1", lat = "gendist_coord2",
+                    dist_comp = "planar", kernel = "uniform")),
+        SE = map(model, function(x) x["x","Std. Error"])
+      ) %>%
+      unnest(c(SE))
+    # select model with the largest SE
+    m <- models$model[which.max(models$SE)][[1]]
+    return(m)
+  }
+  data %>%
+    mutate(
+      # fit and select model
+      model = map(simData, function(x) fitModelFun(x)),
+      # get coefficients on X and 95% CIs
+      bX = map(model, function(x) x["x","Estimate"]),
+      Q2.5 = map(model, function(x) confint(x)["x","2.5 %"]),
+      Q97.5 = map(model, function(x) confint(x)["x","97.5 %"]),
+      sig = (Q2.5 > 0 & Q97.5 > 0) | (Q2.5 < 0 & Q97.5 < 0)
+    ) %>%
+    unnest(c(bX, Q2.5, Q97.5)) %>%
+    select(-c(simData, model))
 }
 
 # initialise brms model
@@ -146,81 +222,23 @@ setupBrms <- function(data, covMat, type = "") {
 
 # fit brms model
 fitBrmsModel <- function(brmsInitial, data) {
-  # fit model
-  m <- update(brmsInitial, newdata = data, chains = 4,
-              control = list(adapt_delta = 0.999, max_treedepth = 15),
-              cores = 4, seed = 2113, iter = 2000)
-  # get coefficient on X and 95% CIs
-  tibble(
-    bX = fixef(m)["x","Estimate"],
-    Q2.5 = fixef(m)["x","Q2.5"],
-    Q97.5 = fixef(m)["x","Q97.5"],
-    sig = (Q2.5 > 0 & Q97.5 > 0) | (Q2.5 < 0 & Q97.5 < 0),
-    rhat = rhat(m)["b_x"],
-    divergences = sum(rstan::get_divergent_iterations(m$fit)),
-    seed = unique(data$seed),
-    rho = unique(data$rho),
-    lambda = unique(data$lambda),
-    r = unique(data$r)
-  )
-}
-
-# fit conley se model with geographic distances
-fitConleyModel1 <- function(data) {
-  # fit models across a range of distance cutoffs in km
-  models <-
-    tibble(dist_cutoff = seq(from = 100, to = 20000, by = 100)) %>%
+  data %>%
     mutate(
-      model = map(dist_cutoff, function(x) 
-        conleyreg(y ~ x, data = data, dist_cutoff = x,
-                  lat = "latitude", lon = "longitude",
-                  kernel = "uniform")),
-      SE = map(model, function(x) x["x","Std. Error"])
-      ) %>%
-    unnest(c(SE))
-  # select model with the largest SE
-  m <- models$model[which.max(models$SE)][[1]]
-  # get coefficient on X and 95% CIs
-  tibble(
-    bX = m["x","Estimate"],
-    Q2.5 = confint(m)["x","2.5 %"],
-    Q97.5 = confint(m)["x","97.5 %"],
-    sig = (Q2.5 > 0 & Q97.5 > 0) | (Q2.5 < 0 & Q97.5 < 0),
-    seed = unique(data$seed),
-    rho = unique(data$rho),
-    lambda = unique(data$lambda),
-    r = unique(data$r)
-  )
-}
-
-# fit conley se model with genetic distances
-fitConleyModel2 <- function(data) {
-  # subset only to nations with genetic distance data (n = 177)
-  data <- drop_na(data, gendist_coord1, gendist_coord2)
-  # fit models across a range of distance cutoffs (max distance = 0.086)
-  models <-
-    tibble(dist_cutoff = seq(from = 0.001, to = 0.086, by = 0.001)) %>%
-    mutate(
-      model = map(dist_cutoff, function(x) 
-        conleyreg(y ~ x, data = data, dist_cutoff = x,
-                  lon = "gendist_coord1", lat = "gendist_coord2",
-                  dist_comp = "planar", kernel = "uniform")),
-      SE = map(model, function(x) x["x","Std. Error"])
+      # fit model
+      model = map(simData, function(x) update(brmsInitial, newdata = x, chains = 4,
+                                              control = list(adapt_delta = 0.999, max_treedepth = 15),
+                                              cores = 4, seed = 2113, iter = 2000)),
+      # get coefficient on x and 95% CIs
+      bX = map(model, function(x) fixef(x)["x","Estimate"]),
+      Q2.5 = map(model, function(x) fixef(x)["x","Q2.5"]), 
+      Q97.5 =  map(model, function(x) fixef(x)["x","Q97.5"]),
+      sig = (Q2.5 > 0 & Q97.5 > 0) | (Q2.5 < 0 & Q97.5 < 0),
+      # bayesian model diagnostics
+      rhat = map(model, function(x) rhat(x)["b_x"]),
+      divergences = map(model, function(x) sum(rstan::get_divergent_iterations(x$fit)))
     ) %>%
-    unnest(c(SE))
-  # select model with the largest SE
-  m <- models$model[which.max(models$SE)][[1]]
-  # get coefficient on X and 95% CIs
-  tibble(
-    bX = m["x","Estimate"],
-    Q2.5 = confint(m)["x","2.5 %"],
-    Q97.5 = confint(m)["x","97.5 %"],
-    sig = (Q2.5 > 0 & Q97.5 > 0) | (Q2.5 < 0 & Q97.5 < 0),
-    seed = unique(data$seed),
-    rho = unique(data$rho),
-    lambda = unique(data$lambda),
-    r = unique(data$r)
-  )
+    unnest(c(bX, Q2.5, Q97.5, rhat, divergences)) %>%
+    select(-c(simData, model))
 }
 
 # plot individual simulation results at strong autocorrelation levels
