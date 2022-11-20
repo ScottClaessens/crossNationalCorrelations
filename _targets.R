@@ -162,7 +162,7 @@ list(
   tar_target(brmsInitial2, setupBrms(simData_simLinCov_0.8_0.8_0$simData[[1]], simLinCov, type = "linguistic")),
   tar_target(brmsInitial3, setupBrms(simData_simLinCov_0.8_0.8_0$simData[[1]], simLinCov, type = "both")),
   # sim iterations
-  tar_target(iter, 2),
+  tar_target(iter, 100),
   # simulation
   simulationTargets,
   # combine
