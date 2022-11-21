@@ -305,3 +305,13 @@ plotReviewArticle <- function(review, yearArticle, ifArticle) {
   ggsave(out, filename = "figures/reviewArticle.pdf", height = 6, width = 6.5)
   return(out)
 }
+
+# make table with all articles in review
+makeTableArticlesReview <- function(review) {
+  review %>%
+    select(Review, Citation, CitationsPerYear) %>%
+    distinct() %>%
+    rename(Reference = Citation, `Citations per year` = CitationsPerYear) %>%
+    mutate(Review = c("Cultural values", rep("", times = 49),
+                      "Economic development", rep("", times = 49)))
+}

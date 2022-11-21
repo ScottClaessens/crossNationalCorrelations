@@ -241,6 +241,38 @@ fitBrmsModel <- function(brmsInitial, data) {
     select(-c(simData, model))
 }
 
+# plot simulation results across all autocorrelation levels
+makeTableSimAll <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5,
+                            olsModel6, conleyModel1, conleyModel2, brmsModel1,
+                            brmsModel2, brmsModel3) {
+  # list of outputs
+  l <- list(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5,
+            olsModel6, conleyModel1, conleyModel2, brmsModel1,
+            brmsModel2, brmsModel3)
+  # get percentage
+  getPerc <- function(x, Rho, Lambda) {
+    x %>% 
+      filter(rho == Rho & lambda == Lambda & r == 0) %>% 
+      pull(sig) %>% 
+      sum()
+  }
+  tibble(
+    Model = c("No control", "Latitude", "Longitude", "Continent",
+              "Language family", "Mean 2000km radius", "Conley SEs spatial",
+              "Conley SEs genetic", "Bayesian spatial", "Bayesian linguistic",
+              "Bayesian spatial & linguistic"),
+    `Rho = 0.2\nLambda = 0.2` = unlist(lapply(l, getPerc, Rho = 0.2, Lambda = 0.2)),
+    `Rho = 0.2\nLambda = 0.5` = unlist(lapply(l, getPerc, Rho = 0.2, Lambda = 0.5)),
+    `Rho = 0.2\nLambda = 0.8` = unlist(lapply(l, getPerc, Rho = 0.2, Lambda = 0.8)),
+    `Rho = 0.5\nLambda = 0.2` = unlist(lapply(l, getPerc, Rho = 0.5, Lambda = 0.2)),
+    `Rho = 0.5\nLambda = 0.5` = unlist(lapply(l, getPerc, Rho = 0.5, Lambda = 0.5)),
+    `Rho = 0.5\nLambda = 0.8` = unlist(lapply(l, getPerc, Rho = 0.5, Lambda = 0.8)),
+    `Rho = 0.8\nLambda = 0.2` = unlist(lapply(l, getPerc, Rho = 0.8, Lambda = 0.2)),
+    `Rho = 0.8\nLambda = 0.5` = unlist(lapply(l, getPerc, Rho = 0.8, Lambda = 0.5)),
+    `Rho = 0.8\nLambda = 0.8` = unlist(lapply(l, getPerc, Rho = 0.8, Lambda = 0.8))
+  )
+}
+
 # plot individual simulation results at strong autocorrelation levels
 plotSimInd <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5,
                        olsModel6, conleyModel1, conleyModel2, brmsModel1,

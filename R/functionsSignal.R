@@ -319,3 +319,49 @@ plotGeoLinSignal <- function(geoHDI, geoGDP, geoGrow, geoGini,
   ggsave(out, filename = "figures/signal.pdf", width = 7, height = 5)
   return(out)
 }
+
+# make table of signal values
+makeTableGeoLinSignal <- function(geoHDI, geoGDP, geoGrow, geoGini,
+                                  geoTrad, geoSurv, geoTight, geoInd,
+                                  linHDI, linGDP, linGrow, linGini,
+                                  linTrad, linSurv, linTight, linInd) {
+  # tidy function
+  tidySignal <- function(signal) {
+    paste0(
+      format(round(signal$hypothesis$Estimate, 2), nsmall = 2), ", 95% CI [",
+      format(round(signal$hypothesis$CI.Lower, 2), nsmall = 2), ", ",
+      format(round(signal$hypothesis$CI.Upper, 2), nsmall = 2), "], BF ",
+      ifelse(
+        signal$hypothesis$Evid.Ratio <= 0, "> 100",
+        ifelse(
+          1 / signal$hypothesis$Evid.Ratio > 100, "> 100",
+          paste0("= ", format(round(1 / signal$hypothesis$Evid.Ratio, 2), nsmall = 2)))
+        )
+      )
+  }
+  # make table
+  tibble(
+    Outcome = c("Human Development Index", "GDP per capita", "GDP per capita growth", "Gini index",
+                "Traditional values", "Survival values", "Tightness", "Individualism"),
+    `Geographic signal` = c(
+      tidySignal(geoHDI),
+      tidySignal(geoGDP),
+      tidySignal(geoGrow),
+      tidySignal(geoGini),
+      tidySignal(geoTrad),
+      tidySignal(geoSurv),
+      tidySignal(geoTight),
+      tidySignal(geoInd)
+    ),
+    `Cultural phylogenetic signal` = c(
+      tidySignal(linHDI),
+      tidySignal(linGDP),
+      tidySignal(linGrow),
+      tidySignal(linGini),
+      tidySignal(linTrad),
+      tidySignal(linSurv),
+      tidySignal(linTight),
+      tidySignal(linInd)
+    )
+  )
+}

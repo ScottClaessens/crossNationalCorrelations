@@ -853,6 +853,70 @@ fitEffSizeRatioModel <- function(formula, ratioList, saList, signalList, nsamps 
   return(out)
 }
 
+# table of deviations from original analyses
+makeTableDeviations <- function() {
+  tibble(
+    Analysis = c(
+      "Adamczyk and Pitt (2009)", "Alesina et al. (2013)", "Beck et al. (2003)", 
+      "Beck et al. (2005)", "Bockstette et al. (2002)", "Easterly and Levine (2003)", 
+      "Easterly (2007)", "Fincher et al. (2008)", "Gelfand et al. (2011)", 
+      "Inglehart and Baker (2000)", "Knack and Keefer (1997)", "Skidmore and Toya (2002)"
+      ),
+    `Original N` = c("33", ">177", "70", "45", "94", "72", "118", "68", "30", "65", "28", "89"),
+    `Reanalysis N` = c("33", "75", "69", "45", "103", "63", "98", "67", "28", "38", "28", "89"),
+    `Reason for deviation` = c(
+      "N/A",
+      paste0("Original analysis used imputed values for traditional plough use which were ",
+             "unavailable to us. For our reanalysis, we collected data from Tables A4 and A9 ",
+             "and ran our regression on the 75 nations with available data for female labour ",
+             "force participation in 2000 and traditional plough use."),
+      paste0("We removed one nation (Zaire) as it was not present in our linguistic distance matrix."),
+      "N/A",
+      paste0("After manually linking state history data from Appendix A with world development ",
+             "indicators, we had complete data for 103 nations."),
+      paste0("After manually linking log GDP per capita 1995 data from Appendix Table A2 in Acemoglu ",
+             "et al. (2001) with an institutions index self-constructed from world governance indicators, ",
+             "we only had complete data for 63 nations."),
+      paste0("After manually linking log wheat-sugar ratio data from Appendix A with longitudinal Gini ",
+             "data, we only had complete data for 98 nations."),
+      "We combined England and Northern Ireland into a single nation (United Kingdom) for the reanalysis.",
+      paste0("We combined East and West Germany into a single nation (Germany) and removed a high ",
+             "leverage point with a substantially higher disaster rate than other nations (Venezuela)."),
+      paste0("After manually linking traditional values data from the World Values Survey with data on ",
+             "percentage total employment in industry from World Development Indicators, we only ",
+             "had complete data for 38 nations."),
+      "N/A",
+      "N/A"
+    )
+  )
+}
+
+# table of replication results
+makeTableReplications <- function(slopeListA, slopeListB, slopeListC, slopeListD) {
+  # get median and 95% CI
+  printMed95CI <- function(x) {
+    paste0(
+      ifelse(round(median(x), 2) >= 0, " ", ""),
+      format(round(median(x), 2), nsmall = 2), ", 95% CI [",
+      ifelse(round(quantile(x, 0.025), 2) >= 0, " ", ""),
+      format(round(quantile(x, 0.025), 2), nsmall = 2), ", ",
+      ifelse(round(quantile(x, 0.975), 2) >= 0, " ", ""),
+      format(round(quantile(x, 0.975), 2), nsmall = 2), "]"
+    )
+  }
+  # make table
+  tibble(
+    Analysis = c("Adamczyk and Pitt (2009)", "Alesina et al. (2013)", "Beck et al. (2003)", 
+                 "Beck et al. (2005)", "Bockstette et al. (2002)", "Easterly and Levine (2003)", 
+                 "Easterly (2007)", "Fincher et al. (2008)", "Gelfand et al. (2011)", 
+                 "Inglehart and Baker (2000)", "Knack and Keefer (1997)", "Skidmore and Toya (2002)"),
+    `No control`       = unlist(lapply(slopeListA, printMed95CI)),
+    `Spatial control`  = unlist(lapply(slopeListB, printMed95CI)),
+    `Cultural control` = unlist(lapply(slopeListC, printMed95CI)),
+    `Both controls`    = unlist(lapply(slopeListD, printMed95CI)),
+  )
+}
+
 # plot replication results - densities
 plotReplicationResults1 <- function(slopeList) {
   # type vector
@@ -867,7 +931,7 @@ plotReplicationResults1 <- function(slopeList) {
                     "*Bockstette et al. (2002)*, n = 103<br>GDP growth ~ State antiquity",
                     "*Easterly and Levine (2003)*, n = 63<br>Log GDP ~ Institutional development",
                     "*Easterly (2007)*, n = 98<br>Gini ~ Log wheat sugar ratio",
-                    "*Fincher et al. (2008)*, n = 66<br>Individualism ~ Hist. pathogen prevalence",
+                    "*Fincher et al. (2008)*, n = 67<br>Individualism ~ Hist. pathogen prevalence",
                     "*Gelfand et al. (2011)*, n = 28<br>Tightness ~ Nature disaster vulnerability",
                     "*Inglehart and Baker (2000)*, n = 38<br>Traditional values ~ % industrial sector",
                     "*Knack and Keefer (1997)*, n = 28<br>Confidence in institutions ~ % trusting",

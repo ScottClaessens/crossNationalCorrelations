@@ -111,6 +111,11 @@ list(
                                           geoTrad, geoSurv, geoTight, geoInd,
                                           linHDI, linGDP, linGrow, linGini,
                                           linTrad, linSurv, linTight, linInd)),
+  # table
+  tar_target(tableSignal, makeTableGeoLinSignal(geoHDI, geoGDP, geoGrow, geoGini,
+                                                geoTrad, geoSurv, geoTight, geoInd,
+                                                linHDI, linGDP, linGrow, linGini,
+                                                linTrad, linSurv, linTight, linInd)),
   
   #### Review ####
   
@@ -141,6 +146,8 @@ list(
   tar_target(plotReview1, plotReviewArticle(review, yearArticle, ifArticle)), 
   tar_target(plotReview2, plotReviewAnalysis(review, yearAnalysis, ifAnalysis, 
                                              postRM1, postRM2, postRM3, postRM4, postRM5)),
+  # table of articles in review
+  tar_target(tableArticlesReview, makeTableArticlesReview(review)),
   
   #### Simulation ####
   
@@ -188,6 +195,13 @@ list(
   tar_combine(brmsModel2_simLinCov,   simulationTargets$brmsModel2[37:72],   command = dplyr::bind_rows(!!!.x)),
   tar_combine(brmsModel3_simGeoCov,   simulationTargets$brmsModel3[1:36],    command = dplyr::bind_rows(!!!.x)),
   tar_combine(brmsModel3_simLinCov,   simulationTargets$brmsModel3[37:72],   command = dplyr::bind_rows(!!!.x)),
+  # tables of simulation results
+  tar_target(tableSim1, makeTableSimAll(olsModel1_simGeoCov, olsModel2_simGeoCov, olsModel3_simGeoCov, olsModel4_simGeoCov, 
+                                        olsModel5_simGeoCov, olsModel6_simGeoCov, conleyModel1_simGeoCov, conleyModel2_simGeoCov,
+                                        brmsModel1_simGeoCov, brmsModel2_simGeoCov, brmsModel3_simGeoCov)),
+  tar_target(tableSim2, makeTableSimAll(olsModel1_simLinCov, olsModel2_simLinCov, olsModel3_simLinCov, olsModel4_simLinCov, 
+                                        olsModel5_simLinCov, olsModel6_simLinCov, conleyModel1_simLinCov, conleyModel2_simLinCov,
+                                        brmsModel1_simLinCov, brmsModel2_simLinCov, brmsModel3_simLinCov)),
   # plot simulation results
   # false positive rates
   tar_target(plotSim1, plotSimInd(olsModel1_simGeoCov, olsModel2_simGeoCov, olsModel3_simGeoCov, olsModel4_simGeoCov, 
@@ -493,6 +507,21 @@ list(
                                                       list(adamczykSignal1, alesinaSignal1, beckSignal1, beckSignal2, 
                                                            bockstetteSignal1, easterlySignal1, easterlySignal2, fincherSignal1, 
                                                            gelfandSignal1, inglehartSignal1, knackSignal1, skidmoreSignal1))),
+  # table of deviations from original analyses
+  tar_target(tableDeviations, makeTableDeviations()),
+  # table of replication results
+  tar_target(tableReplications, makeTableReplications(list(adamczykSlope1a, alesinaSlope1a, beckSlope1a, beckSlope2a, 
+                                                           bockstetteSlope1a, easterlySlope1a, easterlySlope2a, fincherSlope1a, 
+                                                           gelfandSlope1a, inglehartSlope1a, knackSlope1a, skidmoreSlope1a),
+                                                      list(adamczykSlope1b, alesinaSlope1b, beckSlope1b, beckSlope2b, 
+                                                           bockstetteSlope1b, easterlySlope1b, easterlySlope2b, fincherSlope1b, 
+                                                           gelfandSlope1b, inglehartSlope1b, knackSlope1b, skidmoreSlope1b),
+                                                      list(adamczykSlope1c, alesinaSlope1c, beckSlope1c, beckSlope2c, 
+                                                           bockstetteSlope1c, easterlySlope1c, easterlySlope2c, fincherSlope1c, 
+                                                           gelfandSlope1c, inglehartSlope1c, knackSlope1c, skidmoreSlope1c),
+                                                      list(adamczykSlope1d, alesinaSlope1d, beckSlope1d, beckSlope2d, 
+                                                           bockstetteSlope1d, easterlySlope1d, easterlySlope2d, fincherSlope1d, 
+                                                           gelfandSlope1d, inglehartSlope1d, knackSlope1d, skidmoreSlope1d))),
   # plot results of replications
   tar_target(plotReplications1, plotReplicationResults1(list(adamczykSlope1a, adamczykSlope1b, adamczykSlope1c, adamczykSlope1d,
                                                              alesinaSlope1a, alesinaSlope1b, alesinaSlope1c, alesinaSlope1d,
