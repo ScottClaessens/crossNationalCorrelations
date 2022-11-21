@@ -7,6 +7,10 @@ output: md_document
 
 ```{r echo=F}
 options(width = 300)
+oecd <- c("AT","AU","BE","CA","CH","CL","CZ","DE","DK",
+          "EE","ES","FI","FR","GB","GR","HU","IE","IL",
+          "IS","IT","JP","KR","LT","LU","LV","MX","NL",
+          "NO","NZ","PL","PT","SE","SI","SK","TR","US")
 ```
 
 I recently posted a pre-print on PsyArxiv entitled ["The non-independence of nations and why it matters"](https://psyarxiv.com/m6bsn/). In the paper, myself and Quentin Atkinson argue that many cross-national correlations in the social sciences are flawed because they do not adequately take into account various forms of non-independence between nations. Nations are linked to one another via spatial proximity and shared cultural ancestry, and failing to account for these dependencies can increase the chance of false positives.
@@ -33,20 +37,6 @@ The data and code for this vignette can be found on GitHub: https://github.com/S
 ## Spatially non-independent simulated data
 
 For this demonstration, we load a subset of OECD nations from one of the many simulated datasets from our paper. This dataset contains a standardised predictor variable (X) and a standardised outcome variable (Y), both of which are strongly spatially autocorrelated.
-
-```{r echo=FALSE}
-# load data from targets cache
-spatialSimData <- tar_read(simData_simGeoCov_0.8_0.8_1728b220)
-# only OECD countries for example, country iso codes
-oecd <- c("AT","AU","BE","CA","CH","CL","CZ","DE","DK",
-          "EE","ES","FI","FR","GB","GR","HU","IE","IL",
-          "IS","IT","JP","KR","LT","LU","LV","MX","NL",
-          "NO","NZ","PL","PT","SE","SI","SK","TR","US")
-spatialSimData <- filter(spatialSimData, country %in% oecd)
-# write data to file
-write.csv(file = "data/vignette/spatialSimData.csv", 
-          spatialSimData, row.names = FALSE)
-```
 
 ```{r}
 # load dataset from file
@@ -126,16 +116,6 @@ As expected, the slope has reduced in size, and the 95% credible interval now in
 It is also possible for nations to be culturally non-independent --- that is, they share common influences from shared cultural ancestors. For example, even though the United Kingdom and New Zealand are on opposite sides of the planet, they are culturally similar due to the effects of British colonialism. This source of non-independence can be just as important as spatial proximity, especially when we are interested in cultural norms and institutions.
 
 As before, we load a subset of OECD nations from a simulated dataset containing a standardised predictor variable (X) and a standardised outcome variable (Y). Both of these variables are strongly culturally autocorrelated.
-
-```{r echo=FALSE}
-# load data from targets cache
-culturalSimData <- tar_read(simData_simLinCov_0.8_0.8_0fb442ad)
-# only OECD countries
-culturalSimData <- filter(culturalSimData, country %in% oecd)
-# write data to file
-write.csv(file = "data/vignette/culturalSimData.csv", 
-          culturalSimData, row.names = FALSE)
-```
 
 ```{r}
 # load dataset from file

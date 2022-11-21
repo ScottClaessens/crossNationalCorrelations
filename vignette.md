@@ -62,7 +62,7 @@ outcome variables.
       geom_smooth(method = "lm") +
       theme_classic()
 
-![](vignette_files/figure-markdown_strict/unnamed-chunk-5-1.png)
+![](vignette_files/figure-markdown_strict/unnamed-chunk-4-1.png)
 
 The relationship between the simulated variables appears to be positive.
 But is this just due to spatial non-independence? From the plot, it
@@ -105,12 +105,12 @@ this model.
     ## 
     ## Population-Level Effects: 
     ##           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## Intercept    -0.06      0.19    -0.44     0.32 1.00     3205     2621
-    ## x             0.55      0.17     0.21     0.87 1.00     3513     2908
+    ## Intercept    -0.06      0.19    -0.45     0.31 1.00     3351     2339
+    ## x             0.55      0.17     0.22     0.90 1.00     3512     2890
     ## 
     ## Family Specific Parameters: 
     ##       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## sigma     0.97      0.12     0.78     1.23 1.00     3012     2261
+    ## sigma     0.97      0.12     0.78     1.23 1.00     3485     3109
     ## 
     ## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -167,17 +167,17 @@ We fit this model by adding a `gp()` term to our formula.
     ## 
     ## Gaussian Process Terms: 
     ##                             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## sdgp(gplatitudelongitude)       0.59      0.28     0.09     1.22 1.00     1294      857
-    ## lscale(gplatitudelongitude)     0.09      0.08     0.02     0.28 1.00     1474     1975
+    ## sdgp(gplatitudelongitude)       0.60      0.27     0.10     1.17 1.00     1208      836
+    ## lscale(gplatitudelongitude)     0.09      0.08     0.02     0.28 1.00     1655     1849
     ## 
     ## Population-Level Effects: 
     ##           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## Intercept     0.30      0.35    -0.32     1.03 1.00     2103     2585
-    ## x             0.32      0.22    -0.13     0.74 1.00     2853     2917
+    ## Intercept     0.30      0.34    -0.29     1.02 1.00     1994     2450
+    ## x             0.32      0.21    -0.08     0.73 1.00     2302     2528
     ## 
     ## Family Specific Parameters: 
     ##       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## sigma     0.83      0.12     0.63     1.09 1.00     2289     2854
+    ## sigma     0.82      0.12     0.62     1.09 1.00     2194     2876
     ## 
     ## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -217,7 +217,7 @@ outcome variables.
       geom_smooth(method = "lm") +
       theme_classic()
 
-![](vignette_files/figure-markdown_strict/unnamed-chunk-13-1.png)
+![](vignette_files/figure-markdown_strict/unnamed-chunk-11-1.png)
 
 There’s a positive relationship between the variables. But a close look
 at the plot suggests some cultural clustering. For example, the
@@ -257,12 +257,12 @@ model.
     ## 
     ## Population-Level Effects: 
     ##           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## Intercept    -0.18      0.13    -0.44     0.08 1.00     3538     2960
-    ## x             0.38      0.15     0.09     0.68 1.00     3554     2725
+    ## Intercept    -0.18      0.13    -0.45     0.09 1.00     3311     2558
+    ## x             0.37      0.15     0.08     0.67 1.00     3193     2486
     ## 
     ## Family Specific Parameters: 
     ##       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## sigma     0.81      0.10     0.64     1.03 1.00     3688     2931
+    ## sigma     0.81      0.10     0.65     1.02 1.00     3074     2871
     ## 
     ## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -319,7 +319,7 @@ relatedness of different nations.
     ggcorrplot(linProx, hc.order = TRUE, type = "lower") +
       theme(legend.title = element_blank())
 
-![](vignette_files/figure-markdown_strict/unnamed-chunk-18-1.png)
+![](vignette_files/figure-markdown_strict/unnamed-chunk-16-1.png)
 
 From this plot, we can see that majority English-speaking nations have
 high linguistic proximity (i.e. cultural similarity), as do Scandinavian
@@ -350,7 +350,7 @@ from Paul-Christian Bürkner.
     # get model summary
     summary(m2.2)
 
-    ## Warning: There were 5 divergent transitions after warmup. Increasing adapt_delta above 0.999 may help. See http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
+    ## Warning: There were 12 divergent transitions after warmup. Increasing adapt_delta above 0.999 may help. See http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
 
     ##  Family: gaussian 
     ##   Links: mu = identity; sigma = identity 
@@ -362,16 +362,16 @@ from Paul-Christian Bürkner.
     ## Group-Level Effects: 
     ## ~country (Number of levels: 36) 
     ##               Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## sd(Intercept)     0.62      0.36     0.03     1.23 1.02       77      330
+    ## sd(Intercept)     0.54      0.35     0.02     1.19 1.03      131      382
     ## 
     ## Population-Level Effects: 
     ##           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## Intercept    -0.03      0.27    -0.50     0.57 1.01      820      878
-    ## x             0.30      0.17    -0.04     0.63 1.00     1500     1527
+    ## Intercept    -0.05      0.26    -0.48     0.58 1.01      710      556
+    ## x             0.30      0.17    -0.02     0.62 1.00     1547     2091
     ## 
     ## Family Specific Parameters: 
     ##       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## sigma     0.55      0.25     0.07     0.93 1.03       59       79
+    ## sigma     0.60      0.22     0.14     0.95 1.02      135      182
     ## 
     ## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential

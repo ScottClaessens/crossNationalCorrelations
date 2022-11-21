@@ -580,7 +580,7 @@ list(
   
   #### Vignette ####
   
-  #tar_render(vignette, "vignette.Rmd"),
+  tar_render(vignette, "vignette.Rmd"),
   
   #### Session Info ####
   
