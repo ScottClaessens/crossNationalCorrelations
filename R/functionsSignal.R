@@ -341,7 +341,7 @@ makeTableGeoLinSignal <- function(geoHDI, geoGDP, geoGrow, geoGini,
   }
   # make table
   tibble(
-    Outcome = c("Human Development Index", "GDP per capita", "GDP per capita growth", "Gini index",
+    Outcome = c("HDI", "GDPpc", "GDPpc growth", "Gini index",
                 "Traditional values", "Survival values", "Tightness", "Individualism"),
     `Geographic signal` = c(
       tidySignal(geoHDI),

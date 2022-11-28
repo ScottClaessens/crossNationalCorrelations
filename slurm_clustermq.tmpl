@@ -4,7 +4,7 @@
 #SBATCH --output=worker.%A_%a.out           # you can add .%a for array index
 #SBATCH --error=worker.%A_%a.err            # log file
 #SBATCH --mem=50000                         # memory (mb)
-#SBATCH --time=03-00:00:00                  # Walltime (DD-HH:MM:SS)
+#SBATCH --time=01-00:00:00                  # Walltime (DD-HH:MM:SS)
 #SBATCH --array=1-{{ n_jobs }}              # job array
 #SBATCH --cpus-per-task=4                   # 4 CPUs
 #SBATCH --account=uoa03415                  # Project code

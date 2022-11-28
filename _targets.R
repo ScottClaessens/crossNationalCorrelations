@@ -14,7 +14,8 @@ options(
 tar_option_set(packages = c("brms", "cowplot", "conleyreg", "countrycode", 
                             "dagitty", "geosphere", "ggdag", "ggrepel", "ggtext", 
                             "haven", "lmtest", "papaja", "psych", "readxl", 
-                            "rstan", "sf", "sjlabelled", "tidybayes", "tidyverse"))
+                            "rstan", "sf", "sjlabelled", "tidybayes", "tidyverse"),
+               memory = "transient", garbage_collection = TRUE)
 
 # targets for simulation (see below)
 simulationTargets <-
@@ -576,7 +577,7 @@ list(
   
   #### Manuscript ####
   
-  #tar_render(manuscript, "manuscript.Rmd"),
+  tar_render(manuscript, "manuscript.Rmd"),
   
   #### Vignette ####
   

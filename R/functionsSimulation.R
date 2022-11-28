@@ -101,14 +101,14 @@ simulateData <- function(simModel, covMat, continent, iso, langFam,
              rho = rho, lambda = lambda, r = r) %>%
       rename(latitude = Latitude..average.,
              longitude = Longitude..average.)
-    # add outcome variable averages for nations within a 2000km radius
+    # add predictor variable averages for nations within a 2000km radius
     # first get distance matrix in km
     distMat <- distm(as.matrix(out %>% dplyr::select(longitude, latitude))) / 1000
     # are two countries within a 2000km radius? (not including oneself)
     radiusMat <- distMat < 2000
     diag(radiusMat) <- FALSE
-    # for each nation, get outcome variable averages for surrounding nations
-    out$surroundingMean2000km <- apply(radiusMat, 1, function(x) mean(out$y[x]))
+    # for each nation, get predictor variable averages for surrounding nations
+    out$surroundingMean2000km <- apply(radiusMat, 1, function(i) mean(out$x[i]))
     return(out)
   }
   # map over iter
