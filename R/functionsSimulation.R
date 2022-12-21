@@ -261,15 +261,15 @@ makeTableSimAll <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel
               "Language family", "Mean 2000km radius", "Conley SEs spatial",
               "Conley SEs genetic", "Bayesian spatial", "Bayesian linguistic",
               "Bayesian spatial & linguistic"),
-    `Rho = 0.2\nLambda = 0.2` = unlist(lapply(l, getPerc, Rho = 0.2, Lambda = 0.2)),
-    `Rho = 0.2\nLambda = 0.5` = unlist(lapply(l, getPerc, Rho = 0.2, Lambda = 0.5)),
-    `Rho = 0.2\nLambda = 0.8` = unlist(lapply(l, getPerc, Rho = 0.2, Lambda = 0.8)),
-    `Rho = 0.5\nLambda = 0.2` = unlist(lapply(l, getPerc, Rho = 0.5, Lambda = 0.2)),
-    `Rho = 0.5\nLambda = 0.5` = unlist(lapply(l, getPerc, Rho = 0.5, Lambda = 0.5)),
-    `Rho = 0.5\nLambda = 0.8` = unlist(lapply(l, getPerc, Rho = 0.5, Lambda = 0.8)),
-    `Rho = 0.8\nLambda = 0.2` = unlist(lapply(l, getPerc, Rho = 0.8, Lambda = 0.2)),
-    `Rho = 0.8\nLambda = 0.5` = unlist(lapply(l, getPerc, Rho = 0.8, Lambda = 0.5)),
-    `Rho = 0.8\nLambda = 0.8` = unlist(lapply(l, getPerc, Rho = 0.8, Lambda = 0.8))
+    `Rho = 0.2 Lambda = 0.2` = unlist(lapply(l, getPerc, Rho = 0.2, Lambda = 0.2)),
+    `Rho = 0.2 Lambda = 0.5` = unlist(lapply(l, getPerc, Rho = 0.2, Lambda = 0.5)),
+    `Rho = 0.2 Lambda = 0.8` = unlist(lapply(l, getPerc, Rho = 0.2, Lambda = 0.8)),
+    `Rho = 0.5 Lambda = 0.2` = unlist(lapply(l, getPerc, Rho = 0.5, Lambda = 0.2)),
+    `Rho = 0.5 Lambda = 0.5` = unlist(lapply(l, getPerc, Rho = 0.5, Lambda = 0.5)),
+    `Rho = 0.5 Lambda = 0.8` = unlist(lapply(l, getPerc, Rho = 0.5, Lambda = 0.8)),
+    `Rho = 0.8 Lambda = 0.2` = unlist(lapply(l, getPerc, Rho = 0.8, Lambda = 0.2)),
+    `Rho = 0.8 Lambda = 0.5` = unlist(lapply(l, getPerc, Rho = 0.8, Lambda = 0.5)),
+    `Rho = 0.8 Lambda = 0.8` = unlist(lapply(l, getPerc, Rho = 0.8, Lambda = 0.8))
   )
 }
 

@@ -896,7 +896,6 @@ makeTableReplications <- function(slopeListA, slopeListB, slopeListC, slopeListD
   # get median and 95% CI
   printMed95CI <- function(x) {
     paste0(
-      ifelse(round(median(x), 2) >= 0, " ", ""),
       format(round(median(x), 2), nsmall = 2), ", 95% CI [",
       ifelse(round(quantile(x, 0.025), 2) >= 0, " ", ""),
       format(round(quantile(x, 0.025), 2), nsmall = 2), ", ",

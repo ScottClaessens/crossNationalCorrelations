@@ -164,19 +164,60 @@ plotReviewAnalysis <- function(review, yearAnalysis, ifAnalysis,
           axis.ticks.y = element_blank(),
           axis.line.y = element_blank())
   # impact factor results
+  pBdata <- plot(conditional_effects(ifAnalysis, resolution = 500, prob = 0.50), plot = FALSE)[[2]]$data
   pB <-
-    plot(conditional_effects(ifAnalysis, resolution = 500, prob = 0.50), plot = FALSE)[[2]] +
+    ggplot() +
+    stat_dots(
+      data = mutate(
+        review, 
+        ControlNI = ifelse(ControlNI == "Yes", 1, 0),
+        side = ifelse(ControlNI == 0, "top", "bottom"),
+        Review = ifelse(Review == "Cultural\nvalues", "Values", "Economic development")
+        ),
+      aes(y = ControlNI, x = IF, side = side, fill = Review, colour = Review),
+      scale = 0.5
+    ) +
+    geom_ribbon(
+      data = pBdata, 
+      aes(x = IF, ymin = lower__, ymax = upper__, fill = Review),
+      alpha = 0.4
+      ) +
+    geom_line(
+      data = pBdata,
+      aes(x = IF, y = estimate__, colour = Review)
+      ) +
     scale_y_continuous(name = "Probability of analysis\ncontrolling for non-independence", 
-                       limits = c(0, 1)) +
+                       limits = c(0, 1), expand = c(0, 0)) +
     scale_x_log10(name = "Journal impact factor") +
     theme_classic()
   # years published
   years <- c(1995, 2000, 2005, 2010, 2015, 2020)
   # spline results
+  pCdata <- plot(conditional_effects(yearAnalysis, prob = 0.50), plot = FALSE)[[3]]$data
   pC <-
-    plot(conditional_effects(yearAnalysis, prob = 0.50), plot = FALSE)[[3]] +
+    ggplot() +
+    stat_dots(
+      data = mutate(
+        review, 
+        ControlNI = ifelse(ControlNI == "Yes", 1, 0),
+        side = ifelse(ControlNI == 0, "top", "bottom"),
+        Review = ifelse(Review == "Cultural\nvalues", "Values", "Economic development"),
+        Year.std = as.numeric(scale(Year))
+      ),
+      aes(y = ControlNI, x = Year.std, side = side, fill = Review, colour = Review),
+      scale = 0.5
+    ) +
+    geom_ribbon(
+      data = pCdata, 
+      aes(x = Year.std, ymin = lower__, ymax = upper__, fill = Review),
+      alpha = 0.4
+    ) +
+    geom_line(
+      data = pCdata,
+      aes(x = Year.std, y = estimate__, colour = Review)
+    ) +
     scale_y_continuous(name = "Probability of analysis\ncontrolling for non-independence", 
-                       limits = c(0, 1)) +
+                       limits = c(0, 1), expand = c(0, 0)) +
     scale_x_continuous(name = "Year", labels = function(x) round((x*sd(review$Year)) + mean(review$Year), 0),
                        breaks = (years - mean(review$Year)) / sd(review$Year)) +
     theme_classic()
@@ -203,7 +244,7 @@ plotReviewAnalysis <- function(review, yearAnalysis, ifAnalysis,
                guides(colour = guide_legend(byrow = TRUE)))
   out <- plot_grid(out, legend, nrow = 1, rel_widths = c(1, 0.22))
   # save
-  ggsave(out, filename = "figures/reviewAnalysis.pdf", height = 6, width = 6.5)
+  ggsave(out, filename = "figures/reviewAnalysis.pdf", height = 6, width = 7)
   return(out)
 }
 
@@ -260,11 +301,43 @@ plotReviewArticle <- function(review, yearArticle, ifArticle) {
           axis.text.y = element_blank(),
           axis.ticks.y = element_blank(),
           axis.line.y = element_blank())
+  # prepare review raw data by article
+  review100 <-
+    review %>%
+    group_by(Review, Citation) %>%
+    summarise(
+      ControlNI = ifelse(sum(ControlNI == "Yes") > 0, 1, 0),
+      Year = mean(Year),
+      IF = mean(IF)
+    ) %>%
+    mutate(
+      Year.std = as.numeric(scale(Year)),
+      Review = factor(Review)
+    )
   # impact factor results
+  pBdata <- plot(conditional_effects(ifArticle, resolution = 500, prob = 0.50), plot = FALSE)[[2]]$data
   pB <-
-    plot(conditional_effects(ifArticle, resolution = 500, prob = 0.50), plot = FALSE)[[2]] +
+    ggplot() +
+    stat_dots(
+      data = mutate(
+        review100, 
+        side = ifelse(ControlNI == 0, "top", "bottom"),
+        Review = ifelse(Review == "Cultural\nvalues", "Values", "Economic development")
+      ),
+      aes(y = ControlNI, x = IF, side = side, fill = Review, colour = Review),
+      scale = 0.5, dotsize = 0.35
+    ) +
+    geom_ribbon(
+      data = pBdata, 
+      aes(x = IF, ymin = lower__, ymax = upper__, fill = Review),
+      alpha = 0.4
+    ) +
+    geom_line(
+      data = pBdata,
+      aes(x = IF, y = estimate__, colour = Review)
+    ) +
     scale_y_continuous(name = "Probability of article\ncontrolling for non-independence", 
-                       limits = c(0, 1)) +
+                       limits = c(0, 1), expand = c(0, 0)) +
     scale_x_log10(name = "Journal impact factor") +
     theme_classic()
   # years published
@@ -272,10 +345,29 @@ plotReviewArticle <- function(review, yearArticle, ifArticle) {
   meanYear <- review %>% group_by(Review, Citation) %>% summarise(Year = mean(Year)) %>% pull(Year) %>% mean()
   sdYear   <- review %>% group_by(Review, Citation) %>% summarise(Year = mean(Year)) %>% pull(Year) %>% sd()
   # spline results
+  pCdata <- plot(conditional_effects(yearArticle, prob = 0.50), plot = FALSE)[[3]]$data
   pC <-
-    plot(conditional_effects(yearArticle, prob = 0.50), plot = FALSE)[[3]] +
+    ggplot() +
+    stat_dots(
+      data = mutate(
+        review100, 
+        side = ifelse(ControlNI == 0, "top", "bottom"),
+        Review = ifelse(Review == "Cultural\nvalues", "Values", "Economic development")
+      ),
+      aes(y = ControlNI, x = Year.std, side = side, fill = Review, colour = Review),
+      scale = 0.5, dotsize = 0.3
+    ) +
+    geom_ribbon(
+      data = pCdata, 
+      aes(x = Year.std, ymin = lower__, ymax = upper__, fill = Review),
+      alpha = 0.4
+    ) +
+    geom_line(
+      data = pCdata,
+      aes(x = Year.std, y = estimate__, colour = Review)
+    ) +
     scale_y_continuous(name = "Probability of article\ncontrolling for non-independence", 
-                       limits = c(0, 1)) +
+                       limits = c(0, 1), expand = c(0, 0)) +
     scale_x_continuous(name = "Year", labels = function(x) round((x*sdYear) + meanYear, 0),
                        breaks = (years - meanYear) / sdYear) +
     theme_classic()
@@ -302,7 +394,7 @@ plotReviewArticle <- function(review, yearArticle, ifArticle) {
                  guides(colour = guide_legend(byrow = TRUE)))
   out <- plot_grid(out, legend, nrow = 1, rel_widths = c(1, 0.22))
   # save
-  ggsave(out, filename = "figures/reviewArticle.pdf", height = 6, width = 6.5)
+  ggsave(out, filename = "figures/reviewArticle.pdf", height = 6, width = 7)
   return(out)
 }
 

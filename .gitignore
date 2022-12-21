@@ -61,3 +61,6 @@ review/_old/
 
 # google drive files
 desktop.ini
+
+# data for conley SEs checks
+data/stataCheck/

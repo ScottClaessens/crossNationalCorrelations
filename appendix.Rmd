@@ -12,7 +12,7 @@
 
 ### Calculating global geographic and linguistic proximity matrices
 
-Geographic distance between two nations was calculated as the logged geodesic distance between country capital cities (data from the R package _maps_; Brownrigg, 2018) using the R package _geosphere_ (Hijmans, 2019). The geographic proximity matrix was computed as one minus the log geographic distance matrix scaled between 0 and 1.
+Geographic distance between two nations was calculated as the logged geodesic distance between nation capital cities (data from the R package _maps_; Brownrigg, 2018) using the R package _geosphere_ (Hijmans, 2019). The geographic proximity matrix was computed as one minus the log geographic distance matrix scaled between 0 and 1.
 
 Linguistic proximity between two nations was calculated as the cultural proximity between all languages spoken within those nations, weighted by speaker percentages. We acquired cultural proximity data by combining the language family trees provided by Glottolog v3.0 (Hammarström et al., 2017) into one global language tree (undated and unresolved). We calculated cultural proximity $s$ between two languages $j$ and $k$ as the distance (in number of nodes traversed) of their most recent common ancestor $i$ to the root of the tree, through the formula:
 
@@ -71,7 +71,9 @@ where $n$ is the number of nations, and $D^2_{ij}$ reflects the squared Euclidea
 
 \newpage
 
-To control for cultural phylogenetic non-independence, we manually specify the covariance structure for nation random intercepts using a pre-computed linguistic proximity matrix $L$ (see previous section). The covariance between two nations is assumed to be linearly proportional to the linguistic proximity between those nations. This assumption is justified if we assume that cultural traits evolve via Brownian motion along a language phylogeny. The non-centered parameterisation of this model is:
+To control for cultural phylogenetic non-independence, we manually specify the covariance structure for nation random intercepts using a pre-computed linguistic proximity matrix $L$ (see previous section). The covariance between two nations is assumed to be linearly proportional to the linguistic proximity between those nations. This assumption is justified if we assume that cultural traits evolve neutrally via Brownian motion along a language phylogeny. Although this is a conservative assumption, we follow this approach here rather than another Gaussian Process for several reasons: (1) to avoid model non-convergence when later including a spatial Gaussian Process in the same model, (2) to work around the lack of a coordinate system for linguistic distances, as opposed to latitude and longitude values for geographic distance, and (3) to showcase different ways that researchers can allow nations to covary to control for non-independence.
+
+The non-centered parameterisation of this model is:
 
 $$
 \begin{aligned}
@@ -113,9 +115,21 @@ $$
 
 \newpage
 
+## Supplementary Results
+
+### Further exploration of twelve reanalyses
+
+```{r load autocor}
+tar_load(c(inglehartSA1, skidmoreSA1, alesinaSignal1, knackSignal1, effSizeRatioModel1, effSizeRatioModel2))
+```
+
+To understand why some cross-national correlations were attenuated by controls for non-independence while others were robust, we further explored our fitted models for evidence of spatial and cultural autocorrelation. For each outcome variable, our Gaussian process models provided varying estimates of how quickly spatial autocorrelation declined with distance (Supplementary Figure \@ref(fig:plotReplications3)). For example, in Skidmore and Toya[@Skidmore2002] gross domestic product growth was only moderately spatially autocorrelated at 1,000 km distance (posterior median spatial autocorrelation at 1,000 km = `r printnum(median(skidmoreSA1))`, 95% CI [`r printnum(quantile(skidmoreSA1, 0.025))` `r printnum(quantile(skidmoreSA1, 0.975))`]), whereas in Inglehart and Baker[@Inglehart2000] traditional values were strongly spatially autocorrelated at the same distance (posterior median spatial autocorrelation at 1,000 km = `r printnum(median(inglehartSA1))`, 95% CI [`r printnum(quantile(inglehartSA1, 0.025))` `r printnum(quantile(inglehartSA1, 0.975))`]). We also found varying estimates of cultural phylogenetic signal (Supplementary Figure \@ref(fig:plotReplications4)), with some outcome variables expressing low signal (e.g. confidence in institutions[@Knack1997]; posterior median = `r printnum(median(knackSignal1))`, 95% CI [`r printnum(quantile(knackSignal1, 0.025))` `r printnum(quantile(knackSignal1, 0.975))`]) and others expressing high signal (e.g. female labour force participation[@Alesina2013]; posterior median = `r printnum(median(alesinaSignal1))`, 95% CI [`r printnum(quantile(alesinaSignal1, 0.025))` `r printnum(quantile(alesinaSignal1, 0.975))`]). Exploratory regressions provided suggestive evidence that stronger estimates of spatial autocorrelation or cultural phylogenetic signal resulted in a more pronounced reduction in the effect size when controlling for non-independence between nations (Supplementary Figure \@ref(fig:plotReplications5)). However, these negative slopes for spatial autocorrelation (b = `r printnum(fixef(effSizeRatioModel1)["corAt1000km","Estimate"])`, 95% CI [`r printnum(fixef(effSizeRatioModel1)["corAt1000km","Q2.5"])` `r printnum(fixef(effSizeRatioModel1)["corAt1000km","Q97.5"])`]) and cultural phylogenetic signal (b = `r printnum(fixef(effSizeRatioModel2)["signal","Estimate"])`, 95% CI [`r printnum(fixef(effSizeRatioModel2)["signal","Q2.5"])` `r printnum(fixef(effSizeRatioModel2)["signal","Q97.5"])`]) were both very uncertain, due to the small number of analyses and the posterior uncertainty in effect sizes and estimates of non-independence.
+
+\newpage
+
 ## Supplementary Figures
 
-(ref:dagCaption) _A causal directed acyclic graph of spatial and cultural phylogenetic non-independence in cross-national studies._ We are interested in estimating the direct effect of national-level exposure $X$ on national-level outcome $Y$. But these variables are confounded by their common unobserved cause $U$. $U$ is a stand-in for shared environmental, ecological, and geographic causes (e.g. climate, biodiversity, physical topography) and cultural and institutional causes (e.g. cultural norms, political systems). In this causal model, we need to condition on $U$ to estimate the direct path from $X$ to $Y$, but we cannot since it is unobserved. However, geographic $G$ and linguistic $L$ relationships between societies influence $U$, since changing a nation's spatial distance to or shared cultural ancestry with other nations will change its environmental and cultural traits. We can thus use $G$ and $L$ to model the covariation between $X$ and $Y$ induced by $U$. Failing to do this and simply estimating the bivariate correlation between $X$ and $Y$ will produce spurious relationships and residuals that are spatially and culturally non-independent around the world.
+(ref:dagCaption) _A causal directed acyclic graph of spatial and cultural phylogenetic non-independence in cross-national studies._ We are interested in estimating the direct effect of national-level exposure $X$ on national-level outcome $Y$. But these variables are confounded by their common unobserved cause $U$. $U$ is a stand-in for shared environmental, ecological, and geographic causes (e.g. climate, biodiversity, physical topography) and cultural and institutional causes (e.g. cultural norms, technologies, and institutions). In this causal model, we need to condition on $U$ to estimate the direct path from $X$ to $Y$, but we cannot since it is unobserved. However, geographic $G$ and linguistic $L$ relationships between societies influence $U$, since changing a nation's spatial distance to or shared cultural ancestry with other nations will change its environmental and cultural traits. We can thus use $G$ and $L$ to model the covariation between $X$ and $Y$ induced by $U$. Failing to do this and simply estimating the bivariate correlation between $X$ and $Y$ will produce spurious relationships and residuals that are spatially and culturally non-independent around the world.
 
 ```{r dag, fig.width=6, fig.height=3.5, fig.cap="(ref:dagCaption)", fig.pos='H', out.width="\\textwidth"}
 tar_read(dag)
@@ -123,7 +137,7 @@ tar_read(dag)
 
 \newpage
 
-(ref:plotReview2Caption) _Analysis-level results from systematic review of 100 highly-cited cross-national studies of economic development (red) and cultural values (blue)._ (a) Proportion of analyses accounting for non-independence, overall and split by common methods of controlling for non-independence. (b) The association between journal impact factor and the probability that an analysis accounts for non-independence. (c) Estimated trend over time for the probability that an analysis accounts for non-independence. Point ranges represent estimated proportions and 95% credible intervals. Lines and shaded areas are posterior median regression lines and 50% credible intervals from Bayesian multilevel models. Region FEs = region fixed effects.
+(ref:plotReview2Caption) _Analysis-level results from systematic review of 100 highly-cited cross-national studies of economic development (red) and cultural values (blue)._ (a) Proportion of analyses accounting for non-independence, overall and split by common methods of controlling for non-independence. (b) The association between journal impact factor and the probability that an analysis accounts for non-independence. (c) Estimated trend over time for the probability that an analysis accounts for non-independence. Point ranges represent estimated proportions and 95% credible intervals. Lines and shaded areas are posterior median regression lines and 50% credible intervals from Bayesian multilevel models. Histograms represent relative counts for individual analyses that did (top) or did not (bottom) account for non-independence. Region FEs = region fixed effects.
 
 ```{r plotReview2, fig.width=6.5, fig.height=6, fig.cap="(ref:plotReview2Caption)", fig.pos='H', out.width="\\textwidth"}
 tar_read(plotReview2)
@@ -131,7 +145,7 @@ tar_read(plotReview2)
 
 \newpage
 
-(ref:plotSim1Caption) _Distribution of cross-national correlations from simulation study under strong spatial autocorrelation._ In these simulations, the strength of spatial autocorrelation is set to 0.8 for both outcome and predictor variables. For frequentist regression models, point ranges represent correlation estimates and 95% confidence intervals. For Bayesian regression models, point ranges represent posterior means and 95% credible intervals. Correlations are ordered by effect size independently in each panel. Red point ranges indicate that the slope is "significant" (i.e. the 95% confidence / credible interval excludes zero). Black point ranges indicate that the slope is "not significant".
+(ref:plotSim1Caption) _Distribution of cross-national correlations from simulation study under strong spatial autocorrelation._ In these simulations, the strength of spatial autocorrelation is set to 0.8 for both outcome and predictor variables, and the true correlation is set to 0. For frequentist regression models, point ranges represent correlation estimates and 95% confidence intervals. For Bayesian regression models, point ranges represent posterior means and 95% credible intervals. Correlations are ordered by effect size independently in each panel. Red point ranges indicate that the 95% confidence / credible interval excludes zero. Black point ranges indicate that the 95% confidence / credible interval includes zero.
 
 ```{r plotSim1, fig.width=9.5, fig.height=5.5, fig.cap="(ref:plotSim1Caption)", fig.pos='H', out.width="\\textwidth"}
 tar_read(plotSim1)
@@ -139,10 +153,58 @@ tar_read(plotSim1)
 
 \newpage
 
-(ref:plotSim2Caption) _Distribution of cross-national correlations from simulation study under strong cultural phylogenetic autocorrelation._ In these simulations, the strength of cultural phylogenetic autocorrelation is set to 0.8 for both outcome and predictor variables. For frequentist regression models, point ranges represent correlation estimates and 95% confidence intervals. For Bayesian regression models, point ranges represent posterior means and 95% credible intervals. Correlations are ordered by effect size independently in each panel. Red point ranges indicate that the slope is "significant" (i.e. the 95% confidence / credible interval excludes zero). Black point ranges indicate that the slope is "not significant".
+(ref:plotSim2Caption) _Distribution of cross-national correlations from simulation study under strong cultural phylogenetic autocorrelation._ In these simulations, the strength of cultural phylogenetic autocorrelation is set to 0.8 for both outcome and predictor variables, and the true correlation is set to 0. For frequentist regression models, point ranges represent correlation estimates and 95% confidence intervals. For Bayesian regression models, point ranges represent posterior means and 95% credible intervals. Correlations are ordered by effect size independently in each panel. Red point ranges indicate that the 95% confidence / credible interval excludes zero. Black point ranges indicate that the 95% confidence / credible interval includes zero.
 
 ```{r plotSim2, fig.width=9.5, fig.height=5.5, fig.cap="(ref:plotSim2Caption)", fig.pos='H', out.width="\\textwidth"}
 tar_read(plotSim2)
+```
+
+\newpage
+
+(ref:plotPowerGeo01Caption) _Statistical power estimates for different methods of controlling for spatial non-independence in our simulation study, assuming a small true effect size (r = 0.1)._ For simulated outcome and predictor variables, we systematically varied the strength of spatial autocorrelation, from weak (0.2) to moderate (0.5) to strong (0.8). We simulated 100 datasets per parameter combination assuming a small true correlation between variables (_r_ = 0.1) and fitted different models to each dataset. Statistical power was operationalised as the proportion of models that estimated a slope with a 95% confidence / credible interval excluding zero. Point ranges represent proportions and 95% bootstrap confidence intervals, and dashed lines indicate 80% power. SEs = standard errors.
+
+```{r plotPowerGeo01, fig.width=11, fig.height=7, fig.cap="(ref:plotPowerGeo01Caption)", fig.pos='H', out.width="\\textwidth"}
+tar_read(plotPowerGeo0.1)
+```
+
+\newpage
+
+(ref:plotPowerGeo03Caption) _Statistical power estimates for different methods of controlling for spatial non-independence in our simulation study, assuming a medium true effect size (r = 0.3)._ For simulated outcome and predictor variables, we systematically varied the strength of spatial autocorrelation, from weak (0.2) to moderate (0.5) to strong (0.8). We simulated 100 datasets per parameter combination assuming a medium true correlation between variables (_r_ = 0.3) and fitted different models to each dataset. Statistical power was operationalised as the proportion of models that estimated a slope with a 95% confidence / credible interval excluding zero. Point ranges represent proportions and 95% bootstrap confidence intervals, and dashed lines indicate 80% power. SEs = standard errors.
+
+```{r plotPowerGeo03, fig.width=11, fig.height=7, fig.cap="(ref:plotPowerGeo03Caption)", fig.pos='H', out.width="\\textwidth"}
+tar_read(plotPowerGeo0.3)
+```
+
+\newpage
+
+(ref:plotPowerGeo05Caption) _Statistical power estimates for different methods of controlling for spatial non-independence in our simulation study, assuming a large true effect size (r = 0.5)._ For simulated outcome and predictor variables, we systematically varied the strength of spatial autocorrelation, from weak (0.2) to moderate (0.5) to strong (0.8). We simulated 100 datasets per parameter combination assuming a large true correlation between variables (_r_ = 0.5) and fitted different models to each dataset. Statistical power was operationalised as the proportion of models that estimated a slope with a 95% confidence / credible interval excluding zero. Point ranges represent proportions and 95% bootstrap confidence intervals, and dashed lines indicate 80% power. SEs = standard errors.
+
+```{r plotPowerGeo05, fig.width=11, fig.height=7, fig.cap="(ref:plotPowerGeo05Caption)", fig.pos='H', out.width="\\textwidth"}
+tar_read(plotPowerGeo0.5)
+```
+
+\newpage
+
+(ref:plotPowerLin01Caption) _Statistical power estimates for different methods of controlling for cultural phylogenetic non-independence in our simulation study, assuming a small true effect size (r = 0.1)._ For simulated outcome and predictor variables, we systematically varied the strength of cultural phylogenetic autocorrelation, from weak (0.2) to moderate (0.5) to strong (0.8). We simulated 100 datasets per parameter combination assuming a small true correlation between variables (_r_ = 0.1) and fitted different models to each dataset. Statistical power was operationalised as the proportion of models that estimated a slope with a 95% confidence / credible interval excluding zero. Point ranges represent proportions and 95% bootstrap confidence intervals, and dashed lines indicate 80% power. SEs = standard errors.
+
+```{r plotPowerLin01, fig.width=11, fig.height=7, fig.cap="(ref:plotPowerLin01Caption)", fig.pos='H', out.width="\\textwidth"}
+tar_read(plotPowerLin0.1)
+```
+
+\newpage
+
+(ref:plotPowerLin03Caption) _Statistical power estimates for different methods of controlling for cultural phylogenetic non-independence in our simulation study, assuming a medium true effect size (r = 0.3)._ For simulated outcome and predictor variables, we systematically varied the strength of cultural phylogenetic autocorrelation, from weak (0.2) to moderate (0.5) to strong (0.8). We simulated 100 datasets per parameter combination assuming a medium true correlation between variables (_r_ = 0.3) and fitted different models to each dataset. Statistical power was operationalised as the proportion of models that estimated a slope with a 95% confidence / credible interval excluding zero. Point ranges represent proportions and 95% bootstrap confidence intervals, and dashed lines indicate 80% power. SEs = standard errors.
+
+```{r plotPowerLin03, fig.width=11, fig.height=7, fig.cap="(ref:plotPowerLin03Caption)", fig.pos='H', out.width="\\textwidth"}
+tar_read(plotPowerLin0.3)
+```
+
+\newpage
+
+(ref:plotPowerLin05Caption) _Statistical power estimates for different methods of controlling for cultural phylogenetic non-independence in our simulation study, assuming a large true effect size (r = 0.5)._ For simulated outcome and predictor variables, we systematically varied the strength of cultural phylogenetic autocorrelation, from weak (0.2) to moderate (0.5) to strong (0.8). We simulated 100 datasets per parameter combination assuming a large true correlation between variables (_r_ = 0.5) and fitted different models to each dataset. Statistical power was operationalised as the proportion of models that estimated a slope with a 95% confidence / credible interval excluding zero. Point ranges represent proportions and 95% bootstrap confidence intervals, and dashed lines indicate 80% power. SEs = standard errors.
+
+```{r plotPowerLin05, fig.width=11, fig.height=7, fig.cap="(ref:plotPowerLin05Caption)", fig.pos='H', out.width="\\textwidth"}
+tar_read(plotPowerLin0.5)
 ```
 
 \newpage
@@ -155,7 +217,7 @@ tar_read(plotReplications2)
 
 \newpage
 
-(ref:plotReplications3Caption) _Posterior estimates of Gaussian process functions mapping spatial autocorrelation onto geographic distance from our reanalyses of economic development (a) and cultural values (b) studies._ Estimates are from models additionally controlling for cultural phylogenetic non-independence. The y-axis represents the amount of spatial autocorrelation between data points with increasing distance between those points on the x-axis (logged distance in kilometres). Lines and shaded areas represent median posterior spatial autocorrelation functions and 50% and 95% credible intervals.
+(ref:plotReplications3Caption) _Posterior estimates of Gaussian process functions mapping spatial autocorrelation onto geographic distance from our reanalyses of economic development (a) and cultural values (b) studies._ The y-axis represents the amount of spatial autocorrelation between data points with increasing distance between those points on the x-axis (logged distance in kilometres). Lines and shaded areas represent median posterior spatial autocorrelation functions and 50% and 95% credible intervals.
 
 ```{r plotReplications3, fig.width=8.2, fig.height=6, fig.cap="(ref:plotReplications3Caption)", fig.pos='H', out.width="\\textwidth"}
 tar_read(plotReplications3)
@@ -163,7 +225,7 @@ tar_read(plotReplications3)
 
 \newpage
 
-(ref:plotReplications4Caption) _Posterior estimates of cultural phylogenetic signal from our reanalyses._ Estimates are from models additionally controlling for spatial non-independence. Cultural phylogenetic signal is operationalised as the proportion of national-level variance explained by linguistic proximity between nations. Ridges are full posterior distributions, and points are posterior medians, and lines represent 50% and 95% credible intervals.
+(ref:plotReplications4Caption) _Posterior estimates of cultural phylogenetic signal from our reanalyses._ Cultural phylogenetic signal is operationalised as the proportion of national-level variance explained by linguistic proximity between nations. Ridges are full posterior distributions, and points are posterior medians, and lines represent 50% and 95% credible intervals.
 
 ```{r plotReplications4, fig.width=5, fig.height=5, fig.cap="(ref:plotReplications4Caption)", fig.pos='H', out.width="\\textwidth"}
 tar_read(plotReplications4)
@@ -171,6 +233,13 @@ tar_read(plotReplications4)
 
 \newpage
 
+(ref:plotReplications5Caption) _The estimated degree of spatial and cultural phylogenetic non-independence predicts reductions in effect size in our reanalysis._ (a) Higher estimated degrees of spatial autocorrelation at 1,000 km distance predict more pronounced reductions in effect sizes when controlling for non-independence. (b) Higher estimated levels of cultural phylogenetic signal predict more pronounced reductions in effect sizes when controlling for non-independence. In both panels, the y-axis represents the ratio of the effect size when controlling for spatial and cultural non-independence to the original effect size (from naive regression model), and the x-axis represents posterior median model estimates. Regression lines are plotted with 95% credible intervals.
+
+```{r plotReplications5, fig.width=8, fig.height=4, fig.cap="(ref:plotReplications5Caption)"}
+tar_read(plotReplications5)
+```
+
+\newpage
 
 ## Supplementary Tables
 
@@ -195,10 +264,84 @@ apa_table(
   tar_read(tableArticlesReview),
   booktabs = TRUE,
   placement = "H",
-  font_size = "small",
+  font_size = "footnotesize",
   longtable = TRUE,
   align = c("m{2cm}", "m{11cm}", "m{2cm}"),
   caption = "(ref:tableArticlesReviewCaption)"
+)
+```
+
+\newpage
+
+(ref:tableSim1Caption) False positive rates in simulation with varying levels of spatial autocorrelation for the predictor variable ($\rho$) and for the outcome variable ($\lambda$), assuming that the true correlation is 0. Numbers represent the total number of analyses, out of 100, that estimated a slope with a 95% confidence / credible interval excluding zero, falsely inferring a relationship when none is present.
+
+```{r tableSim1, echo=F, warning=F, message=F}
+apa_table(
+  tar_read(tableSim1),
+  booktabs = TRUE,
+  landscape = TRUE,
+  escape = FALSE,
+  col_spanners = list(`$\\rho$ = 0.2` = c(2,4),
+                      `$\\rho$ = 0.5` = c(5,7),
+                      `$\\rho$ = 0.8` = c(8,10)),
+  col.names = c("Model", rep(paste0("$\\lambda$ = ", 
+                                    c(0.2, 0.5, 0.8)), times = 3)),
+  placement = "H",
+  font_size = "small",
+  caption = "(ref:tableSim1Caption)"
+)
+```
+
+\newpage
+
+(ref:tableSim2Caption) False positive rates in simulation with varying levels of cultural phylogenetic autocorrelation for the predictor variable ($\rho$) and for the outcome variable ($\lambda$), assuming that the true correlation is 0. Numbers represent the total number of analyses, out of 100, that estimated a slope with a 95% confidence / credible interval excluding zero, falsely inferring a relationship when none is present.
+
+```{r tableSim2, echo=F, warning=F, message=F}
+apa_table(
+  tar_read(tableSim2),
+  booktabs = TRUE,
+  landscape = TRUE,
+  escape = FALSE,
+  col_spanners = list(`$\\rho$ = 0.2` = c(2,4),
+                      `$\\rho$ = 0.5` = c(5,7),
+                      `$\\rho$ = 0.8` = c(8,10)),
+  col.names = c("Model", rep(paste0("$\\lambda$ = ", 
+                                    c(0.2, 0.5, 0.8)), times = 3)),
+  placement = "H",
+  font_size = "small",
+  caption = "(ref:tableSim2Caption)"
+)
+```
+
+\newpage
+
+(ref:tableReplicationsCaption) Estimated cross-national correlations from our reanalysis of twelve previous cross-national analyses. Numbers are posterior median slopes (equivalent to Pearson's r correlation coefficients) with 95% credible intervals.
+
+```{r tableReplications, echo=F, warning=F, message=F}
+apa_table(
+  tar_read(tableReplications),
+  booktabs = TRUE,
+  placement = "H",
+  font_size = "footnotesize",
+  align = "r",
+  landscape = TRUE,
+  caption = "(ref:tableReplicationsCaption)"
+)
+```
+
+\newpage
+
+(ref:tableDeviationsCaption) List of sample size deviations between original analyses and reanalyses.
+
+```{r tableDeviations, echo=F, warning=F, message=F}
+apa_table(
+  tar_read(tableDeviations),
+  booktabs = TRUE,
+  placement = "H",
+  font_size = "footnotesize",
+  longtable = TRUE,
+  align = c("m{4cm}", "m{2cm}", "m{2cm}", "m{7cm}"),
+  caption = "(ref:tableDeviationsCaption)"
 )
 ```
 

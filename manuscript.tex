@@ -156,7 +156,7 @@
     {}{\InnerPatchFailed}%
   }
 {}{\PatchFailed}
-\keywords{spatial non-independence; cultural non-independence; cross-national analyses; simulations; replications; reanalyses\newline\indent Word count: xxxx words}
+\keywords{spatial non-independence; cultural non-independence; cross-national analyses; simulations; replications; reanalyses\newline\indent Word count: 4892 words excl. Methods (Methods: 1877 words)}
 \usepackage{lineno}
 
 \linenumbers
@@ -176,7 +176,7 @@
 \urlstyle{same} % disable monospaced font for URLs
 \hypersetup{
   pdftitle={The non-independence of nations and why it matters},
-  pdfauthor={Scott Claessens1 \& Quentin D. Atkinson1,2},
+  pdfauthor={Scott Claessens1, Thanos Kyritsis1, \& Quentin D. Atkinson1,2},
   pdflang={en-EN},
   pdfkeywords={spatial non-independence; cultural non-independence; cross-national analyses; simulations; replications; reanalyses},
   colorlinks=true,
@@ -187,7 +187,7 @@
   pdfcreator={LaTeX via pandoc}}
 
 \title{The non-independence of nations and why it matters}
-\author{Scott Claessens\textsuperscript{1} \& Quentin D. Atkinson\textsuperscript{1,2}}
+\author{Scott Claessens\textsuperscript{1}, Thanos Kyritsis\textsuperscript{1}, \& Quentin D. Atkinson\textsuperscript{1,2}}
 \date{}
 
 
@@ -197,16 +197,18 @@
 
 This working paper has not yet been peer-reviewed.
 
-The authors made the following contributions. Scott Claessens: Data curation, Formal analysis, Investigation, Software, Visualization, Writing - original draft, Writing - review \& editing; Quentin D. Atkinson: Conceptualization, Funding acquisition, Supervision, Writing - review \& editing.
+\par
 
-Correspondence concerning this article should be addressed to Quentin D. Atkinson, Floor 2, Building 302, 23 Symonds Street, Auckland, 1010, New Zealand. E-mail: \href{mailto:q.atkinson@auckland.ac.nz}{\nolinkurl{q.atkinson@auckland.ac.nz}}
+Correspondence concerning this article should be addressed to Scott Claessens (\href{mailto:scott.claessens@gmail.com}{\nolinkurl{scott.claessens@gmail.com}}) and Quentin D. Atkinson (\href{mailto:q.atkinson@auckland.ac.nz}{\nolinkurl{q.atkinson@auckland.ac.nz}}), Floor 2, Building 302, 23 Symonds Street, Auckland, 1010, New Zealand.
+
+The authors made the following contributions. Scott Claessens: Conceptualization, Data curation, Formal analysis, Investigation, Software, Visualization, Writing - original draft, Writing - review \& editing; Thanos Kyritsis: Data curation, Writing - review \& editing; Quentin D. Atkinson: Conceptualization, Data curation, Funding acquisition, Supervision, Writing - review \& editing.
 
 }
 
 \affiliation{\vspace{0.5cm}\textsuperscript{1} School of Psychology, University of Auckland, Auckland, New Zealand\\\textsuperscript{2} Max Planck Institute for Evolutionary Anthropology, Leipzig, Germany}
 
 \abstract{%
-Cross-national analyses test hypotheses about the drivers of global variation in national outcomes. However, since nations are connected in various ways, such as via spatial proximity and shared cultural ancestry, cross-national analyses often violate assumptions of non-independence, inflating false positive rates. Here, we show that, despite being recognised as an important statistical pitfall for over 200 years, cross-national research in economics and psychology still does not sufficiently account for non-independence. In a review of the 100 highest-cited cross-national studies of economic development and values, we find that controls for non-independence are rare. When studies do control for non-independence, our simulations suggest that most commonly used methods are insufficient for reducing false positives in non-independent data. In reanalyses of twelve previous cross-national correlations, half of the effect sizes show no association after controlling for non-independence using global proximity matrices. We urge social scientists to sufficiently control for non-independence in cross-national research.
+Cross-national analyses test hypotheses about the drivers of variation in national outcomes. However, since nations are connected in various ways, such as via spatial proximity and shared cultural ancestry, cross-national analyses often violate assumptions of non-independence, inflating false positive rates. Here, we show that, despite being recognised as an important statistical pitfall for over 200 years, cross-national research in economics and psychology still does not sufficiently account for non-independence. In a review of the 100 highest-cited cross-national studies of economic development and values, we find that controls for non-independence are rare. When studies do control for non-independence, our simulations suggest that most commonly used methods are insufficient for reducing false positives in non-independent data. In reanalyses of twelve previous cross-national correlations, half of the estimates are compatible with no association after controlling for non-independence using global proximity matrices. We urge social scientists to sufficiently control for non-independence in cross-national research.
 }
 
 
@@ -216,19 +218,19 @@ Cross-national analyses test hypotheses about the drivers of global variation in
 
 Nations are perhaps the single most important population unit structuring modern human life. The nation in which someone is born has a large effect on what they can expect out of life, including their income level\textsuperscript{1}, life expectancy\textsuperscript{2}, mental health\textsuperscript{3}, subjective well-being\textsuperscript{4}, and educational attainment\textsuperscript{5}. Nations are also among the most important determinants of human cultural variation, with greater cultural similarity within than outside national borders\textsuperscript{6}.
 
-Given the importance of nations for structuring human behaviour, there is justifiably huge interest in statistical analyses that attempt to predict variation in national outcomes of all kinds. At the time of writing, a search in Web of Science for the term ``cross-national'' in titles or abstracts returned over 13,000 unique hits. The standard practice for cross-national analyses is to conduct bivariate correlations or multiple regressions with individual data points representing different nations. Such analyses widen the scope of social science beyond Western populations\textsuperscript{7,8} and have been used to study, among other topics, the causes of variation in the economic wealth of nations\textsuperscript{9--12}, global patterings of cultural norms and values\textsuperscript{13--16}, and the universality and diversity of human behaviour and psychology around the world\textsuperscript{17--20}.
+Given the importance of nations for structuring human behaviour, there is justifiably huge interest in statistical analyses that attempt to predict variation in national outcomes of all kinds. At the time of writing, a search in Web of Science for the term ``cross-national'' in titles or abstracts returned over 13,000 unique hits. The standard practice for cross-national analyses is to conduct bivariate correlations or multiple regressions with individual data points representing different nations. Such analyses widen the scope of social science beyond Western populations\textsuperscript{7,8} and have been used to study, among other topics, the causes of variation in the economic wealth of nations\textsuperscript{9--12}, global patternings of cultural norms and values\textsuperscript{13--16}, and the universality and diversity of human behaviour and psychology around the world\textsuperscript{17--20}.
 
 However, cross-national analyses are complicated by the fact that nations are not statistically independent data points. Unlike independent random samples from a population, nations are related to one another in a number of ways. First, nations that are closer to one another tend to be more similar than distant nations. This phenomenon is known as spatial non-independence\textsuperscript{21}, and it occurs because nations in close spatial proximity share characteristics due to local cultural diffusion of ideas\textsuperscript{22} and regional variation in climate and environment\textsuperscript{21}. For example, the neighbouring African nations Zambia and Tanzania have similar levels of terrain ruggedness, which has been used to partially explain their similar levels of economic development\textsuperscript{23}. This pattern conforms to Tobler's first law of geography: ``everything is related to everything else, but near things are more related than distant things''\textsuperscript{24} (p.~236).
 
-Second, nations with shared cultural ancestry tend to be more similar than culturally unrelated nations. This is known as cultural phylogenetic non-independence\textsuperscript{25--27}, and occurs because related nations share cultural traits inherited via descent from a common ancestor. Shared cultural ancestry can result in a form of pseudoreplication, whereby multiple instances of the same trait across nations are merely duplicates of the ancestral original. For example, the related island nations Tonga and Tuvalu share similar languages and customs due to cultural inheritance from a common Polynesian population dating back more than 1,000 years. More recently, shared ancestry explains a myriad of cultural similarities between colonial settlements and their colonisers (e.g.~Argentina and Spain). Importantly, these deep cultural connections between nations often span large geographic distances around the world. Tonga and Tuvalu share cultural traits despite being separated by over 1,500 kilometres of ocean, and Argentina and Spain remain culturally similar today despite their location on two separate continents. Shared cultural ancestry must therefore be considered independently of spatial proximity in the study of nations.
+Second, nations with shared cultural ancestry tend to be more similar than culturally unrelated nations. This is known as cultural phylogenetic non-independence\textsuperscript{25--27}, and occurs because related nations share cultural traits inherited via descent from a common ancestor. Shared cultural ancestry can result in a form of pseudoreplication, whereby multiple instances of the same trait across nations are merely duplicates of the ancestral original. For example, the related island nations Tonga and Tuvalu share similar languages and customs due to cultural inheritance from a common Polynesian population dating back more than 1,000 years. More recently, shared ancestry explains similarities in institutions, norms, technologies, and values between colonial settlements and their colonisers (e.g.~English, French, Spanish, and Portuguese settlements of the Americas). Importantly, these deep cultural connections between nations often span large geographic distances around the world. Tonga and Tuvalu share cultural traits despite being separated by over 1,500 kilometres of ocean, and South American and European nations remain culturally similar today despite their locations on two separate continents. Shared cultural ancestry must therefore be considered independently of spatial proximity in the study of nations.
 
 Spatial and cultural phylogenetic non-independence between nations make cross-national inference challenging. A fundamental assumption of regression analysis is that model residuals should be independently and identically distributed\textsuperscript{28}. But without accounting for spatial or cultural non-independence between nations, model residuals can show structure that remains unaccounted for, violating this assumption. Treating nations as independent can thus inflate false positive rates\textsuperscript{29}, producing spurious ``direct'' relationships between variables that in fact only indirectly covary due to spatial or cultural connections\textsuperscript{30} (see Supplementary Figure \ref{fig:dag} for an example causal model).
 
-Non-independence is widely acknowledged in fields that routinely deal with spatially or culturally structured data. In ecology and sociology, studies with regional-level data use a variety of autoregressive models designed to account for spatial patternings\textsuperscript{31,32}. In anthropology, researchers have recognised cultural non-independence as an important statistical pitfall for over 200 years, with issues of cultural pseudoreplication being identified in early comparative studies of marriage practices across societies\textsuperscript{25}. In the twentieth century, anthropologists began to emphasise that human societies do not develop independently, but rather exist in a globally interconnected ``world system'' linked by shared history and cultural ancestry\textsuperscript{33}. Researchers compiled the Standard Cross-Cultural Sample of 186 cultures to minimise the confounding effects of this non-independence in comparisons of human societies\textsuperscript{34}, though spatial and cultural dependencies are difficult to remove entirely\textsuperscript{35,36}. Today, anthropologists borrow phylogenetic comparative methods from evolutionary biology, such as phylogenetic least squares regression\textsuperscript{37}, when comparing societies, treating culturally related societies in the same way as biologists treat genetically related species (e.g.\textsuperscript{38,39}).
+Non-independence is widely acknowledged in fields that routinely deal with spatially or culturally structured data. In ecology and sociology, studies with regional-level data use a variety of autoregressive models designed to account for spatial patternings\textsuperscript{31,32}. In anthropology, researchers have recognised cultural non-independence as an important statistical pitfall for over 200 years, with issues of cultural pseudoreplication being identified in early comparative studies of marriage practices across societies\textsuperscript{25}. In the twentieth century, anthropologists began to emphasise that human societies do not develop independently, but rather exist in a globally interconnected ``world system'' linked by shared history and cultural ancestry\textsuperscript{33}. In order to minimise the confounding effects of this non-independence in comparisons of human societies, researchers compiled the Standard Cross-Cultural Sample of 186 cultures which deliberately avoids sampling closely related cultures\textsuperscript{34}, though it is difficult to completely remove spatial and cultural dependencies\textsuperscript{35,36} and the smaller sample of cultures reduces statistical power. Today, anthropologists borrow phylogenetic comparative methods from evolutionary biology, such as phylogenetic least squares regression\textsuperscript{37}, when comparing societies, treating culturally related societies in the same way as biologists treat genetically related species (e.g.\textsuperscript{38,39}).
 
 At the national level, recent reanalyses have revealed that several cross-national relationships reported in economics and psychology do not hold when controlling for non-independence between nations. One working paper replicated 25 analyses of ``persistence'' in economics, in which modern national outcomes are regressed against historical characteristics of those nations, and found that over half of the relationships were attenuated when controlling for spatial non-independence\textsuperscript{40}. Another replication study found that many of the widely publicised relationships between national-level pathogen prevalence and political institutions and attitudes fail to hold when controlling for various kinds of non-independence\textsuperscript{41}. These reanalyses, and others\textsuperscript{42--44}, raise the question: how widespread a concern is non-independence in studies of national-level outcomes?
 
-To address this question, we consider national-level variables of general interest across the social sciences: economic development and cultural values. These variables are frequently included as both outcomes and predictors in cross-national studies in economics and psychology\textsuperscript{9--16}. First, we show that economic development and cultural values are spatially and culturally non-independent across nations, emphasising the need to control for non-independence. Second, we systematically review the 100 highest-cited cross-national studies of economic development and cultural values and estimate the proportion of cross-national analyses within these articles that account for non-independence between nations. Third, we run simulations to determine whether common methods of dealing with non-independence in the literature sufficiently reduce false positive rates. Fourth, we reanalyse twelve previous cross-national analyses of economic development and cultural values from our systematic review, incorporating global geographic and linguistic proximity matrices to correctly control for spatial and cultural non-independence.
+To address this question, we consider national-level variables of general interest across the social sciences: economic development and cultural values. These variables are frequently included as both outcomes and predictors in cross-national studies in economics and psychology\textsuperscript{9--16}. First, we demonstrate that economic development and cultural values are spatially and culturally non-independent across nations, emphasising the need to control for non-independence. Second, we systematically review the 100 highest-cited cross-national studies of economic development and cultural values and determine baseline rates of controlling for non-independence in the literature. Third, we run simulations to determine whether common methods of dealing with non-independence in the literature sufficiently reduce false positive rates. Fourth, we reanalyse twelve previous cross-national analyses of economic development and cultural values from our systematic review, incorporating global geographic and linguistic proximity matrices as controls for spatial and cultural non-independence.
 
 \hypertarget{results}{%
 \section{Results}\label{results}}
@@ -236,11 +238,11 @@ To address this question, we consider national-level variables of general intere
 \hypertarget{national-level-economic-development-and-cultural-values-are-spatially-and-culturally-non-independent}{%
 \subsection{National-level economic development and cultural values are spatially and culturally non-independent}\label{national-level-economic-development-and-cultural-values-are-spatially-and-culturally-non-independent}}
 
-In order to motivate our research question, it is important to first quantify the degree of spatial and cultural non-independence for economic development and cultural values around the world. If these variables are only weakly non-independent, then the issue might be safe to ignore. However, if they are strongly non-independent, then there is a possibility that non-independence could be confounding cross-national inferences.
+In order to motivate our research question, it is important to first quantify the degree of spatial and cultural non-independence for economic development and cultural values around the world. If these variables are independent or only weakly non-independent, then the issue might be safe to ignore. However, if they are more strongly non-independent, then there is a possibility that non-independence could be confounding cross-national inferences.
 
-To this end, we used Bayesian multilevel models to simultaneously estimate geographic and cultural phylogenetic signal for a range of economic development and cultural values variables that are widely used in the literature. For economic development, we focused on the Human Development Index\textsuperscript{45}, gross domestic product per capita, gross domestic product per capita growth, and the Gini index of income inequality. For cultural values, we focused on two primary dimensions of cultural values from the World Values Survey, traditional vs.~secular values and survival vs.~self-expression values\textsuperscript{16}, as well as cultural tightness\textsuperscript{14} and individualism\textsuperscript{15}.
+To this end, we used Bayesian multilevel models to simultaneously estimate geographic and cultural phylogenetic signal for a range of economic development and cultural values variables. For economic development, we focused on the Human Development Index\textsuperscript{45}, gross domestic product per capita, annual gross domestic product per capita growth, and the Gini index of income inequality. For cultural values, we focused on two primary dimensions of cultural values from the World Values Survey, traditional vs.~secular values and survival vs.~self-expression values\textsuperscript{16}, as well as cultural tightness\textsuperscript{14} and individualism\textsuperscript{15}. These variables are not intended to be a comprehensive list of all national-level variables included in cross-national research, but rather an illustrative set of variables that are widely used in the literature.
 
-For all of these variables, we found that a substantial proportion of national-level variation was explained by spatial proximity and/or shared cultural ancestry between nations (Figure \ref{fig:plotSignal}; Supplementary Table \ref{tab:tableSignal}). Signal estimates were often markedly strong, with spatial proximity and shared cultural ancestry frequently explaining over half of the national-level variation. For spatial proximity, Bayes Factors indicated strong evidence that the geographic signal estimates differed from zero for all economic development variables and traditional values. However, the evidence was only equivocal for survival values and individualism, and strong evidence was found that the geographic signal estimate for tightness was equal to zero. For shared cultural ancestry, Bayes Factors indicated strong evidence that the cultural phylogenetic signal estimates differed from zero for all economic development and cultural values variables except for gross domestic product per capita growth, for which the evidence was equivocal. These findings emphasise the need to account for spatial and cultural phylogenetic non-independence in cross-national analyses of economic development and cultural values.
+For all of these variables, we found that a substantial proportion of national-level variation was explained by spatial proximity and/or shared cultural ancestry between nations (Figure \ref{fig:plotSignal}; see Supplementary Table \ref{tab:tableSignal} for numerical results). Signal estimates were often markedly strong, with spatial proximity and shared cultural ancestry frequently explaining over half of the national-level variation. For spatial proximity, Bayes Factors indicated strong evidence that the geographic signal estimates differed from zero for all economic development variables and traditional values. However, the evidence was only equivocal for survival values and individualism, and strong evidence was found that the geographic signal estimate for tightness was equal to zero. For shared cultural ancestry, Bayes Factors indicated strong evidence that the cultural phylogenetic signal estimates differed from zero for all economic development and cultural values variables except for gross domestic product per capita growth, for which the evidence was equivocal. These findings emphasise the need to account for spatial and cultural phylogenetic non-independence in cross-national analyses of economic development and cultural values.
 
 
 
@@ -262,23 +264,23 @@ The results of our systematic review show that most published articles containin
 \begin{figure}
 \centering
 \includegraphics{manuscript_files/figure-latex/plotReview1-1.pdf}
-\caption{\label{fig:plotReview1}\emph{Results from systematic review of 100 highly-cited cross-national studies of economic development (red) and cultural values (blue).} (a) Proportion of articles containing at least one analysis accounting for non-independence, overall and split by common methods of controlling for non-independence. (b) The association between journal impact factor and the probability that an article contains at least one analysis accounting for non-independence. (c) Estimated trend over time for the probability that an article contains at least one analysis accounting for non-independence. Point ranges represent proportions and 95\% bootstrap confidence intervals. Lines and shaded areas are posterior median regression lines and 50\% credible intervals from Bayesian multilevel models. Region FEs = region fixed effects.}
+\caption{\label{fig:plotReview1}\emph{Results from systematic review of 100 highly-cited cross-national studies of economic development (red) and cultural values (blue).} (a) Proportion of articles containing at least one analysis accounting for non-independence, overall and split by common methods of controlling for non-independence. (b) The association between journal impact factor and the probability that an article contains at least one analysis accounting for non-independence. (c) Estimated trend over time for the probability that an article contains at least one analysis accounting for non-independence. Point ranges represent proportions and 95\% bootstrap confidence intervals. Lines and shaded areas are posterior median regression lines and 50\% credible intervals from Bayesian logistic regression models. Dots represent raw counts of individual articles that did (top) or did not (bottom) account for non-independence. Region FEs = region fixed effects.}
 \end{figure}
 
-While our review contains a range of articles from low- and high-impact journals, an anonymous reviewer suggested that our estimates could be biased downwards by analyses published in lower impact outlets with more relaxed standards for issues like non-independence. It is also possible that, since our systematic review goes back as far as 1993, our estimates are being biased downwards by earlier studies, and that controls for non-independence have increased over time with methodological advancements and greater awareness of the issue. To test these possible explanations for our low estimates, we fitted Bayesian logistic regression models to the data from the review, including log journal impact factor and publication year as separate predictors. Interestingly, we found that, contrary to the explanation above, studies from higher impact journals were \emph{less} likely to include at least one control for non-independence than studies from lower impact journals, both for studies of economic development (b = -0.38, 95\% CI {[}-0.87 0.09{]}) and for studies of cultural values (b = -0.56, 95\% CI {[}-1.10 -0.05{]}; Figure \ref{fig:plotReview1}b). Moreover, splines revealed no relationship between publication year and the probability of including at least one control for non-independence, both for studies of economic development (b = -0.13, 95\% CI {[}-1.10 0.82{]}) and for studies of cultural values (b = -0.02, 95\% CI {[}-1.00 0.96{]}; Figure \ref{fig:plotReview1}c).
+While our review contains articles from journals with a range of impact factors, an anonymous reviewer suggested that our estimates could be biased downwards by analyses published in lower impact outlets with more relaxed standards for issues like non-independence. It is also possible that, since our systematic review goes back as far as 1993, our estimates are being biased downwards by earlier studies, and that controls for non-independence have increased over time with methodological advancements and greater awareness of the issue. To test these possible explanations for our low estimates, we fitted logistic regression models to the data from the review, including log journal impact factor and publication year as separate predictors. Interestingly, we found that, if anything, studies from higher impact journals were \emph{less} likely to include at least one control for non-independence than studies from lower impact journals, both for studies of economic development (b = -0.38, 95\% CI {[}-0.87 0.09{]}) and for studies of cultural values (b = -0.56, 95\% CI {[}-1.10 -0.05{]}; Figure \ref{fig:plotReview1}b). Moreover, splines revealed no relationship between publication year and the probability of including at least one control for non-independence, both for studies of economic development (b = -0.13, 95\% CI {[}-1.10 0.82{]}) and for studies of cultural values (b = -0.02, 95\% CI {[}-1.00 0.96{]}; Figure \ref{fig:plotReview1}c).
 
 \hypertarget{common-methods-of-controlling-for-non-independence-are-insufficient-for-reducing-false-positive-rates-in-non-independent-data}{%
 \subsection{Common methods of controlling for non-independence are insufficient for reducing false positive rates in non-independent data}\label{common-methods-of-controlling-for-non-independence-are-insufficient-for-reducing-false-positive-rates-in-non-independent-data}}
 
 Our systematic review revealed that most cross-national analyses in the literature do not control for spatial or cultural phylogenetic non-independence. When they do, they tend to include controls like latitude and regional fixed effects. Do these methods sufficiently account for statistical non-independence?
 
-To compare the efficacy of different methods in the literature, we conducted a simulation study. We simulated national-level datasets (n = 236 nations) with varying degrees of spatial or cultural phylogenetic autocorrelation (i.e.~non-independence) for outcome and predictor variables, but with no direct causal relationship between the variables. We then fitted naive regressions without controls to these datasets, as well as regression models with controls for latitude, longitude, and continent fixed effects. Despite not being identified in our systematic review, we also included other methods that are often used in the literature to account for non-independence. Additional spatial controls included the mean of the predictor variable within a surrounding 2000km radius (e.g.\textsuperscript{46}) and Conley standard errors\textsuperscript{47,48} based on geographic distances between nations (e.g.\textsuperscript{46,\textbf{Schulz2021?}}). Additional cultural controls included fixed effects for the language families of the majority-spoken languages in each nation (e.g.\textsuperscript{49}) and Conley standard errors based on genetic distances between nations (e.g.\textsuperscript{46,\textbf{Schulz2021?}}). These frequentist approaches attempt to account for non-independence by holding geographic location constant (latitude, longitude), discarding between-region variation and exploiting only local variation (continent fixed effects, mean of surrounding 2000km), or correcting standard errors for autocorrelation post-hoc while leaving model coefficients unchanged (Conley standard errors).
+To compare the efficacy of different methods in the literature, we conducted a simulation study. We simulated national-level datasets (n = 236 nations) with varying degrees of spatial or cultural phylogenetic autocorrelation (i.e.~non-independence) for outcome and predictor variables, but with no direct causal relationship between the variables. We then fitted naive regressions without controls to these datasets, as well as regression models with controls for latitude, longitude, and continent fixed effects. Despite not being identified in our systematic review, we also included other methods that are often used in the literature to account for non-independence. Additional spatial controls included the mean of the predictor variable within a surrounding 2000km radius (e.g.\textsuperscript{46}) and Conley standard errors\textsuperscript{47,48} based on geographic distances between nations (e.g.\textsuperscript{19,46}). Additional cultural controls included fixed effects for the language families of the majority-spoken languages in each nation (e.g.\textsuperscript{49}) and Conley standard errors based on genetic distances between nations (e.g.\textsuperscript{19,46}). These fixed effect approaches attempt to account for non-independence by holding geographic location constant (latitude, longitude), discarding between-region variation and exploiting only local variation (continent fixed effects, mean of surrounding 2000km), or correcting standard errors for autocorrelation post-hoc while leaving model coefficients unchanged (Conley standard errors).
 
-Beyond frequentist approaches, we also fitted Bayesian multilevel regressions that explicitly model spatial and/or cultural phylogenetic non-independence by allowing nations to covary according to geographic and/or linguistic proximity matrices. Geographic proximity between nations is calculated from inverse distances between longitude and latitude coordinates. Linguistic proximity between nations is calculated from a global phylogenetic tree that represents hierarchical relationships of genealogical descent for all languages in the world. For each pair of nations, we calculate inverse phylogenetic distances (i.e.~number of branches separating two taxa) between all languages spoken in that nation pair and produce an average ``linguistic proximity'' score weighted by the percentages of speakers within those nations. To include the resulting geographic and linguistic proximity matrices in our models, we included a Gaussian process\textsuperscript{50,51} over latitude and longitude values and/or assumed that nation random intercepts were correlated in proportion to their linguistic proximity\textsuperscript{52}. These approaches attempt to account for non-independence by modelling the covariance between nations that is induced by their geographic or linguistic connections.
+Beyond fixed effect approaches, we also fitted Bayesian random effects regressions that explicitly model spatial and/or cultural phylogenetic non-independence by allowing nations to covary according to geographic and/or linguistic proximity matrices. Geographic proximity between nations is calculated from inverse distances between longitude and latitude coordinates. Linguistic proximity between nations is calculated from a global phylogenetic tree that represents hierarchical relationships of genealogical descent for all languages in the world. For each pair of nations, we calculated inverse phylogenetic distances (i.e.~number of branches separating two taxa) between all languages spoken in that nation pair and produced an average ``linguistic proximity'' score weighted by the percentages of speakers within those nations. To include the resulting geographic and linguistic proximity matrices in our models, we included a Gaussian process\textsuperscript{50,51} over latitude and longitude values and/or assumed that nation random intercepts were correlated in proportion to their linguistic proximity\textsuperscript{52}. These random effects approaches attempt to account for non-independence by modelling the covariance between nations that is induced by their geographic or linguistic connections.
 
-Figures \ref{fig:plotSim3} and \ref{fig:plotSim4} plot the estimated false positive rates from our simulation study, split by different methods and different degrees of spatial or cultural phylogenetic autocorrelation (see Supplementary Figures \ref{fig:plotSim1} and \ref{fig:plotSim2} for full distributions of effect sizes under strong autocorrelation). Across all model types, false positive rates were measured as the proportion of models that estimated a slope with a 95\% confidence / credible interval excluding zero (i.e.~falsely infering a relationship when none is present). For reference, ``weak'' autocorrelation in our simulation is comparable to the geographic signal for survival values in Figure \ref{fig:plotSignal} (i.e.~20\% of the national-level variance is explained by non-independence), while ``moderate'' and ``strong'' levels of autocorrelation are comparable to the cultural phylogenetic signal for traditional and survival values, respectively (i.e.~50\% and 80\% of the national-level variance is explained by non-independence).
+Figures \ref{fig:plotSim3} and \ref{fig:plotSim4} plot the estimated false positive rates from our simulation study, split by different methods and different degrees of spatial or cultural phylogenetic autocorrelation (see Supplementary Tables \ref{tab:tableSim1} and \ref{tab:tableSim2} for numerical results and Supplementary Figures \ref{fig:plotSim1} and \ref{fig:plotSim2} for full distributions of effect sizes under strong autocorrelation). Across all model types, false positive rates were measured as the proportion of models that estimated a slope with a 95\% confidence / credible interval excluding zero, falsely inferring a relationship when none is present. For reference, ``weak'' autocorrelation in our simulation is comparable to the geographic signal for survival values in Figure \ref{fig:plotSignal} (i.e.~20\% of the national-level variance is explained by non-independence), while ``moderate'' and ``strong'' levels of autocorrelation are comparable to the cultural phylogenetic signal for traditional and survival values, respectively (i.e.~50\% and 80\% of the national-level variance is explained by non-independence).
 
-Our simulation study revealed that with at least moderate degrees of spatial or cultural phylogenetic autocorrelation for both outcome and predictor variables, naive regression models produce false positive rates above chance levels. This false positive rate increases as the degree of autocorrelation increases. With strong spatial autocorrelation for both outcomes and predictors, false positive rates reach as high as 78\%. We find a slightly lower false positive rate under strong cultural phylogenetic autocorrelation, though this false positive rate is still greater than expected by chance (39\%).
+Our simulation study revealed that with at least moderate degrees of spatial or cultural phylogenetic autocorrelation for both outcome and predictor variables, naive regression models produce false positive rates above chance levels. This false positive rate increases as the degree of autocorrelation increases. With strong spatial autocorrelation for both outcomes and predictors, false positive rates reach as high as 77\%. We find a slightly lower false positive rate under strong cultural phylogenetic autocorrelation, though this false positive rate is still greater than expected by chance (36\%).
 
 
 
@@ -296,53 +298,47 @@ Our simulation study revealed that with at least moderate degrees of spatial or 
 \caption{\label{fig:plotSim4}\emph{False positive rates for different methods of controlling for cultural phylogenetic non-independence in our simulation study.} For simulated outcome and predictor variables, we systematically varied the strength of cultural phylogenetic autocorrelation, from weak (0.2) to moderate (0.5) to strong (0.8). We simulated 100 datasets per parameter combination and fitted different models to each dataset. False positive rates were operationalised as the proportion of models that estimated a slope with a 95\% confidence / credible interval excluding zero. Point ranges represent proportions and 95\% bootstrap confidence intervals, and dashed lines indicate the 5\% false positive rate that is expected due to chance. SEs = standard errors.}
 \end{figure}
 
-Common methods in the literature do not reduce these high false positive rates. With strong spatial autocorrelation for both outcome and predictor variables, false positive rates remain above 50\% when controlling for latitude, longitude, and language family fixed effects (Figure \ref{fig:plotSim3}). Applying Conley standard errors also does not reduce false positive rates below 50\% under strong spatial autocorrelation, regardless of the distance cutoff. Continent fixed effects are more effective than other frequentist methods, though they continue to produce a false positive rate of 56\% under strong spatial autocorrelation. By contrast, Bayesian spatial Gaussian process regression with longitude and latitude values outperforms all other methods. This approach eliminates false positives under moderate spatial autocorrelation, such that the false positive rate is no different from chance, and reduces the false positive rate under strong spatial autocorrelation to 54\%. Bayesian models that additionally account for linguistic proximity between nations perform equally well, though models with only linguistic covariance continue to produce false positives.
+Most methods common in the literature do not reduce these high false positive rates. With strong spatial autocorrelation for both outcome and predictor variables, false positive rates remain above 50\% when controlling for latitude, longitude, and language family fixed effects (Figure \ref{fig:plotSim3}). Similarly, Conley standard error corrections based on spatial and genetic distances do not reduce false positive rates below 40\% under strong spatial autocorrelation. The most effective fixed effects methods are continent fixed effects, which continue to produce a false positive rate of 35\% under strong spatial autocorrelation, and controlling for the mean of the predictor variable within a 2000km radius, which eliminates false positives under even strong spatial autocorrelation (6\%). However, additional simulations revealed that these reductions in false positive rates come at the cost of lower statistical power (see Supplementary Figures \ref{fig:plotPowerGeo01} - \ref{fig:plotPowerGeo05}). In additional simulations where the true relationship between the predictor and outcome variable was known, power analyses showed that both continent fixed effects and the 2000km radius control had less than 80\% power to detect moderate true correlations (\emph{r} = 0.3) under strong spatial autocorrelation.
 
-In our simulation of cultural phylogenetic non-independence, we find that most frequentist methods do not reduce false positive rates (Figure \ref{fig:plotSim4}). Controls for latitude and longitude, continent fixed effects, and Conley standard errors do little to change false positive rates. Language family fixed effects are slightly more effective than other frequentist methods, though they continue to produce a false positive rate of 39\% under strong cultural phylogenetic autocorrelation. By contrast, Bayesian models with random effects covarying according to linguistic proximity completely eliminate false positives across all degrees of cultural phylogenetic autocorrelation. Bayesian models that additionally account for geographic proximity between nations perform equally well, though models with only a spatial Gaussian process continue to produce false positives.
+By contrast, Bayesian spatial Gaussian process regression with longitude and latitude strikes a balance between reducing false positives and retaining high statistical power to detect true effects. This approach reduces false positives to 15\% under moderate spatial autocorrelation and 23\% under strong spatial autocorrelation. Random effects models that additionally account for linguistic proximity between nations perform equally well, though models with only linguistic covariance continue to produce false positives. False positives are not completely eliminated with these random effects models. Nevertheless, these methods have at least 80\% power to detect moderate (\emph{r} = 0.3) and large (\emph{r} = 0.5) true correlations between variables under all levels of spatial autocorrelation (see Supplementary Figures \ref{fig:plotPowerGeo01} - \ref{fig:plotPowerGeo05}).
+
+In our simulation of cultural phylogenetic non-independence, we find that none of the fixed effects methods reduce false positive rates (Figure \ref{fig:plotSim4}). Controls for latitude, longitude, continent fixed effects, the mean of the predictor variable in a 2000km radius, and Conley standard error corrections based on spatial and genetic distances do little to change false positive rates. Even language family fixed effects continue to produce a false positive rate of 32\% under strong cultural phylogenetic autocorrelation. By contrast, models with random effects covarying according to linguistic proximity completely eliminate false positives across all degrees of cultural phylogenetic autocorrelation. This approach is also the only method that is able to detect large true correlations (\emph{r} = 0.5) with at least 80\% power (see Supplementary Figures \ref{fig:plotPowerLin01} - \ref{fig:plotPowerLin05}). Random effects models that additionally account for geographic proximity between nations perform equally well, though models with only a spatial Gaussian process continue to produce false positives.
 
 \hypertarget{key-findings-in-the-literature-are-not-robust-to-reanalysis-with-more-rigorous-methods}{%
 \subsection{Key findings in the literature are not robust to reanalysis with more rigorous methods}\label{key-findings-in-the-literature-are-not-robust-to-reanalysis-with-more-rigorous-methods}}
 
-Our systematic review and simulation study have shown that controls for non-independence are rare in cross-national studies of economic development and cultural values, and when studies do attempt to control for non-independence, the methods typically used are likely to continue to produce false positives. This raises the worrying possibility that the cross-national literature in economics and psychology is populated with spurious relationships.
+Our systematic review and simulation study have shown that controls for non-independence are rare in cross-national studies of economic development and cultural values, and when studies do attempt to control for non-independence, the methods typically used are unable to sufficiently reduce false positive rates. This raises the worrying possibility that the cross-national literature in economics and psychology is populated with spurious relationships.
 
-To determine how widespread this issue of spurious cross-national relationships might be, we reanalysed a subset of twelve previous cross-national analyses from our systematic review, sufficiently controlling for spatial and cultural phylogenetic non-independence using global geographic and linguistic proximity matrices. We subsampled six analyses from our economic development review\textsuperscript{53--58} and six from our cultural values review\textsuperscript{13,14,16,59--61}. Our choice of analyses was constrained by data availability and whether we were able to initially replicate the original finding. We pre-registered our subsample of analyses before running any control models (\url{https://osf.io/uywx8/}). We controlled for non-independence by including (1) a Gaussian process allowing nation random intercepts to covary according to a geographic proximity matrix, and/or (2) nation random intercepts that covaried according to a linguistic proximity matrix (see Supplementary Methods for full models).
+To determine how widespread this issue of spurious cross-national relationships might be, we reanalysed a subset of twelve previous cross-national analyses from our systematic review, controlling for spatial and cultural phylogenetic non-independence using global geographic and linguistic proximity matrices. Out of the 100 papers included in our systematic review, primary or secondary data were publicly available for 47 papers. We attempted to replicate key statistically significant cross-national correlations from these papers --- mostly initial bivariate regression specifications without covariates (see Methods) --- and stopped when we had sampled a set of twelve analyses for which we were able to replicate the original result. The final set included six analyses from our economic development review\textsuperscript{53--58} and six from our cultural values review\textsuperscript{13,14,16,59--61} that had available data and were able to be replicated. We pre-registered this set before running any control models (\url{https://osf.io/uywx8/}). We controlled for non-independence by including (1) a Gaussian process allowing nation random intercepts to covary according to a geographic proximity matrix, and/or (2) nation random intercepts that covaried according to a linguistic proximity matrix (see Supplementary Methods for full models).
 
-Figure \ref{fig:plotReplications1} visualises the results of our reanalysis. Cross-national correlation effect sizes tended to reduce when controlling for statistical non-independence between nations, sometimes by as much as half of the original effect size. Overall, after controlling for non-independence, six out of twelve cross-national associations had 95\% credible intervals that included zero. For the economic development analyses, four out of six cross-national relationships had 95\% credible intervals including zero when controlling for spatial non-independence. For the cultural values analyses, two out of six cross-national relationships had 95\% credible intervals including zero when controlling for cultural phylogenetic non-independence. Supplementary Figure \ref{fig:plotReplications2} shows these cross-national correlations plotted against the raw data.
+Figure \ref{fig:plotReplications1} visualises the results of our reanalysis (see Supplementary Table \ref{tab:tableReplications} for numerical results). Cross-national correlation effect sizes tended to reduce when controlling for statistical non-independence between nations, sometimes by as much as half of the original effect size. Overall, after controlling for non-independence, six out of twelve cross-national associations had 95\% credible intervals that included zero. For the economic development analyses, four out of six cross-national relationships had 95\% credible intervals including zero when controlling for spatial non-independence. For the cultural values analyses, two out of six cross-national relationships had 95\% credible intervals including zero when controlling for cultural phylogenetic non-independence. Supplementary Figure \ref{fig:plotReplications2} shows these cross-national correlations plotted against the raw data.
 
 
 
 \begin{figure}
 \centering
 \includegraphics{manuscript_files/figure-latex/plotReplications1-1.pdf}
-\caption{\label{fig:plotReplications1}\emph{Posterior correlations from our reanalysis of twelve previous cross-national analyses.} For each previous cross-national relationship, we plot the posterior slopes from a naive regression (red), a regression controlling for spatial non-independence (green), a regression controlling for cultural phylogenetic non-independence (blue), and a regression controlling for both spatial and cultural phylogenetic non-independence simultaneously (purple). All outcome and predictor variables are standardised. Most analyses are simple bivariate cross-national correlations, but Gelfand et al.~(2011) is a partial correlation controlling for log gross national income and Adamczyk and Pitt (2009) is a multilevel model including several covariates. Points and black lines represent posterior medians and 95\% credible intervals. GDP = gross domestic product. FLFP = female labour force participation.}
-\end{figure}
-
-To understand why some cross-national correlations were attenuated by controls for non-independence while others were robust, we further explored our fitted models for evidence of spatial and cultural autocorrelation. For each outcome variable, our Gaussian process models provided varying estimates of how quickly spatial autocorrelation declined with distance (Supplementary Figure \ref{fig:plotReplications3}). For example, in Skidmore and Toya\textsuperscript{58} gross domestic product growth was only moderately spatially autocorrelated at 1,000 km distance (posterior median spatial autocorrelation at 1,000 km = 0.42, 95\% CI {[}0.07 0.90{]}), whereas in Inglehart and Baker\textsuperscript{16} traditional values were strongly spatially autocorrelated at the same distance (posterior median spatial autocorrelation at 1,000 km = 0.96, 95\% CI {[}0.81 0.99{]}). We also found varying estimates of cultural phylogenetic signal (Supplementary Figure \ref{fig:plotReplications4}), with some outcome variables expressing low signal (e.g.~tightness\textsuperscript{14}; posterior median = 0.15, 95\% CI {[}0.00 0.85{]}) and others expressing high signal (e.g.~female labour force participation\textsuperscript{60}; posterior median = 0.89, 95\% CI {[}0.63 0.98{]}). Across all analyses, we found that stronger estimates of spatial autocorrelation or cultural phylogenetic signal resulted in a more pronounced reduction in the effect size when controlling for non-independence between nations (Figure \ref{fig:plotReplications5}).
-
-
-
-\begin{figure}
-\centering
-\includegraphics{manuscript_files/figure-latex/plotReplications5-1.pdf}
-\caption{\label{fig:plotReplications5}\emph{The estimated degree of spatial and cultural phylogenetic non-independence predicts reductions in effect size in our reanalysis.} (a) Higher estimated degrees of spatial autocorrelation at 1,000 km distance predict more pronounced reductions in effect sizes when controlling for non-independence. (b) Higher estimated levels of cultural phylogenetic signal predict more pronounced reductions in effect sizes when controlling for non-independence. In both panels, the y-axis represents the ratio of the effect size when controlling for spatial and cultural non-independence to the original effect size (from naive regression model), and the x-axis represents posterior median model estimates. Regression lines are plotted with 95\% confidence intervals.}
+\caption{\label{fig:plotReplications1}\emph{Posterior correlations from our reanalysis of twelve previous cross-national analyses.} For each previous cross-national relationship, we plot the posterior slopes from a naive regression (red), a regression controlling for spatial non-independence (green), a regression controlling for cultural phylogenetic non-independence (blue), and a regression controlling for both spatial and cultural phylogenetic non-independence simultaneously (purple). All outcome and predictor variables are standardised. Most analyses are simple bivariate cross-national correlations, but Gelfand et al.~(2011) is a partial correlation controlling for log gross national income and Adamczyk and Pitt (2009) is a multilevel model including several covariates. Coloured ridges are full posterior distributions, and points and black lines represent posterior medians and 95\% credible intervals. GDP = gross domestic product. FLFP = female labour force participation.}
 \end{figure}
 
 \hypertarget{discussion}{%
 \section{Discussion}\label{discussion}}
 
-In a systematic literature review and simulation, we found that cross-national studies in economics and psychology rarely account for non-independence between nations, and, when they do, the methods they use continue to produce false positives. In a reanalysis of twelve cross-national correlations, we further showed that neglecting to account for non-independence has resulted in spurious relationships in the published literature, with half of the correlations failing to replicate when controlling for spatial or cultural non-independence with more rigorous methods. These findings suggest that cross-national analyses in economics and psychology should be interpreted with caution until non-independence is sufficiently accounted for.
+In a systematic literature review and simulation, we found that cross-national studies in economics and psychology rarely account for non-independence between nations, and, when they do, the methods they use are insufficient to reduce false positives in non-independent data. In a reanalysis of twelve cross-national correlations, we further showed that neglecting to account for non-independence has resulted in potentially spurious relationships in the published literature, with half of the correlations failing to replicate when controlling for spatial or cultural non-independence with more rigorous methods. These findings suggest that cross-national analyses in economics and psychology should be interpreted with caution until non-independence is sufficiently accounted for.
 
-Our initial analyses add to and clarify existing evidence regarding the non-independence of economic and cultural variation among nations. One previous study suggested that geographic proximity is more important than deep cultural ancestry in explaining the distribution of human development across Eurasian nations, though the authors noted that their small sample of 44 nations and regional focus limited their statistical power\textsuperscript{62}. Our global sample of nations revealed strong cultural phylogenetic signal, as well as geographic signal, for the Human Development Index. Another previous study found that similarities in the cultural values of nations are predicted by linguistic, but not geographic, distances between those nations\textsuperscript{6}. We find this same result for survival vs.~self-expression values, but for traditional vs.~secular values we find that both linguistic and geographic proximity are important independent predictors of global variation. These findings emphasise the need to account for both spatial and cultural phylogenetic non-independence in cross-national studies of economic development and cultural values.
+Our initial analyses add to and clarify existing evidence regarding the degree of non-independence for national-level economic and cultural variables. One previous study suggested that geographic proximity is more important than deep cultural ancestry in explaining the distribution of human development across Eurasian nations, though the authors noted that their small sample of 44 nations and regional focus limited their statistical power\textsuperscript{62}. By contrast, our global samples of over 160 nations revealed strong cultural phylogenetic signal, as well as geographic signal, for the Human Development Index, GDP per capita, and the Gini index of inequality. Another previous study found that similarities in the cultural values of nations are predicted by linguistic, but not geographic, distances between those nations\textsuperscript{6}. We find this same result for survival vs.~self-expression values, cultural tightness, and individualism, but for traditional vs.~secular values we find that both linguistic and geographic proximity are important independent predictors of global variation. These findings emphasise the need to account for both spatial and cultural phylogenetic non-independence in cross-national studies of economic development and cultural values.
 
-Crucially, our systematic literature review and simulation study revealed that the most commonly used controls for non-independence do not sufficiently deal with the issue. In our simulations, controlling for either latitude or longitude did not reduce false positive rates. This result calls into question controls like distance to the equator to account for non-independence in cross-national regression models, though these controls may still be suitable to account for regional or latitudinal variation in ecology, which we did not simulate. High false positive rates persisted with Conley standard errors, which have previously been critiqued for being overly sensitive to arbitrary distance cutoffs\textsuperscript{40}. The simulation also confirmed the assertion that fixed effects for spatial or cultural groupings (e.g.~continent or language family fixed effects) are insufficient because non-independence still remains within groupings\textsuperscript{41}. This logic further applies to analyses that control for non-independence by separately analysing different regions (e.g.\textsuperscript{63}). Across all model types in our simulation, the only methods that sufficiently reduced the false positive rate were the Bayesian multilevel regressions that explicitly modelled spatial and cultural phylogenetic autocorrelation, though we did not include other possible controls for non-independence, such as conditional autoregressive models\textsuperscript{31} or generalised additive models\textsuperscript{64}.
+Crucially, our systematic literature review and simulation study revealed that the most commonly used controls for non-independence do not sufficiently deal with the issue. In our simulations, controlling for either latitude or longitude did not reduce false positive rates. This result calls into question the use of controls like distance to the equator to account for non-independence in cross-national regression models, though these controls may still be suitable to account for regional or latitudinal variation in climate, ecology, and natural threats (e.g.~pathogens), which we did not simulate. High false positive rates persisted with Conley standard errors, despite recent claims that these standard error corrections are sufficient to deal with spatial non-independence\textsuperscript{63}. The simulation also confirmed the assertion that fixed effects for spatial or cultural groupings (e.g.~continent or language family fixed effects) are insufficient because non-independence still remains within groupings\textsuperscript{41}. This logic further applies to analyses that control for non-independence by separately analysing different regions (e.g.\textsuperscript{64}). Controlling for the mean of the predictor variable within a 2000km radius\textsuperscript{46} eliminated false positive rates in spatially autocorrelated data, but had reduced statistical power to detect true associations. Across all model types in our simulation, the only methods that markedly reduced false positive rates while retaining high statistical power were the random effects models with covariance matrices. The important advantage of these models is not that they are Bayesian \emph{per se} (any of the approaches used here could be implemented in a Bayesian framework), but rather that they explicitly model covariance as a function of spatial or cultural distance.
 
-Ours is not the first review to show that studies are misapplying statistical methods in ways that inflate false positive rates. For example, other literature reviews have shown that studies in the social sciences tend to use small samples of participants\textsuperscript{65}, treat ordinal data as metric\textsuperscript{66}, incorrectly handle missing values\textsuperscript{67}, and ignore best practices in meta-analyses\textsuperscript{68}. Why do cross-national studies also rarely account for non-independence? At the institutional level, one possibility is that such practices are incentivised \emph{because} they generate statistically significant relationships, which increase the probability that a study is published\textsuperscript{65}. At the individual level, another possibility is that researchers outside of anthropology and ecology are simply not aware of the problem, or believe that the problem does not apply to analyses of nations. Even if researchers appreciate the problem, they might not know of suitable controls or perceive the methods to be too complex.
+There are other approaches to controlling for non-independence that we did not include in our simulation. For example, conditional autoregressive models\textsuperscript{31} and generalised additive models\textsuperscript{65} are approaches that can be applied in both frequentist and Bayesian frameworks. There are also alternative ways to operationalise cultural distances between nations, including metrics like cultural fixation indices (e.g.~cultural \(F_{ST}\)\textsuperscript{6,66}), covariance based on genetic distances\textsuperscript{67}, and phylogenetic distances between religious traditions. These metrics allow for cultural ancestry effects beyond ethnolinguistic genealogies, though some may produce less interpretable results than language ancestry. For example, unlike language, genes are strongly correlated with geography\textsuperscript{68,69} and their global patternings are consistent with different underlying processes, such as deep cultural inheritance and more recent gene flow between populations. Future work should explore the interpretability of these methods and determine whether they are sufficient to reduce false positive rates in spatially and culturally non-independent data. In addition to spatial proximity and shared cultural ancestry, we did not simulate other sources of non-independence that potentially exist in real cross-national datasets, such as modern connections between nations due to flows of people and information (e.g.~flight networks, social media networks) and shared histories of colonialism and capitalist modes of production that have shaped today's global landscape\textsuperscript{70,71}. Additional controls will be required to ensure that these sources of non-independence do not confound cross-national inferences.
 
-These institutional- and individual-level barriers can be combatted. First, cross-national replication studies like ours and others\textsuperscript{40--44}, combined with the methodological reviews included in Registered Reports\textsuperscript{69}, might change incentive structures and encourage researchers to analyse the world's nations with more rigorous methods. Second, since the issue of non-independence is fundamentally an issue of causal inference (Supplementary Figure \ref{fig:dag}), more explicit descriptions of causal models could promote controls for non-independence in cross-national research. In our review, economists studying economic development dealt with national-level non-independence more than psychologists studying cultural values, likely because economics studies tend to be lengthy statistical exercises that systematically incorporate or exclude numerous variables in an attempt to infer causation. Third, the recent widespread accessibility of open source statistical software, such as the programming language Stan\textsuperscript{70} and the R package \emph{brms}\textsuperscript{71}, should promote the use of more rigorous methods to control for non-independence. Using \emph{brms}, for example, Bayesian Gaussian process regression is straightforward to conduct, requiring only longitude and latitude values for nations.
+Ours is not the first review to show that studies are misapplying statistical methods in ways that inflate false positive rates. For example, other literature reviews have shown that studies in the social sciences tend to use small samples of participants\textsuperscript{72}, treat ordinal data as metric\textsuperscript{73}, incorrectly handle missing values\textsuperscript{74}, and ignore best practices in meta-analyses\textsuperscript{75}. Why do cross-national studies also rarely account for non-independence? At the institutional level, one possibility is that such practices are incentivised \emph{because} they generate statistically significant relationships, which increase the probability that a study is published\textsuperscript{72}. Indeed, we found that controls for non-independence were \emph{less} common among articles published in high impact journals, suggesting that researchers are rewarded for such practices. At the individual level, another possibility is that researchers outside of anthropology and ecology are less aware of the problem, or believe that the problem does not apply to analyses of nations. Even if researchers appreciate the problem, they might not know of suitable controls or perceive the methods to be too complex.
 
-Until such changes are implemented and sufficient controls for non-independence are the norm, existing cross-national correlations should be interpreted with caution. In our reanalyses, we found that four out of six cross-national correlations with economic development variables had 95\% credible intervals that included zero when controlling for spatial non-independence. Three of these analyses were tests of ``persistence'' hypotheses, studying the effects of historical and environmental conditions --- settler mortality\textsuperscript{53}, wheat-sugar suitability\textsuperscript{57}, and natural disaster frequency\textsuperscript{58} --- on modern developmental outcomes. A recent reanalysis has also called into question various studies of this ilk\textsuperscript{40}. We also found that two out of six cross-national correlations with cultural values variables had 95\% credible intervals that included zero when controlling for cultural phylogenetic non-independence.
+These institutional- and individual-level barriers can be combatted. First, cross-national replication studies like ours and others\textsuperscript{40--44}, combined with the methodological reviews included in Registered Reports\textsuperscript{76}, might change incentive structures and encourage researchers to analyse the world's nations with more rigorous methods. Second, more explicit descriptions of causal models could promote controls for non-independence by clearly outlining the nature of confounding and the sources of autocorrelation in cross-national data\textsuperscript{77}. The causal model outlined in Supplementary Figure \ref{fig:dag} is a useful example, but individual studies must outline their own particular causal assumptions, which may include further sources of non-independence and confounding variables to control for (e.g.~post-communist status, colony status). These causal models can then be used to design tailored statistical estimation strategies. Indeed, in our review, economists studying economic development dealt with national-level non-independence more than psychologists studying cultural values, likely because economics studies tend to be lengthy statistical exercises that systematically incorporate or exclude numerous variables in an attempt to infer causation. Third, the recent widespread accessibility of open source statistical software, such as the programming language Stan\textsuperscript{78} and the R package \emph{brms}\textsuperscript{79}, should promote the use of more rigorous methods to control for non-independence. Using \emph{brms}, for example, Bayesian Gaussian process regression is straightforward to conduct, requiring only longitude and latitude values for nations. We have provided an online tutorial to help researchers apply these methods to their own cross-cultural datasets (\url{https://scottclaessens.github.io/blog/2022/crossnational/}).
 
-We do not wish to dissuade researchers from conducting cross-national studies. On the contrary, such work promises to deepen understanding of our world, including the causes and consequences of economic development and cultural values. Moreover, cross-national studies allow social scientists to broaden their scope of study beyond Western populations\textsuperscript{7}, providing the representative samples necessary to test evolutionary and socio-ecological theories of human behaviour\textsuperscript{8,72}. But in order to minimise spurious relationships in global datasets, we urge researchers to control for spatial and cultural phylogenetic non-independence when reporting cross-national correlations. Nations are not independent, and our statistical models must reflect this.
+Until such changes are implemented and sufficient controls for non-independence are the norm, existing cross-national correlations should be interpreted with caution. In our reanalyses, we found that four out of six cross-national correlations with economic development variables had 95\% credible intervals that included zero when controlling for spatial non-independence. Three of these analyses were tests of ``persistence'' hypotheses, studying the effects of historical and environmental conditions --- settler mortality\textsuperscript{53}, wheat-sugar suitability\textsuperscript{57}, and natural disaster frequency\textsuperscript{58} --- on modern developmental outcomes. These results are in line with a recent paper that has called into question various studies of this ilk\textsuperscript{40} and contradict claims that the concern over spatial non-independence has been overblown in these studies\textsuperscript{63}. We also found that two out of six cross-national correlations with cultural values variables had 95\% credible intervals that included zero when controlling for cultural phylogenetic non-independence. Overall, these reanalyses show that the problem of statistical non-independence applies to a wider range of national-level variables than those identified by previous work, such as parasite stress and democratic outcomes\textsuperscript{41}, raising the worrying possibility that the current cross-national literature is populated with spurious relationships. Future work should expand our set of reanalyses to determine the extent of this problem in the literature.
+
+We do not wish to dissuade researchers from conducting cross-national studies. On the contrary, such work promises to deepen understanding of our world, including the causes and consequences of economic development and cultural values. Moreover, cross-national studies allow social scientists to broaden their scope of study beyond Western populations\textsuperscript{7}, providing the representative samples necessary to test evolutionary and socio-ecological theories of human behaviour\textsuperscript{8,80}. But in order to minimise spurious relationships in global datasets, we urge researchers to control for spatial and cultural phylogenetic non-independence when reporting cross-national correlations. Nations are not independent, and our statistical models must reflect this.
 
 \hypertarget{methods}{%
 \section{Methods}\label{methods}}
@@ -350,9 +346,9 @@ We do not wish to dissuade researchers from conducting cross-national studies. O
 \hypertarget{geographic-and-cultural-phylogenetic-signal}{%
 \subsection{Geographic and cultural phylogenetic signal}\label{geographic-and-cultural-phylogenetic-signal}}
 
-To estimate the degree of spatial and cultural phylogenetic non-independence in economic development and cultural values, we calculated geographic and cultural phylogenetic signal for global measures of development and values. Our measure of economic development was the Human Development Index\textsuperscript{45}. We retrieved a longitudinal dataset capturing human development for 189 nations since 1990 (n = 1,512; \url{https://hdr.undp.org/en/content/download-data}). Our measures of cultural values were traditional vs.~secular values and survival vs.~self-expression values from the World Values Survey\textsuperscript{16}. We downloaded the full Integrated Values Survey, which included all waves from the World Values Survey and the European Values Survey, and computed the two dimensions of cultural values following procedures from previous research\textsuperscript{16}. This longitudinal dataset captures values and attitudes for 116 nations since 1981 (n = 645,249; \url{https://www.worldvaluessurvey.org/WVSEVStrend.jsp}).
+To estimate the degree of spatial and cultural phylogenetic non-independence in economic development and cultural values, we calculated geographic and cultural phylogenetic signal for global measures of development and values. For economic development variables, we retrieved longitudinal data on the Human Development Index\textsuperscript{45} (1990 - 2019; n = 189 nations), gross domestic product per capita (1960 - 2021; n = 209 nations), annual percentage growth in gross domestic product per capita (1961 - 2021; n = 208 nations), and the Gini coefficient of income inequality (1967 - 2021; n = 167 nations). Human development data were retrieved from the United Nations Development Programme (\url{https://hdr.undp.org/en/content/download-data}) and data for all other economic development variables were retrieved from the World Bank (\url{https://data.worldbank.org/}). For cultural values variables, we retrieved longitudinal data on traditional vs.~secular values and survival vs.~self-expression values from the World Values Survey\textsuperscript{16} (1981 - 2019; n = 116 nations). We downloaded the full Integrated Values Survey, which included all waves from the World Values Survey and the European Values Survey, and computed the two dimensions of cultural values following procedures from previous research\textsuperscript{16}. Additionally, we retrieved cross-sectional data on cultural tightness (n = 57 nations) and individualism (n = 97 nations) from previous work\textsuperscript{13,81}.
 
-To calculate geographic and cultural phylogenetic signal, we created two proximity matrices for 269 of the world's nations: a geographic proximity matrix and a linguistic proximity matrix. Geographic proximity was converted from logged geodesic distances between nation capital cities. Linguistic proximity was calculated as the cultural proximity between all languages spoken within nations, weighted by speaker percentages (see Supplementary Methods). We included these matrices in Bayesian multilevel models, allowing nation random intercepts to covary according to both geographic and linguistic proximity simultaneously. These models were fitted with the R package \emph{brms}\textsuperscript{71} and converged normally (\(\hat{R}\) \textless{} 1.1). Estimates of geographic and cultural phylogenetic signal were computed as the proportion of national-level variance in these models explained by geographic and linguistic proximity matrices.
+To calculate geographic and cultural phylogenetic signal, we created two proximity matrices for 269 of the world's nations: a geographic proximity matrix and a linguistic proximity matrix. Geographic proximity was converted from logged geodesic distances between nation capital cities. Linguistic proximity was calculated as the cultural proximity between all languages spoken within nations, weighted by speaker percentages (see Supplementary Methods). We included these matrices in Bayesian multilevel models, allowing nation random intercepts to covary according to both geographic and linguistic proximity simultaneously. These models were fitted with the R package \emph{brms}\textsuperscript{79} and converged normally (\(\hat{R}\) \textless{} 1.1). Estimates of geographic and cultural phylogenetic signal were computed as the proportion of national-level variance in these models explained by geographic and linguistic proximity matrices.
 
 \hypertarget{systematic-literature-review}{%
 \subsection{Systematic literature review}\label{systematic-literature-review}}
@@ -361,53 +357,76 @@ We exported two searches from Web of Science (\url{https://www.webofknowledge.co
 
 We then systematically coded each article, in order, for inclusion in our review. Articles were only included if: (1) they were judged to be relevant to economic development or cultural values; (2) they were an original empirical research article; and (3) they contained at least one analysis with national-level outcome or predictor variables. We stopped when we had included 50 articles for the economic development review and 50 articles for the cultural values review.
 
-Within each included article, we exhaustively coded every individual cross-national analysis reported in the main text. We coded mainly correlation or regression analyses, and explicitly excluded meta-analyses, factor analyses, measurement invariance analyses, multidimensional scaling analyses, hierarchical clustering analyses, multiverse analyses, and scale development / validation analyses. We also excluded analyses that compared only two, three, four, five, or six nations. For each included analysis, we recorded the year, outcome variable, all predictor variables, test statistic, p-value, number of nations, number of data points, model type, if the data were available, and whether and how the analysis attempted to control for non-independence.
+Within each included article, we exhaustively coded every individual cross-national analysis reported in the main text. We coded mainly correlation or regression analyses, and explicitly excluded meta-analyses, factor analyses, measurement invariance analyses, multidimensional scaling analyses, hierarchical clustering analyses, multiverse analyses, and scale development / validation analyses. We also excluded analyses that compared only two, three, four, five, or six nations. For each included analysis, we recorded the year, impact factor of the journal (retrieved from \url{https://jcr.clarivate.com/jcr/home}), outcome variable, all predictor variables, test statistic, p-value, number of nations, number of data points, model type, if the data were available, and whether and how the analysis attempted to control for non-independence.
 
-We coded common attempts to control for non-independence between nations. These included: (1) any higher-level control variables for spatial regional groupings (e.g.~continent fixed effects); (2) any geographic distance control variables (e.g.~distance between capital cities, distance from equator, latitude); (3) any control variables capturing shared cultural history (e.g.~former colony, legal origin fixed effects, linguistic history, cultural influence); and (4) any other control variables, tests, or approaches that were deemed as attempts to control for non-independence (e.g.~eigenvector filtering\textsuperscript{73}, controls for trade-weightings between nations, cross-sectional dependence tests\textsuperscript{74}, separate analyses for subsets of nations). These were coded by the first author.
+We coded common attempts to control for non-independence between nations. These included: (1) any higher-level control variables for spatial regional groupings (e.g.~continent fixed effects); (2) any geographic distance control variables (e.g.~distance between capital cities, distance from equator, latitude); (3) any control variables capturing shared cultural history (e.g.~former colony, legal origin fixed effects, linguistic history, cultural influence); and (4) any other control variables, tests, or approaches that were deemed as attempts to control for non-independence (e.g.~eigenvector filtering\textsuperscript{82}, controls for trade-weightings between nations, cross-sectional dependence tests\textsuperscript{83}, separate analyses for subsets of nations). These were coded by the first author.
 
-Once we had compiled our review database, we calculated the proportion of articles attempting to control for non-independence at least once. We also calculated the proportion of articles employing the different types of control listed above at least once: regional fixed effects, distance, shared cultural history, or other. For these proportions, we calculated 95\% boostrap confidence intervals with 1,000 bootstrap iterations.
+Once we had compiled our review database, we calculated the proportion of articles attempting to control for non-independence at least once. We also calculated the proportion of articles employing the different types of control listed above at least once: regional fixed effects, distance, shared cultural history, or other. For these proportions, we calculated 95\% bootstrap confidence intervals with 1,000 bootstrap iterations. Additionally, we predicted the probability of an article attempting to control for non-independence at least once using Bayesian logistic regression, including in separate models log journal impact factor and year of publication as linear and spline predictors, respectively.
 
-For individual analyses, we dealt with the nested nature of the data (analyses nested within articles) by fitting Bayesian multilevel logistic regression models with review type (economic development vs.~cultural values) as the sole fixed effect and random intercepts for articles. We fitted these models separately for overall attempts to control for non-independence and split by method type. We report the adjusted proportions with 95\% credible intervals. To test for a trend over time, we also fitted a Bayesian multilevel logistic regression with a multigroup spline for year of publication and random intercepts for articles. Bayesian models were fitted with the \emph{brms} R package\textsuperscript{71}. Our priors were informed by prior predictive checks, and all models converged normally (\(\hat{R}\) \textless{} 1.1).
+For individual analyses, we dealt with the nested nature of the data (analyses nested within articles) by fitting Bayesian multilevel logistic regression models with review type (economic development vs.~cultural values) as the sole fixed effect and random intercepts for articles. We fitted these models separately for overall attempts to control for non-independence and split by method type. We report the adjusted proportions with 95\% credible intervals (see Results and Supplementary Figure \ref{fig:plotReview2}). Additionally, we predicted the probability of an analysis attempting to control for non-independence using Bayesian multilevel logistic regression with random intercepts for articles. In separate models, we included log journal impact factor and year of publication as linear and spline predictors, respectively. All Bayesian models were fitted with the \emph{brms} R package\textsuperscript{79}. Our priors were informed by prior predictive checks, and all models converged normally (\(\hat{R}\) \textless{} 1.1).
 
 \hypertarget{simulations}{%
 \subsection{Simulations}\label{simulations}}
 
-We simulated data for 236 nations with varying degrees of spatial or cultural phylogenetic signal for outcome \(y\) and predictor \(x\) using the following generative model:
+We simulated data for 236 nations \(i\) with varying degrees of spatial or cultural phylogenetic signal for outcome \(y\) and predictor \(x\) using the following generative model:
 
-\[
-\begin{aligned}
-y &= \alpha_y + \epsilon_y \\
-x &= \alpha_x + \epsilon_x \\
-\alpha_y &\sim \mathcal{N}(0, \sqrt{\lambda} \cdot \Sigma) \\
-\alpha_x &\sim \mathcal{N}(0, \sqrt{\rho} \cdot \Sigma) \\
-\epsilon_y &\sim \mathcal{N}(0, \sqrt{1 - \lambda}) \\
-\epsilon_x &\sim \mathcal{N}(0, \sqrt{1 - \rho})
-\end{aligned}
-\]
+\begin{gather*}
+\begin{bmatrix}y_i\\x_i \end{bmatrix} \sim \text{MVNormal}
+\begin{pmatrix}\begin{bmatrix}\alpha_y\\\alpha_x \end{bmatrix},\textbf{S}\end{pmatrix}\\
+\alpha_y \sim \text{Normal}(0, \sqrt{\lambda} \cdot \Sigma) \\
+\alpha_x \sim \text{Normal}(0, \sqrt{\rho} \cdot \Sigma) \\
+\textbf{S} = 
+\begin{pmatrix}\sqrt{1 - \lambda} & 0 \\ 0 & \sqrt{1 - \rho} \end{pmatrix}
+\begin{pmatrix}1 & r \\ r & 1\end{pmatrix}
+\begin{pmatrix}\sqrt{1 - \lambda} & 0 \\ 0 & \sqrt{1 - \rho} \end{pmatrix}
+\\
+\end{gather*}
 
-where \(\Sigma\) is a correlation matrix proportional to either geographic or linguistic proximities between nations, and \(\lambda\) and \(\rho\) are autocorrelation parameters that represent the expected spatial or cultural phylogenetic signal for outcome and predictor variables, respectively. Importantly, in this simulation, we know that there is no direct causal relationship between \(y\) and \(x\) because we simulate the variables independently. Instead, any relationship between the two variables is merely the result of autocorrelation.
+where \(\Sigma\) is a correlation matrix proportional to either geographic or linguistic proximities between nations, \(\lambda\) and \(\rho\) are autocorrelation parameters that represent the expected spatial or cultural phylogenetic signal for outcome and predictor variables, respectively, and \(r\) is the true cross-national correlation between the variables after accounting for autocorrelation. Importantly, when \(r = 0\) in this simulation, we know that there is no direct causal relationship between \(y\) and \(x\). Instead, any relationship between the two variables is merely the result of autocorrelation.
 
-We set the autocorrelation parameters to either 0.2 (weak), 0.5 (moderate), or 0.8 (strong). We simulated 100 datasets for each parameter combination, resulting in 900 datasets. Each dataset had 236 rows representing different nations, with the following associated data for each nation: latitude, longitude, continent (Africa, Asia, Europe, North America, Oceania, or South America), and language family of the nation's majority spoken language (Afro-Asiatic, Atlantic-Congo, Austroasiatic, Austronesian, Eskimo-Aleut, Indo-European, Japonic, Kartvelian, Koreanic, Mande, Mongolic-Khitan, Nilotic, Nuclear Trans New Guinea, Sino-Tibetan, Tai-Kadai, Tupian, Turkic, or Uralic).
+We set the autocorrelation parameters \(\lambda\) and \(\rho\) to either 0.2 (weak), 0.5 (moderate), or 0.8 (strong). We also initially set the true cross-national correlation to 0 in order to determine false positive rates, and then additionally set \(r\) to 0.1 (small effect), 0.3 (medium effect), and 0.5 (large effect) in order to determine statistical power to detect true effects. For each parameter combination, we simulated 100 datasets, resulting in 3600 datasets. Each dataset had 236 rows representing different nations, with the following associated data for each nation: latitude, longitude, continent (Africa, Asia, Europe, North America, Oceania, or South America), language family of the nation's majority spoken language (Afro-Asiatic, Atlantic-Congo, Austroasiatic, Austronesian, Eskimo-Aleut, Indo-European, Japonic, Kartvelian, Koreanic, Mande, Mongolic-Khitan, Nilotic, Nuclear Trans New Guinea, Sino-Tibetan, Tai-Kadai, Tupian, Turkic, or Uralic), the mean of the predictor variable within a 2000km radius, and coordinates for genetic distances from a previous study\textsuperscript{19} (only available for 177 nations).
 
-With the resulting simulated datasets, we standardised outcome and predictor variables and fitted eleven different models: (1) naive regression without controls, (2) regression with latitude control, (3) regression with longitude control, (4) regression with continent fixed effects, (5) regression with language family fixed effects, (6) regression employing Conley standard errors with 100 km cutoff, (7) regression employing Conley standard errors with 1,000 km cutoff, (8) regression employing Conley standard errors with 10,000 km cutoff, (9) Bayesian regression including a Gaussian process over latitudes and longitudes, (10) Bayesian regression including random intercepts covarying according to linguistic proximity, and (11) Bayesian regression including both a Gaussian process over latitudes and longitudes and random intercepts covarying according to linguistic proximity.
+With the resulting simulated datasets, we standardised outcome and predictor variables and fitted eleven different models: (1) naive regression without controls, (2) regression with latitude control, (3) regression with longitude control, (4) regression with continent fixed effects, (5) regression with language family fixed effects, (6) regression controlling for the mean of the predictor variable in a 2000km radius, (7) regression employing Conley standard errors based on geographic distances, (8) regression employing Conley standard errors based on genetic distances, (9) Bayesian regression including a Gaussian process over latitudes and longitudes, (10) Bayesian regression including random intercepts covarying according to linguistic proximity, and (11) Bayesian regression including both a Gaussian process over latitudes and longitudes and random intercepts covarying according to linguistic proximity.
 
-Models employing Conley standard errors required latitude and longitude values, and the cutoffs implied the distance beyond which autocorrelation is assumed to be zero. These models were fitted using the \emph{conleyreg} R package\textsuperscript{75}. Bayesian models were fitted using the \emph{brms} R package\textsuperscript{71}. Our choice of priors was based on prior predictive simulation. All models converged normally (\(\hat{R}\) \textless{} 1.1). Across all model types and parameter combinations, we calculated the false positive rate as the proportion of models that estimated slopes with a 95\% confidence / credible interval excluding zero. We calculated 95\% bootstrap confidence intervals for these false positive rates with 1,000 bootstrap iterations.
+Models employing Conley standard errors either required latitude and longitude values or coordinates for genetic distances. To determine distance cutoffs, we employed an approach recommended in previous work\textsuperscript{84}: we fitted models with a range of feasible distance cutoffs and retained the model with the largest standard error for the slope parameter. These models were fitted using the \emph{conleyreg} R package\textsuperscript{85}. Bayesian models were fitted using the \emph{brms} R package\textsuperscript{79}. Our choice of priors was based on prior predictive simulation. All models converged normally (\(\hat{R}\) \textless{} 1.1). Across all model types and parameter combinations, we calculated the false positive rate as the proportion of models that estimated slopes with a 95\% confidence / credible interval excluding zero when \(r = 0\). We calculated statistical power as the proportion of models that estimated slopes with a 95\% confidence / credible interval excluding zero when \(r > 0\). We calculated 95\% bootstrap confidence intervals for these false positive rates and statistical power estimates with 1,000 bootstrap iterations.
 
 \hypertarget{reanalyses}{%
 \subsection{Reanalyses}\label{reanalyses}}
 
-We searched the individual analyses from our systematic review for cross-national correlations with available data. We included only analyses for which we were able to replicate the original result (i.e.~find a cross-national correlation with the same sign and roughly the same effect size). We restricted our search to one analysis per article, and aimed for an even number of analyses for both economic development and cultural values studies. We also ensured that at least one analysis was a multilevel model, with multiple observations per nation.
+We searched the individual analyses from our systematic review for statistically significant cross-national correlations with available primary or secondary data. We restricted our search to one analysis per paper, and searched until we had a set of twelve analyses, six from economic development papers and six from cultural values papers, for which we were able to replicate the original result (i.e.~find a cross-national correlation with the same sign and roughly the same effect size). We also ensured that at least one analysis was a multilevel model, with multiple observations per nation.
 
-The twelve analyses that we settled on\textsuperscript{13,14,16,53--61} were mostly bivariate cross-national correlations, except for two. One analysis\textsuperscript{14} additionally controlled for log gross national income, and another analysis\textsuperscript{58} is a multilevel model including random intercepts for nations and several individual-level and national-level covariates (see Model 5 in original paper). Before running any additional models, we pre-registered these twelve analyses on the Open Science Framework on 25\textsuperscript{th} January 2022 (\url{https://osf.io/uywx8/}).
+The twelve analyses that we settled on\textsuperscript{13,14,16,53--61} were mostly bivariate cross-national correlations, except for two. One analysis\textsuperscript{14} additionally controlled for log gross national income, and another analysis\textsuperscript{58} is a multilevel model including random intercepts for nations and several individual-level and national-level covariates (see Model 5 in original paper). Before running any additional models, we pre-registered these twelve analyses on the Open Science Framework on 25\textsuperscript{th} January 2022 (\url{https://osf.io/uywx8/}). We endeavoured to keep the sample sizes of our reanalyses as close to the original analyses as possible, though there were some deviations (see Supplementary Table \ref{tab:tableDeviations}). Despite these slight deviations from the original analyses, all models reported in Figure \ref{fig:plotReplications1} are fitted to the same number of data points, meaning that any changes in effect sizes are solely due to controlling for non-independence.
 
 For each individual analysis, we ran four models: (1) a naive regression replicating the original finding, (2) a regression including a Gaussian process allowing nation random intercepts to covary according to a geographic proximity matrix from latitude and longitude values, (3) a regression including nation random intercepts that covaried according to a linguistic proximity matrix, and (4) a regression including both a geographic Gaussian process and nation random intercepts with linguistic covariance. See Supplementary Methods for full models.
 
-We fitted these models using the \emph{brms} R package\textsuperscript{71}. Our choice of priors was based on prior predictive simulation. All models converged normally (\(\hat{R}\) \textless{} 1.1), though for some models we resorted to using approximate Gaussian processes\textsuperscript{76} to reach convergence.
+We fitted these models using the \emph{brms} R package\textsuperscript{79}. Our choice of priors was based on prior predictive simulation. All models converged normally (\(\hat{R}\) \textless{} 1.1), though for some models we resorted to using approximate Gaussian processes\textsuperscript{86} to reach convergence.
 
 \hypertarget{reproducibility}{%
 \subsection{Reproducibility}\label{reproducibility}}
 
-All data and code are accesible at our Open Science Framework repository (\url{https://osf.io/uywx8/}). We used the \emph{targets} R package\textsuperscript{77} to create a reproducible data analysis pipeline and the \emph{papaja} R package\textsuperscript{78} to reproducibly generate the manuscript.
+All data and code are accessible at our Open Science Framework repository (\url{https://osf.io/uywx8/}). We used the \emph{targets} R package\textsuperscript{87} to create a reproducible data analysis pipeline and the \emph{papaja} R package\textsuperscript{88} to reproducibly generate the manuscript.
+
+\newpage
+
+\hypertarget{acknowledgements}{%
+\section{Acknowledgements}\label{acknowledgements}}
+
+This work was supported by a Royal Society of New Zealand Marsden grant (20-UOA123) to QDA.
+
+\hypertarget{author-contributions}{%
+\section{Author Contributions}\label{author-contributions}}
+
+SC and QDA conceived of and designed the study. SC curated the data, produced all code for analysis and visualisation, and wrote the original draft of the manuscript. TK and QDA developed and compiled the geographic and linguistic distance matrices. QDA provided funding and input on manuscript preparation and revision. All authors reviewed and edited the final draft of the manuscript.
+
+\hypertarget{competing-interests}{%
+\section{Competing Interests}\label{competing-interests}}
+
+The authors declare no competing interests.
+
+\hypertarget{research-transparency-and-reproducibility}{%
+\section{Research Transparency and Reproducibility}\label{research-transparency-and-reproducibility}}
+
+All data and code to reproduce the statistical analyses in this manuscript can be found on the Open Science Framework: \url{https://osf.io/uywx8/}
 
 \newpage
 
@@ -415,8 +434,6 @@ All data and code are accesible at our Open Science Framework repository (\url{h
 \section{References}\label{references}}
 
 \begingroup
-\setlength{\parindent}{-0.5in}
-\setlength{\leftskip}{0.5in}
 
 \hypertarget{refs}{}
 \begin{CSLReferences}{0}{0}
@@ -506,7 +523,7 @@ All data and code are accesible at our Open Science Framework repository (\url{h
 
 \leavevmode\vadjust pre{\hypertarget{ref-Hewlett2002}{}}%
 \CSLLeftMargin{22. }%
-\CSLRightInline{Hewlett, B. S., DeSilvestri, A. \& Guglielmino, C. R. \href{https://doi.org/10.1086/339379}{Semes and genes in africa}. \emph{Current Anthropology} \textbf{43}, 313--321 (2002).}
+\CSLRightInline{Hewlett, B. S., DeSilvestri, A. \& Guglielmino, C. R. \href{https://doi.org/10.1086/339379}{Semes and genes in {Africa}}. \emph{Current Anthropology} \textbf{43}, 313--321 (2002).}
 
 \leavevmode\vadjust pre{\hypertarget{ref-Nunn2012}{}}%
 \CSLLeftMargin{23. }%
@@ -574,7 +591,7 @@ All data and code are accesible at our Open Science Framework repository (\url{h
 
 \leavevmode\vadjust pre{\hypertarget{ref-Atkinson2016}{}}%
 \CSLLeftMargin{39. }%
-\CSLRightInline{Atkinson, Q. D., Coomber, T., Passmore, S., Greenhill, S. J. \& Kushnick, G. \href{https://doi.org/10.1371/journal.pone.0156340}{Cultural and environmental predictors of pre-european deforestation on pacific islands}. \emph{PLOS ONE} \textbf{11}, 1--15 (2016).}
+\CSLRightInline{Atkinson, Q. D., Coomber, T., Passmore, S., Greenhill, S. J. \& Kushnick, G. \href{https://doi.org/10.1371/journal.pone.0156340}{Cultural and environmental predictors of pre-{European} deforestation on {Pacific} islands}. \emph{PLOS ONE} \textbf{11}, 1--15 (2016).}
 
 \leavevmode\vadjust pre{\hypertarget{ref-Kelly2020}{}}%
 \CSLLeftMargin{40. }%
@@ -634,7 +651,7 @@ All data and code are accesible at our Open Science Framework repository (\url{h
 
 \leavevmode\vadjust pre{\hypertarget{ref-Beck2005}{}}%
 \CSLLeftMargin{54. }%
-\CSLRightInline{Beck, T., Demirgäç-Kunt, A. \& Levine, R. {SME}s, growth, and poverty: Cross-country evidence. \emph{Journal of economic growth} \textbf{10}, 199--229 (2005).}
+\CSLRightInline{Beck, T., Demirgäç-Kunt, A. \& Levine, R. {SME}s, growth, and poverty: Cross-country evidence. \emph{Journal of Economic Growth} \textbf{10}, 199--229 (2005).}
 
 \leavevmode\vadjust pre{\hypertarget{ref-Bockstette2002}{}}%
 \CSLLeftMargin{55. }%
@@ -668,68 +685,108 @@ All data and code are accesible at our Open Science Framework repository (\url{h
 \CSLLeftMargin{62. }%
 \CSLRightInline{Sookias, R. B., Passmore, S. \& Atkinson, Q. D. \href{https://doi.org/10.1098/rsos.171411}{Deep cultural ancestry and human development indicators across nation states}. \emph{Royal Society Open Science} \textbf{5}, 171411 (2018).}
 
-\leavevmode\vadjust pre{\hypertarget{ref-Smith2017}{}}%
+\leavevmode\vadjust pre{\hypertarget{ref-Voth2021}{}}%
 \CSLLeftMargin{63. }%
+\CSLRightInline{Voth, H.-J. Persistence -- myth and mystery. in \emph{The handbook of historical economics} (eds. Bisin, A. \& Federico, G.) 243--267 (Academic Press, 2021). doi:\href{https://doi.org/10.1016/B978-0-12-815874-6.00015-0}{10.1016/B978-0-12-815874-6.00015-0}.}
+
+\leavevmode\vadjust pre{\hypertarget{ref-Smith2017}{}}%
+\CSLLeftMargin{64. }%
 \CSLRightInline{Smith, M. D., Rabbitt, M. P. \& Coleman- Jensen, A. \href{https://doi.org/10.1016/j.worlddev.2017.01.006}{Who are the world's food insecure? New evidence from the {F}ood and {A}griculture {O}rganization's {F}ood {I}nsecurity {E}xperience {S}cale}. \emph{World Development} \textbf{93}, 402--412 (2017).}
 
 \leavevmode\vadjust pre{\hypertarget{ref-Hastie2017}{}}%
-\CSLLeftMargin{64. }%
+\CSLLeftMargin{65. }%
 \CSLRightInline{Hastie, T. J. \& Tibshirani, R. J. \emph{Generalized additive models}. (Routledge, 2017).}
 
+\leavevmode\vadjust pre{\hypertarget{ref-Muthukrishna2020}{}}%
+\CSLLeftMargin{66. }%
+\CSLRightInline{Muthukrishna, M. \emph{et al.} \href{https://doi.org/10.1177/0956797620916782}{Beyond western, educated, industrial, rich, and democratic (WEIRD) psychology: Measuring and mapping scales of cultural and psychological distance}. \emph{Psychological Science} \textbf{31}, 678--701 (2020).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-Spolaore2009}{}}%
+\CSLLeftMargin{67. }%
+\CSLRightInline{Spolaore, E. \& Wacziarg, R. The diffusion of development. \emph{The Quarterly Journal of Economics} \textbf{124}, 469--529 (2009).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-Handley2007}{}}%
+\CSLLeftMargin{68. }%
+\CSLRightInline{Handley, L. J. L., Manica, A., Goudet, J. \& Balloux, F. Going the distance: Human population genetics in a clinal world. \emph{TRENDS in Genetics} \textbf{23}, 432--439 (2007).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-Novembre2008}{}}%
+\CSLLeftMargin{69. }%
+\CSLRightInline{Novembre, J. \emph{et al.} Genes mirror geography within europe. \emph{Nature} \textbf{456}, 98--101 (2008).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-Trouillot2016}{}}%
+\CSLLeftMargin{70. }%
+\CSLRightInline{Trouillot, M. \emph{Global transformations: Anthropology and the modern world}. (Springer, 2016).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-Wolf2010}{}}%
+\CSLLeftMargin{71. }%
+\CSLRightInline{Wolf, E. R. Europe and the people without history. \emph{University of California Press} (2010).}
+
 \leavevmode\vadjust pre{\hypertarget{ref-Smaldino2016}{}}%
-\CSLLeftMargin{65. }%
+\CSLLeftMargin{72. }%
 \CSLRightInline{Smaldino, P. E. \& McElreath, R. \href{https://doi.org/10.1098/rsos.160384}{The natural selection of bad science}. \emph{Royal Society Open Science} \textbf{3}, 160384 (2016).}
 
 \leavevmode\vadjust pre{\hypertarget{ref-Liddell2018}{}}%
-\CSLLeftMargin{66. }%
+\CSLLeftMargin{73. }%
 \CSLRightInline{Liddell, T. M. \& Kruschke, J. K. \href{https://doi.org/10.1016/j.jesp.2018.08.009}{Analyzing ordinal data with metric models: What could possibly go wrong?} \emph{Journal of Experimental Social Psychology} \textbf{79}, 328--348 (2018).}
 
 \leavevmode\vadjust pre{\hypertarget{ref-Nicholson2017}{}}%
-\CSLLeftMargin{67. }%
+\CSLLeftMargin{74. }%
 \CSLRightInline{Nicholson, J. S., Deboeck, P. R. \& Howard, W. \href{https://doi.org/10.1177/0165025415618275}{Attrition in developmental psychology: A review of modern missing data reporting and practices}. \emph{International Journal of Behavioral Development} \textbf{41}, 143--153 (2017).}
 
 \leavevmode\vadjust pre{\hypertarget{ref-Tipton2019}{}}%
-\CSLLeftMargin{68. }%
+\CSLLeftMargin{75. }%
 \CSLRightInline{Tipton, E., Pustejovsky, J. E. \& Ahmadi, H. \href{https://doi.org/10.1002/jrsm.1339}{Current practices in meta-regression in psychology, education, and medicine}. \emph{Research Synthesis Methods} \textbf{10}, 180--194 (2019).}
 
 \leavevmode\vadjust pre{\hypertarget{ref-Chambers2021}{}}%
-\CSLLeftMargin{69. }%
+\CSLLeftMargin{76. }%
 \CSLRightInline{Chambers, C. D. \& Tzavella, L. The past, present and future of {Registered Reports}. \emph{Nature Human Behaviour} \textbf{6}, 29--42 (2021).}
 
+\leavevmode\vadjust pre{\hypertarget{ref-Deffner2022}{}}%
+\CSLLeftMargin{77. }%
+\CSLRightInline{Deffner, D., Rohrer, J. M. \& McElreath, R. \href{https://doi.org/10.1177/25152459221106366}{A causal framework for cross-cultural generalizability}. \emph{Advances in Methods and Practices in Psychological Science} \textbf{5}, 25152459221106366 (2022).}
+
 \leavevmode\vadjust pre{\hypertarget{ref-rstan}{}}%
-\CSLLeftMargin{70. }%
+\CSLLeftMargin{78. }%
 \CSLRightInline{Stan Development Team. \href{http://mc-stan.org/}{{RStan}: The {R} interface to {Stan}}. (2020).}
 
 \leavevmode\vadjust pre{\hypertarget{ref-Burkner2017}{}}%
-\CSLLeftMargin{71. }%
+\CSLLeftMargin{79. }%
 \CSLRightInline{Bürkner, P.-C. \href{https://doi.org/10.18637/jss.v080.i01}{{brms}: An {R} package for {Bayesian} multilevel models using {Stan}}. \emph{Journal of Statistical Software} \textbf{80}, 1--28 (2017).}
 
 \leavevmode\vadjust pre{\hypertarget{ref-Oishi2013}{}}%
-\CSLLeftMargin{72. }%
+\CSLLeftMargin{80. }%
 \CSLRightInline{Oishi, S. \href{https://doi.org/10.1146/annurev-psych-030413-152156}{Socioecological psychology}. \emph{Annual Review of Psychology} \textbf{65}, 581--609 (2014).}
 
+\leavevmode\vadjust pre{\hypertarget{ref-Gelfand2021}{}}%
+\CSLLeftMargin{81. }%
+\CSLRightInline{Gelfand, M. J. \emph{et al.} \href{https://doi.org/10.1016/S2542-5196(20)30301-6}{The relationship between cultural tightness--looseness and {COVID-19} cases and deaths: A global analysis}. \emph{The Lancet Planetary Health} \textbf{5}, e135--e144 (2021).}
+
 \leavevmode\vadjust pre{\hypertarget{ref-Tiefelsdorf2007}{}}%
-\CSLLeftMargin{73. }%
+\CSLLeftMargin{82. }%
 \CSLRightInline{Tiefelsdorf, M. \& Griffith, D. A. \href{https://doi.org/10.1068/a37378}{Semiparametric filtering of spatial autocorrelation: The eigenvector approach}. \emph{Environment and Planning A: Economy and Space} \textbf{39}, 1193--1221 (2007).}
 
 \leavevmode\vadjust pre{\hypertarget{ref-DeHoyos2006}{}}%
-\CSLLeftMargin{74. }%
+\CSLLeftMargin{83. }%
 \CSLRightInline{De Hoyos, R. E. \& Sarafidis, V. \href{https://doi.org/10.1177/1536867X0600600403}{Testing for cross-sectional dependence in panel-data models}. \emph{The Stata Journal} \textbf{6}, 482--496 (2006).}
 
+\leavevmode\vadjust pre{\hypertarget{ref-Colella2019}{}}%
+\CSLLeftMargin{84. }%
+\CSLRightInline{Colella, F., Lalive, R., Sakalli, S. O. \& Thoenig, M. Inference with arbitrary clustering. \emph{IZA Discussion Paper No. 12584} (2019) doi:\href{https://doi.org/10.2139/ssrn.3449578}{10.2139/ssrn.3449578}.}
+
 \leavevmode\vadjust pre{\hypertarget{ref-Duben2021}{}}%
-\CSLLeftMargin{75. }%
+\CSLLeftMargin{85. }%
 \CSLRightInline{Düben, C. \emph{\href{https://CRAN.R-project.org/package=conleyreg}{{conleyreg}: Estimations using {C}onley standard errors}}. (2021).}
 
 \leavevmode\vadjust pre{\hypertarget{ref-Solin2020}{}}%
-\CSLLeftMargin{76. }%
+\CSLLeftMargin{86. }%
 \CSLRightInline{Solin, A. \& Särkkä, S. Hilbert space methods for reduced-rank {G}aussian process regression. \emph{Statistics and Computing} \textbf{30}, 419--446 (2020).}
 
 \leavevmode\vadjust pre{\hypertarget{ref-Landau2021}{}}%
-\CSLLeftMargin{77. }%
+\CSLLeftMargin{87. }%
 \CSLRightInline{Landau, W. M. \href{https://doi.org/10.21105/joss.02959}{The targets {R} package: A dynamic {M}ake-like function-oriented pipeline toolkit for reproducibility and high-performance computing}. \emph{Journal of Open Source Software} \textbf{6}, 2959 (2021).}
 
 \leavevmode\vadjust pre{\hypertarget{ref-Aust2020}{}}%
-\CSLLeftMargin{78. }%
+\CSLLeftMargin{88. }%
 \CSLRightInline{Aust, F. \& Barth, M. \emph{\href{https://github.com/crsh/papaja}{{papaja}: {Create} {APA} manuscripts with {R Markdown}}}. (2020).}
 
 \end{CSLReferences}
@@ -758,7 +815,7 @@ All data and code are accesible at our Open Science Framework repository (\url{h
 \hypertarget{calculating-global-geographic-and-linguistic-proximity-matrices}{%
 \subsubsection{Calculating global geographic and linguistic proximity matrices}\label{calculating-global-geographic-and-linguistic-proximity-matrices}}
 
-Geographic distance between two nations was calculated as the logged geodesic distance between country capital cities (data from the R package \emph{maps}; Brownrigg, 2018) using the R package \emph{geosphere} (Hijmans, 2019). The geographic proximity matrix was computed as one minus the log geographic distance matrix scaled between 0 and 1.
+Geographic distance between two nations was calculated as the logged geodesic distance between nation capital cities (data from the R package \emph{maps}; Brownrigg, 2018) using the R package \emph{geosphere} (Hijmans, 2019). The geographic proximity matrix was computed as one minus the log geographic distance matrix scaled between 0 and 1.
 
 Linguistic proximity between two nations was calculated as the cultural proximity between all languages spoken within those nations, weighted by speaker percentages. We acquired cultural proximity data by combining the language family trees provided by Glottolog v3.0 (Hammarström et al., 2017) into one global language tree (undated and unresolved). We calculated cultural proximity \(s\) between two languages \(j\) and \(k\) as the distance (in number of nodes traversed) of their most recent common ancestor \(i\) to the root of the tree, through the formula:
 
@@ -818,7 +875,9 @@ where \(n\) is the number of nations, and \(D^2_{ij}\) reflects the squared Eucl
 
 \newpage
 
-To control for cultural phylogenetic non-independence, we manually specify the covariance structure for nation random intercepts using a pre-computed linguistic proximity matrix \(L\) (see previous section). The covariance between two nations is assumed to be linearly proportional to the linguistic proximity between those nations. This assumption is justified if we assume that cultural traits evolve via Brownian motion along a language phylogeny. The non-centered parameterisation of this model is:
+To control for cultural phylogenetic non-independence, we manually specify the covariance structure for nation random intercepts using a pre-computed linguistic proximity matrix \(L\) (see previous section). The covariance between two nations is assumed to be linearly proportional to the linguistic proximity between those nations. This assumption is justified if we assume that cultural traits evolve neutrally via Brownian motion along a language phylogeny. Although this is a conservative assumption, we follow this approach here rather than another Gaussian Process for several reasons: (1) to avoid model non-convergence when later including a spatial Gaussian Process in the same model, (2) to work around the lack of a coordinate system for linguistic distances, as opposed to latitude and longitude values for geographic distance, and (3) to showcase different ways that researchers can allow nations to covary to control for non-independence.
+
+The non-centered parameterisation of this model is:
 
 \[
 \begin{aligned}
@@ -860,13 +919,23 @@ lscale &\sim \text{InverseGamma}(?,?)
 
 \newpage
 
+\hypertarget{supplementary-results}{%
+\subsection{Supplementary Results}\label{supplementary-results}}
+
+\hypertarget{further-exploration-of-twelve-reanalyses}{%
+\subsubsection{Further exploration of twelve reanalyses}\label{further-exploration-of-twelve-reanalyses}}
+
+To understand why some cross-national correlations were attenuated by controls for non-independence while others were robust, we further explored our fitted models for evidence of spatial and cultural autocorrelation. For each outcome variable, our Gaussian process models provided varying estimates of how quickly spatial autocorrelation declined with distance (Supplementary Figure \ref{fig:plotReplications3}). For example, in Skidmore and Toya\textsuperscript{58} gross domestic product growth was only moderately spatially autocorrelated at 1,000 km distance (posterior median spatial autocorrelation at 1,000 km = 0.42, 95\% CI {[}0.07 0.90{]}), whereas in Inglehart and Baker\textsuperscript{16} traditional values were strongly spatially autocorrelated at the same distance (posterior median spatial autocorrelation at 1,000 km = 0.96, 95\% CI {[}0.81 0.99{]}). We also found varying estimates of cultural phylogenetic signal (Supplementary Figure \ref{fig:plotReplications4}), with some outcome variables expressing low signal (e.g.~confidence in institutions\textsuperscript{61}; posterior median = 0.07, 95\% CI {[}0.00 0.53{]}) and others expressing high signal (e.g.~female labour force participation\textsuperscript{60}; posterior median = 0.89, 95\% CI {[}0.63 0.98{]}). Exploratory regressions provided suggestive evidence that stronger estimates of spatial autocorrelation or cultural phylogenetic signal resulted in a more pronounced reduction in the effect size when controlling for non-independence between nations (Supplementary Figure \ref{fig:plotReplications5}). However, these negative slopes for spatial autocorrelation (b = -0.19, 95\% CI {[}-1.33 1.04{]}) and cultural phylogenetic signal (b = -0.28, 95\% CI {[}-1.26 0.70{]}) were both very uncertain, due to the small number of analyses and the posterior uncertainty in effect sizes and estimates of non-independence.
+
+\newpage
+
 \hypertarget{supplementary-figures}{%
 \subsection{Supplementary Figures}\label{supplementary-figures}}
 
 
 
 \begin{figure}[H]
-\includegraphics[width=\textwidth]{manuscript_files/figure-latex/dag-1} \caption{\emph{A causal directed acyclic graph of spatial and cultural phylogenetic non-independence in cross-national studies.} We are interested in estimating the direct effect of national-level exposure \(X\) on national-level outcome \(Y\). But these variables are confounded by their common unobserved cause \(U\). \(U\) is a stand-in for shared environmental, ecological, and geographic causes (e.g.~climate, biodiversity, physical topography) and cultural and institutional causes (e.g.~cultural norms, political systems). In this causal model, we need to condition on \(U\) to estimate the direct path from \(X\) to \(Y\), but we cannot since it is unobserved. However, geographic \(G\) and linguistic \(L\) relationships between societies influence \(U\), since changing a nation's spatial distance to or shared cultural ancestry with other nations will change its environmental and cultural traits. We can thus use \(G\) and \(L\) to model the covariation between \(X\) and \(Y\) induced by \(U\). Failing to do this and simply estimating the bivariate correlation between \(X\) and \(Y\) will produce spurious relationships and residuals that are spatially and culturally non-independent around the world.}\label{fig:dag}
+\includegraphics[width=\textwidth]{manuscript_files/figure-latex/dag-1} \caption{\emph{A causal directed acyclic graph of spatial and cultural phylogenetic non-independence in cross-national studies.} We are interested in estimating the direct effect of national-level exposure \(X\) on national-level outcome \(Y\). But these variables are confounded by their common unobserved cause \(U\). \(U\) is a stand-in for shared environmental, ecological, and geographic causes (e.g.~climate, biodiversity, physical topography) and cultural and institutional causes (e.g.~cultural norms, technologies, and institutions). In this causal model, we need to condition on \(U\) to estimate the direct path from \(X\) to \(Y\), but we cannot since it is unobserved. However, geographic \(G\) and linguistic \(L\) relationships between societies influence \(U\), since changing a nation's spatial distance to or shared cultural ancestry with other nations will change its environmental and cultural traits. We can thus use \(G\) and \(L\) to model the covariation between \(X\) and \(Y\) induced by \(U\). Failing to do this and simply estimating the bivariate correlation between \(X\) and \(Y\) will produce spurious relationships and residuals that are spatially and culturally non-independent around the world.}\label{fig:dag}
 \end{figure}
 
 \newpage
@@ -874,7 +943,7 @@ lscale &\sim \text{InverseGamma}(?,?)
 
 
 \begin{figure}[H]
-\includegraphics[width=\textwidth]{manuscript_files/figure-latex/plotReview2-1} \caption{\emph{Analysis-level results from systematic review of 100 highly-cited cross-national studies of economic development (red) and cultural values (blue).} (a) Proportion of analyses accounting for non-independence, overall and split by common methods of controlling for non-independence. (b) The association between journal impact factor and the probability that an analysis accounts for non-independence. (c) Estimated trend over time for the probability that an analysis accounts for non-independence. Point ranges represent estimated proportions and 95\% credible intervals. Lines and shaded areas are posterior median regression lines and 50\% credible intervals from Bayesian multilevel models. Region FEs = region fixed effects.}\label{fig:plotReview2}
+\includegraphics[width=\textwidth]{manuscript_files/figure-latex/plotReview2-1} \caption{\emph{Analysis-level results from systematic review of 100 highly-cited cross-national studies of economic development (red) and cultural values (blue).} (a) Proportion of analyses accounting for non-independence, overall and split by common methods of controlling for non-independence. (b) The association between journal impact factor and the probability that an analysis accounts for non-independence. (c) Estimated trend over time for the probability that an analysis accounts for non-independence. Point ranges represent estimated proportions and 95\% credible intervals. Lines and shaded areas are posterior median regression lines and 50\% credible intervals from Bayesian multilevel models. Histograms represent relative counts for individual analyses that did (top) or did not (bottom) account for non-independence. Region FEs = region fixed effects.}\label{fig:plotReview2}
 \end{figure}
 
 \newpage
@@ -882,7 +951,7 @@ lscale &\sim \text{InverseGamma}(?,?)
 
 
 \begin{figure}[H]
-\includegraphics[width=\textwidth]{manuscript_files/figure-latex/plotSim1-1} \caption{\emph{Distribution of cross-national correlations from simulation study under strong spatial autocorrelation.} In these simulations, the strength of spatial autocorrelation is set to 0.8 for both outcome and predictor variables. For frequentist regression models, point ranges represent correlation estimates and 95\% confidence intervals. For Bayesian regression models, point ranges represent posterior means and 95\% credible intervals. Correlations are ordered by effect size independently in each panel. Red point ranges indicate that the slope is ``significant'' (i.e.~the 95\% confidence / credible interval excludes zero). Black point ranges indicate that the slope is ``not significant''.}\label{fig:plotSim1}
+\includegraphics[width=\textwidth]{manuscript_files/figure-latex/plotSim1-1} \caption{\emph{Distribution of cross-national correlations from simulation study under strong spatial autocorrelation.} In these simulations, the strength of spatial autocorrelation is set to 0.8 for both outcome and predictor variables, and the true correlation is set to 0. For frequentist regression models, point ranges represent correlation estimates and 95\% confidence intervals. For Bayesian regression models, point ranges represent posterior means and 95\% credible intervals. Correlations are ordered by effect size independently in each panel. Red point ranges indicate that the 95\% confidence / credible interval excludes zero. Black point ranges indicate that the 95\% confidence / credible interval includes zero.}\label{fig:plotSim1}
 \end{figure}
 
 \newpage
@@ -890,7 +959,55 @@ lscale &\sim \text{InverseGamma}(?,?)
 
 
 \begin{figure}[H]
-\includegraphics[width=\textwidth]{manuscript_files/figure-latex/plotSim2-1} \caption{\emph{Distribution of cross-national correlations from simulation study under strong cultural phylogenetic autocorrelation.} In these simulations, the strength of cultural phylogenetic autocorrelation is set to 0.8 for both outcome and predictor variables. For frequentist regression models, point ranges represent correlation estimates and 95\% confidence intervals. For Bayesian regression models, point ranges represent posterior means and 95\% credible intervals. Correlations are ordered by effect size independently in each panel. Red point ranges indicate that the slope is ``significant'' (i.e.~the 95\% confidence / credible interval excludes zero). Black point ranges indicate that the slope is ``not significant''.}\label{fig:plotSim2}
+\includegraphics[width=\textwidth]{manuscript_files/figure-latex/plotSim2-1} \caption{\emph{Distribution of cross-national correlations from simulation study under strong cultural phylogenetic autocorrelation.} In these simulations, the strength of cultural phylogenetic autocorrelation is set to 0.8 for both outcome and predictor variables, and the true correlation is set to 0. For frequentist regression models, point ranges represent correlation estimates and 95\% confidence intervals. For Bayesian regression models, point ranges represent posterior means and 95\% credible intervals. Correlations are ordered by effect size independently in each panel. Red point ranges indicate that the 95\% confidence / credible interval excludes zero. Black point ranges indicate that the 95\% confidence / credible interval includes zero.}\label{fig:plotSim2}
+\end{figure}
+
+\newpage
+
+
+
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{manuscript_files/figure-latex/plotPowerGeo01-1} \caption{\emph{Statistical power estimates for different methods of controlling for spatial non-independence in our simulation study, assuming a small true effect size (r = 0.1).} For simulated outcome and predictor variables, we systematically varied the strength of spatial autocorrelation, from weak (0.2) to moderate (0.5) to strong (0.8). We simulated 100 datasets per parameter combination assuming a small true correlation between variables (\emph{r} = 0.1) and fitted different models to each dataset. Statistical power was operationalised as the proportion of models that estimated a slope with a 95\% confidence / credible interval excluding zero. Point ranges represent proportions and 95\% bootstrap confidence intervals, and dashed lines indicate 80\% power. SEs = standard errors.}\label{fig:plotPowerGeo01}
+\end{figure}
+
+\newpage
+
+
+
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{manuscript_files/figure-latex/plotPowerGeo03-1} \caption{\emph{Statistical power estimates for different methods of controlling for spatial non-independence in our simulation study, assuming a medium true effect size (r = 0.3).} For simulated outcome and predictor variables, we systematically varied the strength of spatial autocorrelation, from weak (0.2) to moderate (0.5) to strong (0.8). We simulated 100 datasets per parameter combination assuming a medium true correlation between variables (\emph{r} = 0.3) and fitted different models to each dataset. Statistical power was operationalised as the proportion of models that estimated a slope with a 95\% confidence / credible interval excluding zero. Point ranges represent proportions and 95\% bootstrap confidence intervals, and dashed lines indicate 80\% power. SEs = standard errors.}\label{fig:plotPowerGeo03}
+\end{figure}
+
+\newpage
+
+
+
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{manuscript_files/figure-latex/plotPowerGeo05-1} \caption{\emph{Statistical power estimates for different methods of controlling for spatial non-independence in our simulation study, assuming a large true effect size (r = 0.5).} For simulated outcome and predictor variables, we systematically varied the strength of spatial autocorrelation, from weak (0.2) to moderate (0.5) to strong (0.8). We simulated 100 datasets per parameter combination assuming a large true correlation between variables (\emph{r} = 0.5) and fitted different models to each dataset. Statistical power was operationalised as the proportion of models that estimated a slope with a 95\% confidence / credible interval excluding zero. Point ranges represent proportions and 95\% bootstrap confidence intervals, and dashed lines indicate 80\% power. SEs = standard errors.}\label{fig:plotPowerGeo05}
+\end{figure}
+
+\newpage
+
+
+
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{manuscript_files/figure-latex/plotPowerLin01-1} \caption{\emph{Statistical power estimates for different methods of controlling for cultural phylogenetic non-independence in our simulation study, assuming a small true effect size (r = 0.1).} For simulated outcome and predictor variables, we systematically varied the strength of cultural phylogenetic autocorrelation, from weak (0.2) to moderate (0.5) to strong (0.8). We simulated 100 datasets per parameter combination assuming a small true correlation between variables (\emph{r} = 0.1) and fitted different models to each dataset. Statistical power was operationalised as the proportion of models that estimated a slope with a 95\% confidence / credible interval excluding zero. Point ranges represent proportions and 95\% bootstrap confidence intervals, and dashed lines indicate 80\% power. SEs = standard errors.}\label{fig:plotPowerLin01}
+\end{figure}
+
+\newpage
+
+
+
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{manuscript_files/figure-latex/plotPowerLin03-1} \caption{\emph{Statistical power estimates for different methods of controlling for cultural phylogenetic non-independence in our simulation study, assuming a medium true effect size (r = 0.3).} For simulated outcome and predictor variables, we systematically varied the strength of cultural phylogenetic autocorrelation, from weak (0.2) to moderate (0.5) to strong (0.8). We simulated 100 datasets per parameter combination assuming a medium true correlation between variables (\emph{r} = 0.3) and fitted different models to each dataset. Statistical power was operationalised as the proportion of models that estimated a slope with a 95\% confidence / credible interval excluding zero. Point ranges represent proportions and 95\% bootstrap confidence intervals, and dashed lines indicate 80\% power. SEs = standard errors.}\label{fig:plotPowerLin03}
+\end{figure}
+
+\newpage
+
+
+
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{manuscript_files/figure-latex/plotPowerLin05-1} \caption{\emph{Statistical power estimates for different methods of controlling for cultural phylogenetic non-independence in our simulation study, assuming a large true effect size (r = 0.5).} For simulated outcome and predictor variables, we systematically varied the strength of cultural phylogenetic autocorrelation, from weak (0.2) to moderate (0.5) to strong (0.8). We simulated 100 datasets per parameter combination assuming a large true correlation between variables (\emph{r} = 0.5) and fitted different models to each dataset. Statistical power was operationalised as the proportion of models that estimated a slope with a 95\% confidence / credible interval excluding zero. Point ranges represent proportions and 95\% bootstrap confidence intervals, and dashed lines indicate 80\% power. SEs = standard errors.}\label{fig:plotPowerLin05}
 \end{figure}
 
 \newpage
@@ -906,7 +1023,7 @@ lscale &\sim \text{InverseGamma}(?,?)
 
 
 \begin{figure}[H]
-\includegraphics[width=\textwidth]{manuscript_files/figure-latex/plotReplications3-1} \caption{\emph{Posterior estimates of Gaussian process functions mapping spatial autocorrelation onto geographic distance from our reanalyses of economic development (a) and cultural values (b) studies.} Estimates are from models additionally controlling for cultural phylogenetic non-independence. The y-axis represents the amount of spatial autocorrelation between data points with increasing distance between those points on the x-axis (logged distance in kilometres). Lines and shaded areas represent median posterior spatial autocorrelation functions and 50\% and 95\% credible intervals.}\label{fig:plotReplications3}
+\includegraphics[width=\textwidth]{manuscript_files/figure-latex/plotReplications3-1} \caption{\emph{Posterior estimates of Gaussian process functions mapping spatial autocorrelation onto geographic distance from our reanalyses of economic development (a) and cultural values (b) studies.} The y-axis represents the amount of spatial autocorrelation between data points with increasing distance between those points on the x-axis (logged distance in kilometres). Lines and shaded areas represent median posterior spatial autocorrelation functions and 50\% and 95\% credible intervals.}\label{fig:plotReplications3}
 \end{figure}
 
 \newpage
@@ -914,7 +1031,17 @@ lscale &\sim \text{InverseGamma}(?,?)
 
 
 \begin{figure}[H]
-\includegraphics[width=\textwidth]{manuscript_files/figure-latex/plotReplications4-1} \caption{\emph{Posterior estimates of cultural phylogenetic signal from our reanalyses.} Estimates are from models additionally controlling for spatial non-independence. Cultural phylogenetic signal is operationalised as the proportion of national-level variance explained by linguistic proximity between nations. Ridges are full posterior distributions, and points are posterior medians, and lines represent 50\% and 95\% credible intervals.}\label{fig:plotReplications4}
+\includegraphics[width=\textwidth]{manuscript_files/figure-latex/plotReplications4-1} \caption{\emph{Posterior estimates of cultural phylogenetic signal from our reanalyses.} Cultural phylogenetic signal is operationalised as the proportion of national-level variance explained by linguistic proximity between nations. Ridges are full posterior distributions, and points are posterior medians, and lines represent 50\% and 95\% credible intervals.}\label{fig:plotReplications4}
+\end{figure}
+
+\newpage
+
+
+
+\begin{figure}
+\centering
+\includegraphics{manuscript_files/figure-latex/plotReplications5-1.pdf}
+\caption{\label{fig:plotReplications5}\emph{The estimated degree of spatial and cultural phylogenetic non-independence predicts reductions in effect size in our reanalysis.} (a) Higher estimated degrees of spatial autocorrelation at 1,000 km distance predict more pronounced reductions in effect sizes when controlling for non-independence. (b) Higher estimated levels of cultural phylogenetic signal predict more pronounced reductions in effect sizes when controlling for non-independence. In both panels, the y-axis represents the ratio of the effect size when controlling for spatial and cultural non-independence to the original effect size (from naive regression model), and the x-axis represents posterior median model estimates. Regression lines are plotted with 95\% credible intervals.}
 \end{figure}
 
 \newpage
@@ -962,7 +1089,7 @@ Individualism & 0.26, 95\% CI [0.00, 0.66], BF = 1.97 & 0.69, 95\% CI [0.29, 0.9
 \begin{center}
 \begin{ThreePartTable}
 
-\small{
+\footnotesize{
 
 \begin{longtable}{m{2cm}m{11cm}m{2cm}}\noalign{\getlongtablewidth\global\LTcapwidth=\longtablewidth}
 \caption{\label{tab:tableArticlesReview}List of 100 papers included in literature review, sorted by annual rate of citations since publication.}\\
@@ -1075,6 +1202,166 @@ Economic development & Inglehart, R., \& Baker, W. E. (2000). Modernization, cul
  & Jones-Smith, J. C., Gordon-Larsen, P., Siddiqi, A., \& Popkin, B. M. (2011). Cross-national comparisons of time trends in overweight inequality by socioeconomic status among women using repeated cross-sectional surveys from 37 developing countries, 1989–2007. American journal of epidemiology, 173(6), 667-675. & 10.40\\
  & Demirgüç-Kunt, A., \& Levine, R. (1996). Stock market development and financial intermediaries: stylized facts. The World Bank Economic Review, 10(2), 291-321. & 10.36\\
  & Sethi, D., \& Acharya, D. (2018). Financial inclusion and economic growth linkage: Some cross country evidence. Journal of Financial Economic Policy. & 10.33\\
+\bottomrule
+\end{longtable}
+
+}
+
+\end{ThreePartTable}
+\end{center}
+
+\newpage
+
+
+
+\begin{lltable}
+
+\small{
+
+\begin{longtable}{llllllllll}\noalign{\getlongtablewidth\global\LTcapwidth=\longtablewidth}
+\caption{\label{tab:tableSim1}False positive rates in simulation with varying levels of spatial autocorrelation for the predictor variable (\(\rho\)) and for the outcome variable (\(\lambda\)), assuming that the true correlation is 0. Numbers represent the total number of analyses, out of 100, that estimated a slope with a 95\% confidence / credible interval excluding zero, falsely inferring a relationship when none is present.}\\
+\toprule
+ & \multicolumn{3}{c}{$\rho$ = 0.2} & \multicolumn{3}{c}{$\rho$ = 0.5} & \multicolumn{3}{c}{$\rho$ = 0.8} \\
+\cmidrule(r){2-4} \cmidrule(r){5-7} \cmidrule(r){8-10}
+Model & $\lambda$ = 0.2 & $\lambda$ = 0.5 & $\lambda$ = 0.8 & $\lambda$ = 0.2 & $\lambda$ = 0.5 & $\lambda$ = 0.8 & $\lambda$ = 0.2 & $\lambda$ = 0.5 & $\lambda$ = 0.8\\
+\midrule
+\endfirsthead
+\caption*{\normalfont{Table \ref{tab:tableSim1} continued}}\\
+\toprule
+ & \multicolumn{3}{c}{$\rho$ = 0.2} & \multicolumn{3}{c}{$\rho$ = 0.5} & \multicolumn{3}{c}{$\rho$ = 0.8} \\
+\cmidrule(r){2-4} \cmidrule(r){5-7} \cmidrule(r){8-10}
+Model & $\lambda$ = 0.2 & $\lambda$ = 0.5 & $\lambda$ = 0.8 & $\lambda$ = 0.2 & $\lambda$ = 0.5 & $\lambda$ = 0.8 & $\lambda$ = 0.2 & $\lambda$ = 0.5 & $\lambda$ = 0.8\\
+\midrule
+\endhead
+No control & 18 & 27 & 41 & 27 & 48 & 61 & 40 & 61 & 77\\
+Latitude & 19 & 25 & 39 & 25 & 44 & 60 & 33 & 58 & 71\\
+Longitude & 14 & 20 & 27 & 22 & 34 & 48 & 29 & 49 & 62\\
+Continent & 10 & 13 & 16 & 13 & 18 & 24 & 13 & 25 & 35\\
+Language family & 12 & 17 & 29 & 20 & 33 & 46 & 27 & 48 & 58\\
+Mean 2000km radius & 9 & 12 & 19 & 5 & 9 & 13 & 5 & 5 & 6\\
+Conley SEs spatial & 13 & 13 & 14 & 18 & 23 & 25 & 22 & 37 & 43\\
+Conley SEs genetic & 17 & 22 & 27 & 20 & 34 & 51 & 28 & 49 & 66\\
+Bayesian spatial & 14 & 13 & 11 & 13 & 15 & 12 & 16 & 17 & 23\\
+Bayesian linguistic & 12 & 20 & 21 & 21 & 26 & 39 & 28 & 42 & 49\\
+Bayesian spatial \& linguistic & 11 & 13 & 9 & 14 & 13 & 12 & 17 & 18 & 21\\
+\bottomrule
+\end{longtable}
+
+}
+
+\end{lltable}
+
+\newpage
+
+
+
+\begin{lltable}
+
+\small{
+
+\begin{longtable}{llllllllll}\noalign{\getlongtablewidth\global\LTcapwidth=\longtablewidth}
+\caption{\label{tab:tableSim2}False positive rates in simulation with varying levels of cultural phylogenetic autocorrelation for the predictor variable (\(\rho\)) and for the outcome variable (\(\lambda\)), assuming that the true correlation is 0. Numbers represent the total number of analyses, out of 100, that estimated a slope with a 95\% confidence / credible interval excluding zero, falsely inferring a relationship when none is present.}\\
+\toprule
+ & \multicolumn{3}{c}{$\rho$ = 0.2} & \multicolumn{3}{c}{$\rho$ = 0.5} & \multicolumn{3}{c}{$\rho$ = 0.8} \\
+\cmidrule(r){2-4} \cmidrule(r){5-7} \cmidrule(r){8-10}
+Model & $\lambda$ = 0.2 & $\lambda$ = 0.5 & $\lambda$ = 0.8 & $\lambda$ = 0.2 & $\lambda$ = 0.5 & $\lambda$ = 0.8 & $\lambda$ = 0.2 & $\lambda$ = 0.5 & $\lambda$ = 0.8\\
+\midrule
+\endfirsthead
+\caption*{\normalfont{Table \ref{tab:tableSim2} continued}}\\
+\toprule
+ & \multicolumn{3}{c}{$\rho$ = 0.2} & \multicolumn{3}{c}{$\rho$ = 0.5} & \multicolumn{3}{c}{$\rho$ = 0.8} \\
+\cmidrule(r){2-4} \cmidrule(r){5-7} \cmidrule(r){8-10}
+Model & $\lambda$ = 0.2 & $\lambda$ = 0.5 & $\lambda$ = 0.8 & $\lambda$ = 0.2 & $\lambda$ = 0.5 & $\lambda$ = 0.8 & $\lambda$ = 0.2 & $\lambda$ = 0.5 & $\lambda$ = 0.8\\
+\midrule
+\endhead
+No control & 7 & 14 & 15 & 8 & 19 & 30 & 15 & 26 & 36\\
+Latitude & 7 & 10 & 16 & 10 & 19 & 27 & 15 & 22 & 35\\
+Longitude & 5 & 12 & 14 & 9 & 16 & 26 & 13 & 26 & 35\\
+Continent & 5 & 6 & 10 & 3 & 11 & 21 & 8 & 20 & 29\\
+Language family & 7 & 9 & 12 & 9 & 14 & 22 & 10 & 20 & 32\\
+Mean 2000km radius & 5 & 8 & 12 & 2 & 12 & 21 & 4 & 16 & 25\\
+Conley SEs spatial & 2 & 6 & 7 & 2 & 9 & 15 & 6 & 14 & 20\\
+Conley SEs genetic & 5 & 11 & 13 & 8 & 13 & 21 & 8 & 17 & 26\\
+Bayesian spatial & 7 & 12 & 12 & 9 & 17 & 25 & 14 & 24 & 32\\
+Bayesian linguistic & 5 & 9 & 11 & 6 & 7 & 7 & 4 & 5 & 5\\
+Bayesian spatial \& linguistic & 3 & 10 & 11 & 5 & 8 & 8 & 4 & 5 & 5\\
+\bottomrule
+\end{longtable}
+
+}
+
+\end{lltable}
+
+\newpage
+
+
+
+\begin{lltable}
+
+\footnotesize{
+
+\begin{longtable}{rrrrr}\noalign{\getlongtablewidth\global\LTcapwidth=\longtablewidth}
+\caption{\label{tab:tableReplications}Estimated cross-national correlations from our reanalysis of twelve previous cross-national analyses. Numbers are posterior median slopes (equivalent to Pearson's r correlation coefficients) with 95\% credible intervals.}\\
+\toprule
+Analysis & \multicolumn{1}{c}{No control} & \multicolumn{1}{c}{Spatial control} & \multicolumn{1}{c}{Cultural control} & \multicolumn{1}{c}{Both controls}\\
+\midrule
+\endfirsthead
+\caption*{\normalfont{Table \ref{tab:tableReplications} continued}}\\
+\toprule
+Analysis & \multicolumn{1}{c}{No control} & \multicolumn{1}{c}{Spatial control} & \multicolumn{1}{c}{Cultural control} & \multicolumn{1}{c}{Both controls}\\
+\midrule
+\endhead
+Adamczyk and Pitt (2009) & 0.20, 95\% CI [ 0.07,\ \ 0.33] & 0.20, 95\% CI [ 0.07,\ \ 0.34] & 0.19, 95\% CI [ 0.05,\ \ 0.33] & 0.20, 95\% CI [ 0.06,\ \ 0.33]\\
+Alesina et al. (2013) & -0.21, 95\% CI [-0.42,\ \ 0.01] & -0.21, 95\% CI [-0.43,\ \ 0.01] & -0.07, 95\% CI [-0.26,\ \ 0.11] & -0.07, 95\% CI [-0.25,\ \ 0.11]\\
+Beck et al. (2003) & -0.50, 95\% CI [-0.68, -0.30] & -0.15, 95\% CI [-0.38,\ \ 0.02] & -0.56, 95\% CI [-0.77, -0.33] & -0.54, 95\% CI [-0.76, -0.30]\\
+Beck et al. (2005) & 0.38, 95\% CI [ 0.12,\ \ 0.64] & 0.25, 95\% CI [-0.01,\ \ 0.50] & 0.29, 95\% CI [ 0.10,\ \ 0.49] & 0.29, 95\% CI [ 0.09,\ \ 0.48]\\
+Bockstette et al. (2002) & 0.43, 95\% CI [ 0.25,\ \ 0.59] & 0.41, 95\% CI [ 0.19,\ \ 0.59] & 0.37, 95\% CI [ 0.18,\ \ 0.57] & 0.37, 95\% CI [ 0.15,\ \ 0.56]\\
+Easterly and Levine (2003) & 0.75, 95\% CI [ 0.60,\ \ 0.90] & 0.76, 95\% CI [ 0.57,\ \ 0.93] & 0.65, 95\% CI [ 0.47,\ \ 0.82] & 0.66, 95\% CI [ 0.47,\ \ 0.84]\\
+Easterly (2007) & -0.46, 95\% CI [-0.63, -0.29] & -0.18, 95\% CI [-0.36,\ \ 0.01] & -0.25, 95\% CI [-0.41, -0.09] & -0.19, 95\% CI [-0.36, -0.01]\\
+Fincher et al. (2008) & -0.64, 95\% CI [-0.82, -0.46] & -0.59, 95\% CI [-0.80, -0.21] & -0.50, 95\% CI [-0.71, -0.27] & -0.47, 95\% CI [-0.69, -0.18]\\
+Gelfand et al. (2011) & 0.54, 95\% CI [ 0.20,\ \ 0.85] & 0.54, 95\% CI [ 0.19,\ \ 0.86] & 0.49, 95\% CI [ 0.14,\ \ 0.83] & 0.50, 95\% CI [ 0.15,\ \ 0.83]\\
+Inglehart and Baker (2000) & 0.48, 95\% CI [ 0.21,\ \ 0.74] & 0.27, 95\% CI [ 0.11,\ \ 0.44] & 0.36, 95\% CI [ 0.11,\ \ 0.60] & 0.28, 95\% CI [ 0.10,\ \ 0.46]\\
+Knack and Keefer (1997) & 0.36, 95\% CI [ 0.05,\ \ 0.67] & 0.36, 95\% CI [ 0.04,\ \ 0.66] & 0.28, 95\% CI [-0.10,\ \ 0.63] & 0.29, 95\% CI [-0.09,\ \ 0.62]\\
+Skidmore and Toya (2002) & 0.30, 95\% CI [ 0.10,\ \ 0.49] & 0.20, 95\% CI [ 0.00,\ \ 0.41] & 0.21, 95\% CI [ 0.03,\ \ 0.40] & 0.21, 95\% CI [ 0.01,\ \ 0.41]\\
+\bottomrule
+\end{longtable}
+
+}
+
+\end{lltable}
+
+\newpage
+
+
+
+\begin{center}
+\begin{ThreePartTable}
+
+\footnotesize{
+
+\begin{longtable}{m{4cm}m{2cm}m{2cm}m{7cm}}\noalign{\getlongtablewidth\global\LTcapwidth=\longtablewidth}
+\caption{\label{tab:tableDeviations}List of sample size deviations between original analyses and reanalyses.}\\
+\toprule
+Analysis & \multicolumn{1}{c}{Original N} & \multicolumn{1}{c}{Reanalysis N} & \multicolumn{1}{c}{Reason for deviation}\\
+\midrule
+\endfirsthead
+\caption*{\normalfont{Table \ref{tab:tableDeviations} continued}}\\
+\toprule
+Analysis & \multicolumn{1}{c}{Original N} & \multicolumn{1}{c}{Reanalysis N} & \multicolumn{1}{c}{Reason for deviation}\\
+\midrule
+\endhead
+Adamczyk and Pitt (2009) & 33 & 33 & N/A\\
+Alesina et al. (2013) & >177 & 75 & Original analysis used imputed values for traditional plough use which were unavailable to us. For our reanalysis, we collected data from Tables A4 and A9 and ran our regression on the 75 nations with available data for female labour force participation in 2000 and traditional plough use.\\
+Beck et al. (2003) & 70 & 69 & We removed one nation (Zaire) as it was not present in our linguistic distance matrix.\\
+Beck et al. (2005) & 45 & 45 & N/A\\
+Bockstette et al. (2002) & 94 & 103 & After manually linking state history data from Appendix A with world development indicators, we had complete data for 103 nations.\\
+Easterly and Levine (2003) & 72 & 63 & After manually linking log GDP per capita 1995 data from Appendix Table A2 in Acemoglu et al. (2001) with an institutions index self-constructed from world governance indicators, we only had complete data for 63 nations.\\
+Easterly (2007) & 118 & 98 & After manually linking log wheat-sugar ratio data from Appendix A with longitudinal Gini data, we only had complete data for 98 nations.\\
+Fincher et al. (2008) & 68 & 67 & We combined England and Northern Ireland into a single nation (United Kingdom) for the reanalysis.\\
+Gelfand et al. (2011) & 30 & 28 & We combined East and West Germany into a single nation (Germany) and removed a high leverage point with a substantially higher disaster rate than other nations (Venezuela).\\
+Inglehart and Baker (2000) & 65 & 38 & After manually linking traditional values data from the World Values Survey with data on percentage total employment in industry from World Development Indicators, we only had complete data for 38 nations.\\
+Knack and Keefer (1997) & 28 & 28 & N/A\\
+Skidmore and Toya (2002) & 89 & 89 & N/A\\
 \bottomrule
 \end{longtable}
 
