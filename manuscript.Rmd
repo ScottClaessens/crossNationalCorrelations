@@ -324,9 +324,17 @@ SC and QDA conceived of and designed the study. SC curated the data, produced al
 
 The authors declare no competing interests.
 
-# Research Transparency and Reproducibility
+# Data Availability
 
-All data and code to reproduce the statistical analyses in this manuscript can be found on the Open Science Framework: https://osf.io/uywx8/
+All data can be found on the Open Science Framework: https://osf.io/uywx8/
+
+# Code Availability
+
+All code to reproduce the statistical analyses in this manuscript can be found on the Open Science Framework: https://osf.io/uywx8/
+
+# Ethical Approval
+
+Ethical approval was not required for the study as we analysed only secondary and simulated data.
 
 \newpage
 
