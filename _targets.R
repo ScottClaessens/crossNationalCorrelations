@@ -147,8 +147,6 @@ list(
   tar_target(plotReview1, plotReviewArticle(review, yearArticle, ifArticle)), 
   tar_target(plotReview2, plotReviewAnalysis(review, yearAnalysis, ifAnalysis, 
                                              postRM1, postRM2, postRM3, postRM4, postRM5)),
-  # table of articles in review
-  tar_target(tableArticlesReview, makeTableArticlesReview(review)),
   
   #### Simulation ####
   

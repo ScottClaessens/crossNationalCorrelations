@@ -334,69 +334,57 @@ plotSimInd <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5,
 plotSimAll <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5,
                        olsModel6, conleyModel1, conleyModel2, brmsModel1,
                        brmsModel2, brmsModel3, type, file) {
-  # plotting function
-  plotFun <- function(data, title, ylab, xlab) {
+  # data wrangling function
+  dataWrangle <- function(data, label) {
     data %>%
       filter(r == 0) %>%
       group_by(lambda, rho) %>%
-      summarise(prop = sum(sig) / n(), n = n()) %>%
+      summarise(prop = sum(sig) / n(), n = n(), .groups = "drop") %>%
       mutate(lower = map2(prop, n, function(x, y) getBootCIProp(x, y, 1000)[1]), 
              upper = map2(prop, n, function(x, y) getBootCIProp(x, y, 1000)[2])) %>%
       unnest(c(lower, upper)) %>%
-      ggplot(aes(x = lambda, y = prop, group = factor(rho), colour = factor(rho))) +
-      geom_hline(yintercept = 0.05, linetype = "dashed") +
-      geom_pointrange(aes(x = lambda, y = prop, ymin = lower, ymax = upper), 
-                      position = position_dodge(0.05), size = 0.15) +
-      geom_line(position = position_dodge(0.05)) +
-      scale_x_continuous(name = xlab, limits = c(0.1, 0.9), breaks = c(0.2, 0.5, 0.8)) +
-      scale_y_continuous(name = ylab, limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1)) +
-      guides(colour = guide_legend(title = "Strength of\nautocorrelation\nfor predictor\nvariable")) +
-      ggtitle(title) +
-      theme_classic()
+      mutate(label = label)
   }
-  # individual plots
-  pA <- plotFun(olsModel1, "No control", "", "")
-  pB <- plotFun(olsModel2, "Latitude", "", "")
-  pC <- plotFun(olsModel3, "Longitude", "", "")
-  pD <- plotFun(olsModel4, "Continent", "", "")
-  pE <- plotFun(olsModel5, "Language family", "False positive rate", "")
-  pF <- plotFun(olsModel6, "Mean 2000km radius", "", "")
-  pG <- plotFun(conleyModel1, "Conley SEs spatial", "", "")
-  pH <- plotFun(conleyModel2, "Conley SEs genetic", "", "")
-  pI <- plotFun(brmsModel1, "Bayesian spatial", "", " \n ")
-  pJ <- plotFun(brmsModel2, "Bayesian linguistic", "", "Strength of autocorrelation\nfor outcome variable")
-  pK <- plotFun(brmsModel3, "Bayesian spatial and linguistic", "", " \n ")
-  # put together
   out <-
-    plot_grid(
-      plot_grid(ggdraw() + draw_label(paste0("Simulation with ", type, " non-independence"), 
-                                      x = ifelse(type == "spatial", 0.27, 0.35), fontface = "bold")),
-      plot_grid(
-        pA + theme(legend.position = "none"),
-        pB + theme(legend.position = "none"),
-        pC + theme(legend.position = "none"),
-        pD + theme(legend.position = "none"),
-        nrow = 1
-      ),
-      plot_grid(
-        pE + theme(legend.position = "none"),
-        pF + theme(legend.position = "none"),
-        pG + theme(legend.position = "none"),
-        pH + theme(legend.position = "none"),
-        nrow = 1
-      ),
-      plot_grid(
-        NULL, pI + theme(legend.position = "none"),
-        pJ + theme(legend.position = "none"),
-        pK + theme(legend.position = "none"), NULL,
-        nrow = 1, rel_widths = c(0.5, 1, 1, 1, 0.5)
-      ),
-      nrow = 4, rel_heights = c(0.3, 1, 1, 1.08)
-    )
-  # add legend
-  out <- plot_grid(out, NULL, get_legend(pA), nrow = 1, rel_widths = c(1, 0.02, 0.15))
+    # combine datasets
+    dataWrangle(olsModel1, label = "No control") %>%
+    bind_rows(dataWrangle(olsModel2, label = "Latitude")) %>%
+    bind_rows(dataWrangle(olsModel3, label = "Longitude")) %>%
+    bind_rows(dataWrangle(olsModel4, label = "Continent")) %>%
+    bind_rows(dataWrangle(olsModel5, label = "Language\nfamily")) %>%
+    bind_rows(dataWrangle(olsModel6, label = "Mean 2000km\nradius")) %>%
+    bind_rows(dataWrangle(conleyModel1, label = "Conley SEs\nspatial")) %>%
+    bind_rows(dataWrangle(conleyModel2, label = "Conley SEs\ngenetic")) %>%
+    bind_rows(dataWrangle(brmsModel1, label = "Bayesian\nspatial")) %>%
+    bind_rows(dataWrangle(brmsModel2, label = "Bayesian\nlinguistic")) %>%
+    bind_rows(dataWrangle(brmsModel3, label = "Bayesian spatial\nand linguistic")) %>%
+    mutate(label = factor(label, levels = c("No control", "Latitude", "Longitude", "Continent",
+                                            "Language\nfamily", "Mean 2000km\nradius",
+                                            "Conley SEs\nspatial", "Conley SEs\ngenetic",
+                                            "Bayesian\nspatial", "Bayesian\nlinguistic",
+                                            "Bayesian spatial\nand linguistic"))) %>%
+    # plot
+    ggplot(aes(x = lambda, y = prop, group = factor(rho), colour = factor(rho))) +
+    geom_hline(yintercept = 0.05, linetype = "dashed") +
+    geom_pointrange(aes(x = lambda, y = prop, ymin = lower, ymax = upper), 
+                    position = position_dodge(0.08), size = 0.1) +
+    geom_line(position = position_dodge(0.08)) +
+    facet_wrap(. ~ label, scales = "free") +
+    scale_x_continuous(name = "Strength of autocorrelation for outcome variable", limits = c(0.1, 0.9), breaks = c(0.2, 0.5, 0.8)) +
+    scale_y_continuous(name = "False positive rate", limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1)) +
+    guides(colour = guide_legend(title = "Strength of\nautocorrelation\nfor predictor\nvariable")) +
+    ggtitle(paste0("Simulation with ", type, " non-independence")) +
+    theme_classic() +
+    theme(
+      strip.background = element_blank(),
+      strip.text = element_text(size = 10),
+      axis.text = element_text(size = 7),
+      legend.position = c(0.92, 0.1),
+      legend.title = element_text(size = 10),
+      legend.background = element_rect(linetype = "solid", colour = "black")
+      )
   # save
-  ggsave(out, filename = file, width = 11, height = 7)
+  ggsave(out, filename = file, width = 7, height = 5.5)
   return(out)
 }
 
@@ -406,69 +394,57 @@ plotPower <- function(olsModel1, olsModel2, olsModel3, olsModel4, olsModel5,
                       brmsModel2, brmsModel3, r, type, file) {
   # true effect size
   R <- r
-  # plotting function
-  plotFun <- function(data, title, ylab, xlab) {
+  # data wrangling function
+  dataWrangle <- function(data, label) {
     data %>%
       mutate(power = Q2.5 > 0) %>%
       filter(r == R) %>%
       group_by(lambda, rho) %>%
-      summarise(power = sum(power) / n(), n = n()) %>%
+      summarise(power = sum(power) / n(), n = n(), .groups = "drop") %>%
       mutate(lower = map2(power, n, function(x, y) getBootCIProp(x, y, 1000)[1]), 
              upper = map2(power, n, function(x, y) getBootCIProp(x, y, 1000)[2])) %>%
       unnest(c(lower, upper)) %>%
-      ggplot(aes(x = lambda, y = power, group = factor(rho), colour = factor(rho))) +
-      geom_hline(yintercept = 0.8, linetype = "dashed") +
-      geom_pointrange(aes(x = lambda, y = power, ymin = lower, ymax = upper), 
-                      position = position_dodge(0.05), size = 0.15) +
-      geom_line(position = position_dodge(0.05)) +
-      scale_x_continuous(name = xlab, limits = c(0.1, 0.9), breaks = c(0.2, 0.5, 0.8)) +
-      scale_y_continuous(name = ylab, limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1)) +
-      guides(colour = guide_legend(title = "Strength of\nautocorrelation\nfor predictor\nvariable")) +
-      ggtitle(title) +
-      theme_classic()
+      mutate(label = label)
   }
-  # individual plots
-  pA <- plotFun(olsModel1, "No control", "", "")
-  pB <- plotFun(olsModel2, "Latitude", "", "")
-  pC <- plotFun(olsModel3, "Longitude", "", "")
-  pD <- plotFun(olsModel4, "Continent", "", "")
-  pE <- plotFun(olsModel5, "Language family", "Power", "")
-  pF <- plotFun(olsModel6, "Mean 2000km radius", "", "")
-  pG <- plotFun(conleyModel1, "Conley SEs spatial", "", "")
-  pH <- plotFun(conleyModel2, "Conley SEs genetic", "", "")
-  pI <- plotFun(brmsModel1, "Bayesian spatial", "", " \n ")
-  pJ <- plotFun(brmsModel2, "Bayesian linguistic", "", "Strength of autocorrelation\nfor outcome variable")
-  pK <- plotFun(brmsModel3, "Bayesian spatial and linguistic", "", " \n ")
-  # put together
   out <-
-    plot_grid(
-      plot_grid(ggdraw() + draw_label(paste0("Simulation with ", type, " non-independence - r = ", r, ", n = 236"), 
-                                      x = ifelse(type == "spatial", 0.32, 0.42), fontface = "bold")),
-      plot_grid(
-        pA + theme(legend.position = "none"),
-        pB + theme(legend.position = "none"),
-        pC + theme(legend.position = "none"),
-        pD + theme(legend.position = "none"),
-        nrow = 1
-      ),
-      plot_grid(
-        pE + theme(legend.position = "none"),
-        pF + theme(legend.position = "none"),
-        pG + theme(legend.position = "none"),
-        pH + theme(legend.position = "none"),
-        nrow = 1
-      ),
-      plot_grid(
-        NULL, pI + theme(legend.position = "none"),
-        pJ + theme(legend.position = "none"),
-        pK + theme(legend.position = "none"), NULL,
-        nrow = 1, rel_widths = c(0.5, 1, 1, 1, 0.5)
-      ),
-      nrow = 4, rel_heights = c(0.3, 1, 1, 1.08)
+    # combine datasets
+    dataWrangle(olsModel1, label = "No control") %>%
+    bind_rows(dataWrangle(olsModel2, label = "Latitude")) %>%
+    bind_rows(dataWrangle(olsModel3, label = "Longitude")) %>%
+    bind_rows(dataWrangle(olsModel4, label = "Continent")) %>%
+    bind_rows(dataWrangle(olsModel5, label = "Language\nfamily")) %>%
+    bind_rows(dataWrangle(olsModel6, label = "Mean 2000km\nradius")) %>%
+    bind_rows(dataWrangle(conleyModel1, label = "Conley SEs\nspatial")) %>%
+    bind_rows(dataWrangle(conleyModel2, label = "Conley SEs\ngenetic")) %>%
+    bind_rows(dataWrangle(brmsModel1, label = "Bayesian\nspatial")) %>%
+    bind_rows(dataWrangle(brmsModel2, label = "Bayesian\nlinguistic")) %>%
+    bind_rows(dataWrangle(brmsModel3, label = "Bayesian spatial\nand linguistic")) %>%
+    mutate(label = factor(label, levels = c("No control", "Latitude", "Longitude", "Continent",
+                                            "Language\nfamily", "Mean 2000km\nradius",
+                                            "Conley SEs\nspatial", "Conley SEs\ngenetic",
+                                            "Bayesian\nspatial", "Bayesian\nlinguistic",
+                                            "Bayesian spatial\nand linguistic"))) %>%
+    # plot
+    ggplot(aes(x = lambda, y = power, group = factor(rho), colour = factor(rho))) +
+    geom_hline(yintercept = 0.8, linetype = "dashed") +
+    geom_pointrange(aes(x = lambda, y = power, ymin = lower, ymax = upper), 
+                    position = position_dodge(0.08), size = 0.1) +
+    geom_line(position = position_dodge(0.08)) +
+    facet_wrap(. ~ label, scales = "free") +
+    scale_x_continuous(name = "Strength of autocorrelation for outcome variable", limits = c(0.1, 0.9), breaks = c(0.2, 0.5, 0.8)) +
+    scale_y_continuous(name = "Power", limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1)) +
+    guides(colour = guide_legend(title = "Strength of\nautocorrelation\nfor predictor\nvariable")) +
+    ggtitle(paste0("Simulation with ", type, " non-independence - r = ", R, ", n = 236")) +
+    theme_classic() +
+    theme(
+      strip.background = element_blank(),
+      strip.text = element_text(size = 10),
+      axis.text = element_text(size = 7),
+      legend.position = c(0.92, 0.1),
+      legend.title = element_text(size = 10),
+      legend.background = element_rect(linetype = "solid", colour = "black")
     )
-  # add legend
-  out <- plot_grid(out, NULL, get_legend(pA), nrow = 1, rel_widths = c(1, 0.02, 0.15))
   # save
-  ggsave(out, filename = file, width = 11, height = 7)
+  ggsave(out, filename = file, width = 7, height = 5.5)
   return(out)
 }

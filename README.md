@@ -1,6 +1,6 @@
-# The non-independence of nations and why it matters
+# Cross-national analyses require additional controls to account for the non-independence of nations
 
-This repository contains the R code for the manuscript "The non-independence of nations and why it matters".
+This repository contains the R code for the manuscript "Cross-national analyses require additional controls to account for the non-independence of nations".
 
 ## Getting Started
 
@@ -21,7 +21,7 @@ install.packages(c("brms", "cowplot", "conleyreg", "countrycode",
                    "dagitty", "geosphere", "ggcorrplot", "ggdag", "ggrepel", 
                    "ggtext", "haven", "lmtest", "papaja", "psych", "readxl", 
                    "rstan", "sf", "sjlabelled", "targets", "tarchetypes",
-		               "tidybayes", "tidyverse"))
+                   "tidybayes", "tidyverse"))
 ```
 
 If you run into issues with the pipeline, try installing the specific R version or package versions outlined in `sessionInfo.txt`.
