@@ -308,7 +308,7 @@ We fitted these models using the brms R package[@Burkner2017]. Our choice of pri
 
 ## Reproducibility
 
-All data and code are accessible on GitHub (https://github.com/ScottClaessens/crossNationalCorrelations). We used the targets R package[@Landau2021] to create a reproducible data analysis pipeline and the papaja R package[@Aust2020] to reproducibly generate the manuscript.
+All data and code are accessible on GitHub (https://github.com/ScottClaessens/crossNationalCorrelations)[@github]. We used the targets R package[@Landau2021] to create a reproducible data analysis pipeline and the papaja R package[@Aust2020] to reproducibly generate the manuscript.
 
 ## Ethics
 
