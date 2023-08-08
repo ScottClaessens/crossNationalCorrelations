@@ -180,7 +180,7 @@
 \urlstyle{same}
 \hypersetup{
   pdftitle={Cross-national analyses require additional controls to account for the non-independence of nations},
-  pdfauthor={Scott Claessens1, Thanos Kyritsis1, \& Quentin D. Atkinson1,2},
+  pdfauthor={Scott Claessens1*, Thanos Kyritsis1, \& Quentin D. Atkinson1,2*},
   pdflang={en-EN},
   pdfkeywords={spatial non-independence; cultural non-independence; cross-national analyses; simulations; replications; reanalyses},
   colorlinks=true,
@@ -191,15 +191,13 @@
   pdfcreator={LaTeX via pandoc}}
 
 \title{Cross-national analyses require additional controls to account for the non-independence of nations}
-\author{Scott Claessens\textsuperscript{1}, Thanos Kyritsis\textsuperscript{1}, \& Quentin D. Atkinson\textsuperscript{1,2}}
+\author{Scott Claessens\textsuperscript{1*}, Thanos Kyritsis\textsuperscript{1}, \& Quentin D. Atkinson\textsuperscript{1,2*}}
 \date{}
 
 
 \shorttitle{Non-independence of nations}
 
-\authornote{Correspondence concerning this article should be addressed to Scott Claessens (\href{mailto:scott.claessens@gmail.com}{\nolinkurl{scott.claessens@gmail.com}}) and Quentin D. Atkinson (\href{mailto:q.atkinson@auckland.ac.nz}{\nolinkurl{q.atkinson@auckland.ac.nz}}), Floor 2, Building 302, 23 Symonds Street, Auckland, 1010, New Zealand. \newline \indent The authors made the following contributions. Scott Claessens: Conceptualization, Data curation, Formal analysis, Investigation, Software, Visualization, Writing - original draft, Writing - review \& editing; Thanos Kyritsis: Data curation, Writing - review \& editing; Quentin D. Atkinson: Conceptualization, Data curation, Funding acquisition, Supervision, Writing - review \& editing.}
-
-\affiliation{\vspace{0.5cm}\textsuperscript{1} \footnotesize School of Psychology, University of Auckland, Auckland, New Zealand\\\textsuperscript{2} \footnotesize School of Anthropology and Museum Ethnography, University of Oxford, Oxford, United Kingdom}
+\affiliation{\vspace{0.5cm}\textsuperscript{1} \footnotesize School of Psychology, University of Auckland, Auckland, New Zealand\\\textsuperscript{2} \footnotesize School of Anthropology and Museum Ethnography, University of Oxford, Oxford, United Kingdom \newline *email: \href{mailto:scott.claessens@gmail.com}{\nolinkurl{scott.claessens@gmail.com}}; \href{mailto:q.atkinson@auckland.ac.nz}{\nolinkurl{q.atkinson@auckland.ac.nz}}}
 
 \abstract{%
 Cross-national analyses test hypotheses about the drivers of variation in national outcomes. However, since nations are connected in various ways, such as via spatial proximity and shared cultural ancestry, cross-national analyses often violate assumptions of non-independence, inflating false positive rates. Here, we show that, despite being recognised as an important statistical pitfall for over 200 years, cross-national research in economics and psychology still does not sufficiently account for non-independence. In a review of the 100 highest-cited cross-national studies of economic development and values, we find that controls for non-independence are rare. When studies do control for non-independence, our simulations suggest that most commonly used methods are insufficient for reducing false positives in non-independent data. In reanalyses of twelve previous cross-national correlations, half of the estimates are compatible with no association after controlling for non-independence using global proximity matrices. We urge social scientists to sufficiently control for non-independence in cross-national research.
@@ -211,6 +209,9 @@ Cross-national analyses test hypotheses about the drivers of variation in nation
 \maketitle
 
 \linenumbers
+
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
 
 Nations are an important population unit structuring modern human life. The nation in which someone is born has a large effect on what they can expect out of life, including their income level\textsuperscript{1}, life expectancy\textsuperscript{2}, mental health\textsuperscript{3}, subjective well-being\textsuperscript{4}, and educational attainment\textsuperscript{5}. Nations are also among the most important determinants of human cultural variation, with greater cultural similarity within than outside national borders\textsuperscript{6}.
 
@@ -251,7 +252,7 @@ For all of these variables, we found that a substantial proportion of national-l
 \hypertarget{previous-cross-national-analyses-have-not-sufficiently-accounted-for-non-independence}{%
 \subsection{Previous cross-national analyses have not sufficiently accounted for non-independence}\label{previous-cross-national-analyses-have-not-sufficiently-accounted-for-non-independence}}
 
-Given that economic development and cultural values show evidence of geographic and cultural phylogenetic signal, have cross-national analyses sufficiently accounted for this non-independence? To assess this, we searched the published literature for articles that combined the search terms ``economic development'' or ``values'' with the search terms ``cross-national'', ``cross-cultural'', or ``cross-country''. We removed articles that did not report original research, were not relevant to economic development or cultural values, or did not report at least one cross-national analysis. We then retained the 100 articles (50 for economic development, 50 for cultural values) with the highest annual rate of citations (see Supplementary Data). For each of these highly-cited articles, we exhaustively recorded every cross-national analysis reported in the main text (n = 4,308), identifying in each case whether or not the analysis attempted to control for spatial, cultural, or any other form of non-independence between nations (see Methods for detailed search criteria and coding decisions).
+Given that economic development and cultural values show evidence of geographic and cultural phylogenetic signal, have cross-national analyses sufficiently accounted for this non-independence? To assess this, we searched the published literature for articles that combined the search terms ``economic development'' or ``values'' with the search terms ``cross-national'', ``cross-cultural'', or ``cross-country''. We removed articles that did not report original research, were not relevant to economic development or cultural values, or did not report at least one cross-national analysis. We then retained the 100 articles (50 for economic development, 50 for cultural values) with the highest annual rate of citations (see Supplementary Data 1). For each of these highly-cited articles, we exhaustively recorded every cross-national analysis reported in the main text (n = 4,308), identifying in each case whether or not the analysis attempted to control for spatial, cultural, or any other form of non-independence between nations (see Methods for detailed search criteria and coding decisions).
 
 The results of our literature review show that most published articles containing cross-national analyses make no attempt to account for statistical non-independence. Figure \ref{fig:plotReview1}a plots the proportion of articles that contain at least one cross-national analysis accounting for non-independence. We find that 42\% of economic development articles contain at least one attempt to control for non-independence (two-tailed 95\% bootstrap confidence interval {[}0.30 0.54{]}), while this proportion decreases to only 8\% for cultural values articles (two-tailed 95\% bCI {[}0.02 0.16{]}). Both kinds of article are most likely to use regional fixed effects (e.g.~continent fixed effects) to account for non-independence, but some articles also include controls for spatial distance (e.g.~latitude) and shared cultural history (e.g.~colony status). These proportions are even lower when focusing on the full sample of 4,308 analyses: only 5\% (equal-tailed 95\% credible interval {[}0.02 0.13{]}) of individual economic development analyses and 1\% (equal-tailed 95\% CI {[}0.00 0.02{]}) of individual cultural values analyses are estimated to control for non-independence (Supplementary Figure \ref{fig:plotReview2}).
 
@@ -365,13 +366,13 @@ We included these matrices in Bayesian multilevel models, allowing nation random
 \hypertarget{literature-review}{%
 \subsection{Literature review}\label{literature-review}}
 
-We exported two searches from Web of Science (\url{https://www.webofknowledge.com/}) on 27\textsuperscript{th} September 2021, restricting our searches to articles published between 1900 and 2018. The first search was for the terms ``economic development'' AND (``cross-national'' OR ``cross-cultural'' OR ``cross-country''), which returned 965 articles. The second search was for the terms ``values'' AND (``cross-national'' OR ``cross-cultural'' OR ``cross-country''), which returned 6806 articles. Once exported, we ordered the articles by descending number of citations per year since initial publication, using citation counts reported by Web of Science.
+We exported two searches from Web of Science (\url{https://www.webofknowledge.com/}) on 27\textsuperscript{th} September 2021, restricting our searches to articles published between 1900 and 2018. The first search was for the terms ``economic development'' AND (``cross-national'' OR ``cross-cultural'' OR ``cross-country''), which returned 965 articles. The second search was for the terms ``values'' AND (``cross-national'' OR ``cross-cultural'' OR ``cross-country''), which returned 6806 articles. As this was not a formal systematic literature review, we did not follow PRISMA\textsuperscript{89} guidelines for systematic literature reviews.
 
-We then coded each article, in order, for inclusion in our review. Articles were only included if: (1) they were judged to be relevant to economic development or cultural values; (2) they were an original empirical research article; and (3) they contained at least one analysis with national-level outcome or predictor variables. We stopped when we had included 50 articles for the economic development review and 50 articles for the cultural values review.
+Once exported, we ordered the articles by descending number of citations per year since initial publication, using citation counts reported by Web of Science. We then coded each article, in order, for inclusion in our review. Articles were only included if: (1) they were judged to be relevant to economic development or cultural values; (2) they were an original empirical research article; and (3) they contained at least one analysis with national-level outcome or predictor variables. We stopped when we had included 50 articles for the economic development review and 50 articles for the cultural values review.
 
 Within each included article, we exhaustively coded every individual cross-national analysis reported in the main text. We coded mainly correlation or regression analyses, and explicitly excluded meta-analyses, factor analyses, measurement invariance analyses, multidimensional scaling analyses, hierarchical clustering analyses, multiverse analyses, and scale development / validation analyses. We also excluded analyses that compared only two, three, four, five, or six nations. For each included analysis, we recorded the year, impact factor of the journal (retrieved from \url{https://jcr.clarivate.com/jcr/home}), outcome variable, all predictor variables, test statistic, p-value, number of nations, number of data points, model type, if the data were available, and whether and how the analysis attempted to control for non-independence.
 
-We coded common attempts to control for non-independence between nations. These included: (1) any higher-level control variables for spatial regional groupings (e.g.~continent fixed effects); (2) any geographic distance control variables (e.g.~distance between capital cities, distance from equator, latitude); (3) any control variables capturing shared cultural history (e.g.~former colony, legal origin fixed effects, linguistic history, cultural influence); and (4) any other control variables, tests, or approaches that were deemed as attempts to control for non-independence (e.g.~eigenvector filtering\textsuperscript{89}, controls for trade-weightings between nations, cross-sectional dependence tests\textsuperscript{90}, separate analyses for subsets of nations). These were coded by the first author.
+We coded common attempts to control for non-independence between nations. These included: (1) any higher-level control variables for spatial regional groupings (e.g.~continent fixed effects); (2) any geographic distance control variables (e.g.~distance between capital cities, distance from equator, latitude); (3) any control variables capturing shared cultural history (e.g.~former colony, legal origin fixed effects, linguistic history, cultural influence); and (4) any other control variables, tests, or approaches that were deemed as attempts to control for non-independence (e.g.~eigenvector filtering\textsuperscript{90}, controls for trade-weightings between nations, cross-sectional dependence tests\textsuperscript{91}, separate analyses for subsets of nations). These were coded by the first author.
 
 Once we had compiled our review database, we calculated the proportion of articles attempting to control for non-independence at least once. We also calculated the proportion of articles employing the different types of control listed above at least once: regional fixed effects, distance, shared cultural history, or other. For these proportions, we calculated two-tailed 95\% bootstrap confidence intervals with 1,000 bootstrap iterations. Additionally, we predicted the probability of an article attempting to control for non-independence at least once using Bayesian logistic regression, including in separate models log journal impact factor and year of publication as linear and spline predictors, respectively.
 
@@ -399,7 +400,7 @@ We set the autocorrelation parameters \(\lambda\) and \(\rho\) to either 0.2 (we
 
 With the resulting simulated datasets, we standardised outcome and predictor variables and fitted eleven different models: (1) naive regression without controls, (2) regression with latitude control, (3) regression with longitude control, (4) regression with continent fixed effects, (5) regression with language family fixed effects, (6) regression controlling for the mean of the predictor variable in a 2000km radius, (7) regression employing Conley standard errors based on geographic distances, (8) regression employing Conley standard errors based on genetic distances, (9) Bayesian regression including a Gaussian process over latitudes and longitudes, (10) Bayesian regression including random intercepts covarying according to linguistic proximity, and (11) Bayesian regression including both a Gaussian process over latitudes and longitudes and random intercepts covarying according to linguistic proximity.
 
-Models employing Conley standard errors either required latitude and longitude values or coordinates for genetic distances. To determine distance cutoffs, we employed an approach recommended in previous work\textsuperscript{91}: we fitted models with a range of feasible distance cutoffs and retained the model with the largest standard error for the slope parameter. These models were fitted using the conleyreg R package\textsuperscript{92}. Bayesian models were fitted using the brms R package\textsuperscript{81}. Our choice of priors was based on prior predictive simulation. All models converged normally (\(\hat{R}\) \textless{} 1.1). Across all model types and parameter combinations, we calculated the false positive rate as the proportion of models that estimated slopes with a two-tailed 95\% confidence / credible interval excluding zero when \(r = 0\). We calculated statistical power as the proportion of models that estimated slopes with a 95\% confidence / credible interval excluding zero when \(r > 0\). We calculated two-tailed 95\% bootstrap confidence intervals for these false positive rates and statistical power estimates with 1,000 bootstrap iterations.
+Models employing Conley standard errors either required latitude and longitude values or coordinates for genetic distances. To determine distance cutoffs, we employed an approach recommended in previous work\textsuperscript{92}: we fitted models with a range of feasible distance cutoffs and retained the model with the largest standard error for the slope parameter. These models were fitted using the conleyreg R package\textsuperscript{93}. Bayesian models were fitted using the brms R package\textsuperscript{81}. Our choice of priors was based on prior predictive simulation. All models converged normally (\(\hat{R}\) \textless{} 1.1). Across all model types and parameter combinations, we calculated the false positive rate as the proportion of models that estimated slopes with a two-tailed 95\% confidence / credible interval excluding zero when \(r = 0\). We calculated statistical power as the proportion of models that estimated slopes with a 95\% confidence / credible interval excluding zero when \(r > 0\). We calculated two-tailed 95\% bootstrap confidence intervals for these false positive rates and statistical power estimates with 1,000 bootstrap iterations.
 
 \hypertarget{reanalyses}{%
 \subsection{Reanalyses}\label{reanalyses}}
@@ -410,17 +411,17 @@ The twelve analyses that we settled on\textsuperscript{13,14,16,55--63} were mos
 
 For each individual analysis, we ran four models: (1) a naive regression replicating the original finding, (2) a regression including a Gaussian process allowing nation random intercepts to covary according to a geographic proximity matrix from latitude and longitude values, (3) a regression including nation random intercepts that covaried according to a linguistic proximity matrix, and (4) a regression including both a geographic Gaussian process and nation random intercepts with linguistic covariance. See Supplementary Methods for full models.
 
-We fitted these models using the brms R package\textsuperscript{81}. Our choice of priors was based on prior predictive simulation. All models converged normally (\(\hat{R}\) \textless{} 1.1), though for some models we resorted to using approximate Gaussian processes\textsuperscript{93} to reach convergence. The assumptions of these models were met: residuals were approximately normally distributed, though this was not formally tested.
+We fitted these models using the brms R package\textsuperscript{81}. Our choice of priors was based on prior predictive simulation. All models converged normally (\(\hat{R}\) \textless{} 1.1), though for some models we resorted to using approximate Gaussian processes\textsuperscript{94} to reach convergence. The assumptions of these models were met: residuals were approximately normally distributed, though this was not formally tested.
 
 \hypertarget{reproducibility}{%
 \subsection{Reproducibility}\label{reproducibility}}
 
-All data and code are accessible on GitHub (\url{https://github.com/ScottClaessens/crossNationalCorrelations})\textsuperscript{94}. We used the targets R package\textsuperscript{95} to create a reproducible data analysis pipeline and the papaja R package\textsuperscript{96} to reproducibly generate the manuscript.
+All data and code are accessible on GitHub\textsuperscript{95}. We used the targets R package\textsuperscript{96} to create a reproducible data analysis pipeline and the papaja R package\textsuperscript{97} to reproducibly generate the manuscript.
 
 \hypertarget{ethics}{%
 \subsection{Ethics}\label{ethics}}
 
-Ethical approval was not required for the study as we analysed only secondary and simulated data. We did not apply for ethical approval through an ethics board.
+We did not apply for ethical approval through an ethics board as we analysed only publicly available and simulated data in this study.
 
 \newpage
 \nolinenumbers
@@ -428,12 +429,12 @@ Ethical approval was not required for the study as we analysed only secondary an
 \hypertarget{data-availability}{%
 \section{Data Availability}\label{data-availability}}
 
-All data can be found on GitHub (\url{https://github.com/ScottClaessens/crossNationalCorrelations}). Data on human development were retrieved from the United Nations Development Programme (\url{https://hdr.undp.org/en/content/download-data}). Data on GDP per capita, annual GDP per capita growth, and the Gini coefficient were retrieved from the World Bank (\url{https://data.worldbank.org/}). Data on traditional vs.~secular values and survival vs.~self-expression values were retrieved from the World Values Survey (\url{https://www.worldvaluessurvey.org/wvs.jsp}). Data on cultural tightness were retrieved from the OSF repository for Gelfand et al.~2021 (\url{https://osf.io/47pe8/}). The review data generated in this study are provided in the Supplementary Data file. All other datasets (e.g., for replications) were retrieved from tables and supplementary tables directly from papers cited in the main text\textsuperscript{13,14,16,55--63} - these datasets can be found in our GitHub repository.
+All data to reproduce the statistical analyses in this manuscript can be found on GitHub\textsuperscript{95}. Data on human development were retrieved from the United Nations Development Programme (\url{https://hdr.undp.org/en/content/download-data}). Data on GDP per capita, annual GDP per capita growth, and the Gini coefficient were retrieved from the World Bank (\url{https://data.worldbank.org/}). Data on traditional vs.~secular values and survival vs.~self-expression values were retrieved from the World Values Survey (\url{https://www.worldvaluessurvey.org/wvs.jsp}). Data on cultural tightness were retrieved from the OSF repository for ref\textsuperscript{83} (\url{https://osf.io/47pe8/}). The review data generated in this study are provided in Supplementary Data 1. All other datasets (e.g., for replications) were retrieved from tables and supplementary tables directly from papers cited in the main text\textsuperscript{13,14,16,55--63} - these datasets can be found in our GitHub repository\textsuperscript{95}.
 
 \hypertarget{code-availability}{%
 \section{Code Availability}\label{code-availability}}
 
-All code to reproduce the statistical analyses in this manuscript can be found on GitHub (\url{https://github.com/ScottClaessens/crossNationalCorrelations}).
+All code to reproduce the statistical analyses in this manuscript can be found on GitHub\textsuperscript{95}.
 
 \newpage
 
@@ -630,7 +631,7 @@ All code to reproduce the statistical analyses in this manuscript can be found o
 
 \leavevmode\vadjust pre{\hypertarget{ref-hdi}{}}%
 \CSLLeftMargin{47. }%
-\CSLRightInline{\emph{Human development report}. \url{http://hdr.undp.org/en/composite/HDI}.}
+\CSLRightInline{United Nations Development Programme. \emph{Human development report}. \url{http://hdr.undp.org/en/composite/HDI} (2021).}
 
 \leavevmode\vadjust pre{\hypertarget{ref-Schulz2022}{}}%
 \CSLLeftMargin{48. }%
@@ -790,42 +791,46 @@ All code to reproduce the statistical analyses in this manuscript can be found o
 
 \leavevmode\vadjust pre{\hypertarget{ref-Ethnologue}{}}%
 \CSLLeftMargin{87. }%
-\CSLRightInline{\emph{Ethnologue: Languages of the world}. (SIL International, 2018).}
+\CSLRightInline{Eberhard, D. M., Simons, G. F. \& Fennig, C. D. \emph{\href{https://www.ethnologue.com/}{Ethnologue: Languages of the world}}. (SIL International, 2018).}
 
 \leavevmode\vadjust pre{\hypertarget{ref-Eff2008}{}}%
 \CSLLeftMargin{88. }%
 \CSLRightInline{Eff, E. A. Weight matrices for cultural proximity: Deriving weights from a language phylogeny. \emph{Structure and Dynamics} \textbf{3}, (2008).}
 
-\leavevmode\vadjust pre{\hypertarget{ref-Tiefelsdorf2007}{}}%
+\leavevmode\vadjust pre{\hypertarget{ref-Page2021}{}}%
 \CSLLeftMargin{89. }%
+\CSLRightInline{Page, M. J. \emph{et al.} \href{https://doi.org/10.1136/bmj.n71}{The {PRISMA} 2020 statement: An updated guideline for reporting systematic reviews}. \emph{BMJ} \textbf{372}, (2021).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-Tiefelsdorf2007}{}}%
+\CSLLeftMargin{90. }%
 \CSLRightInline{Tiefelsdorf, M. \& Griffith, D. A. \href{https://doi.org/10.1068/a37378}{Semiparametric filtering of spatial autocorrelation: The eigenvector approach}. \emph{Environment and Planning A: Economy and Space} \textbf{39}, 1193--1221 (2007).}
 
 \leavevmode\vadjust pre{\hypertarget{ref-DeHoyos2006}{}}%
-\CSLLeftMargin{90. }%
+\CSLLeftMargin{91. }%
 \CSLRightInline{De Hoyos, R. E. \& Sarafidis, V. \href{https://doi.org/10.1177/1536867X0600600403}{Testing for cross-sectional dependence in panel-data models}. \emph{The Stata Journal} \textbf{6}, 482--496 (2006).}
 
 \leavevmode\vadjust pre{\hypertarget{ref-Colella2019}{}}%
-\CSLLeftMargin{91. }%
+\CSLLeftMargin{92. }%
 \CSLRightInline{Colella, F., Lalive, R., Sakalli, S. O. \& Thoenig, M. Inference with arbitrary clustering. \emph{IZA Discussion Paper No. 12584} (2019) doi:\href{https://doi.org/10.2139/ssrn.3449578}{10.2139/ssrn.3449578}.}
 
 \leavevmode\vadjust pre{\hypertarget{ref-Duben2021}{}}%
-\CSLLeftMargin{92. }%
+\CSLLeftMargin{93. }%
 \CSLRightInline{Düben, C. \emph{\href{https://CRAN.R-project.org/package=conleyreg}{{conleyreg}: Estimations using {C}onley standard errors}}. (2021).}
 
 \leavevmode\vadjust pre{\hypertarget{ref-Solin2020}{}}%
-\CSLLeftMargin{93. }%
+\CSLLeftMargin{94. }%
 \CSLRightInline{Solin, A. \& Särkkä, S. Hilbert space methods for reduced-rank {G}aussian process regression. \emph{Statistics and Computing} \textbf{30}, 419--446 (2020).}
 
 \leavevmode\vadjust pre{\hypertarget{ref-github}{}}%
-\CSLLeftMargin{94. }%
+\CSLLeftMargin{95. }%
 \CSLRightInline{Claessens, S., Kyritsis, T. \& Atkinson, Q. D. Cross-national analyses require additional controls to account for the non-independence of nations - ScottClaessens/crossNationalCorrelations: v1.0.0. (2023) doi:\href{https://doi.org/10.5281/zenodo.8128702}{10.5281/zenodo.8128702}.}
 
 \leavevmode\vadjust pre{\hypertarget{ref-Landau2021}{}}%
-\CSLLeftMargin{95. }%
+\CSLLeftMargin{96. }%
 \CSLRightInline{Landau, W. M. \href{https://doi.org/10.21105/joss.02959}{The targets {R} package: A dynamic {M}ake-like function-oriented pipeline toolkit for reproducibility and high-performance computing}. \emph{Journal of Open Source Software} \textbf{6}, 2959 (2021).}
 
 \leavevmode\vadjust pre{\hypertarget{ref-Aust2020}{}}%
-\CSLLeftMargin{96. }%
+\CSLLeftMargin{97. }%
 \CSLRightInline{Aust, F. \& Barth, M. \emph{\href{https://github.com/crsh/papaja}{{papaja}: {Create} {APA} manuscripts with {R Markdown}}}. (2020).}
 
 \end{CSLReferences}

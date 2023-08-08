@@ -4,19 +4,17 @@ shorttitle        : "Non-independence of nations"
 
 author: 
   - name          : "Scott Claessens"
-    affiliation   : "1"
+    affiliation   : "1*"
   - name          : "Thanos Kyritsis"
     affiliation   : "1"
   - name          : "Quentin D. Atkinson"
-    affiliation   : "1,2"
+    affiliation   : "1,2*"
 
 affiliation:
   - id            : "1"
     institution   : "\\footnotesize School of Psychology, University of Auckland, Auckland, New Zealand"
   - id            : "2"
-    institution   : "\\footnotesize School of Anthropology and Museum Ethnography, University of Oxford, Oxford, United Kingdom"
-
-authornote: "Correspondence concerning this article should be addressed to Scott Claessens (scott.claessens@gmail.com) and Quentin D. Atkinson (q.atkinson@auckland.ac.nz), Floor 2, Building 302, 23 Symonds Street, Auckland, 1010, New Zealand. \\newline \\indent The authors made the following contributions. Scott Claessens: Conceptualization, Data curation, Formal analysis, Investigation, Software, Visualization, Writing - original draft, Writing - review & editing; Thanos Kyritsis: Data curation, Writing - review & editing; Quentin D. Atkinson: Conceptualization, Data curation, Funding acquisition, Supervision, Writing - review & editing."
+    institution   : "\\footnotesize School of Anthropology and Museum Ethnography, University of Oxford, Oxford, United Kingdom \\newline *email: scott.claessens@gmail.com; q.atkinson@auckland.ac.nz"
 
 abstract: |
  Cross-national analyses test hypotheses about the drivers of variation in national outcomes. However, since nations are connected in various ways, such as via spatial proximity and shared cultural ancestry, cross-national analyses often violate assumptions of non-independence, inflating false positive rates. Here, we show that, despite being recognised as an important statistical pitfall for over 200 years, cross-national research in economics and psychology still does not sufficiently account for non-independence. In a review of the 100 highest-cited cross-national studies of economic development and values, we find that controls for non-independence are rare. When studies do control for non-independence, our simulations suggest that most commonly used methods are insufficient for reducing false positives in non-independent data. In reanalyses of twelve previous cross-national correlations, half of the estimates are compatible with no association after controlling for non-independence using global proximity matrices. We urge social scientists to sufficiently control for non-independence in cross-national research.
@@ -54,6 +52,8 @@ urlcolor          : blue
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
 ```
+
+# Introduction
 
 Nations are an important population unit structuring modern human life. The nation in which someone is born has a large effect on what they can expect out of life, including their income level[@Caselli2005], life expectancy[@Austin2012], mental health[@Rai2013], subjective well-being[@Diener2009], and educational attainment[@Kirkcaldy2004]. Nations are also among the most important determinants of human cultural variation, with greater cultural similarity within than outside national borders[@White2021].
 
@@ -93,7 +93,7 @@ tar_read(plotSignal)
 tar_load(review)
 ```
 
-Given that economic development and cultural values show evidence of geographic and cultural phylogenetic signal, have cross-national analyses sufficiently accounted for this non-independence? To assess this, we searched the published literature for articles that combined the search terms "economic development" or "values" with the search terms "cross-national", "cross-cultural", or "cross-country". We removed articles that did not report original research, were not relevant to economic development or cultural values, or did not report at least one cross-national analysis. We then retained the 100 articles (50 for economic development, 50 for cultural values) with the highest annual rate of citations (see Supplementary Data). For each of these highly-cited articles, we exhaustively recorded every cross-national analysis reported in the main text (n = `r printnum(as.numeric(nrow(review)), digits = 0)`), identifying in each case whether or not the analysis attempted to control for spatial, cultural, or any other form of non-independence between nations (see Methods for detailed search criteria and coding decisions).
+Given that economic development and cultural values show evidence of geographic and cultural phylogenetic signal, have cross-national analyses sufficiently accounted for this non-independence? To assess this, we searched the published literature for articles that combined the search terms "economic development" or "values" with the search terms "cross-national", "cross-cultural", or "cross-country". We removed articles that did not report original research, were not relevant to economic development or cultural values, or did not report at least one cross-national analysis. We then retained the 100 articles (50 for economic development, 50 for cultural values) with the highest annual rate of citations (see Supplementary Data 1). For each of these highly-cited articles, we exhaustively recorded every cross-national analysis reported in the main text (n = `r printnum(as.numeric(nrow(review)), digits = 0)`), identifying in each case whether or not the analysis attempted to control for spatial, cultural, or any other form of non-independence between nations (see Methods for detailed search criteria and coding decisions).
 
 ```{r calculate prop}
 # article-level
@@ -257,9 +257,9 @@ We included these matrices in Bayesian multilevel models, allowing nation random
 
 ## Literature review
 
-We exported two searches from Web of Science (https://www.webofknowledge.com/) on 27^th^ September 2021, restricting our searches to articles published between 1900 and 2018. The first search was for the terms "economic development" AND ("cross-national" OR "cross-cultural" OR "cross-country"), which returned 965 articles. The second search was for the terms "values" AND ("cross-national" OR "cross-cultural" OR "cross-country"), which returned 6806 articles. Once exported, we ordered the articles by descending number of citations per year since initial publication, using citation counts reported by Web of Science.
+We exported two searches from Web of Science (https://www.webofknowledge.com/) on 27^th^ September 2021, restricting our searches to articles published between 1900 and 2018. The first search was for the terms "economic development" AND ("cross-national" OR "cross-cultural" OR "cross-country"), which returned 965 articles. The second search was for the terms "values" AND ("cross-national" OR "cross-cultural" OR "cross-country"), which returned 6806 articles. As this was not a formal systematic literature review, we did not follow PRISMA[@Page2021] guidelines for systematic literature reviews.
 
-We then coded each article, in order, for inclusion in our review. Articles were only included if: (1) they were judged to be relevant to economic development or cultural values; (2) they were an original empirical research article; and (3) they contained at least one analysis with national-level outcome or predictor variables. We stopped when we had included 50 articles for the economic development review and 50 articles for the cultural values review.
+Once exported, we ordered the articles by descending number of citations per year since initial publication, using citation counts reported by Web of Science. We then coded each article, in order, for inclusion in our review. Articles were only included if: (1) they were judged to be relevant to economic development or cultural values; (2) they were an original empirical research article; and (3) they contained at least one analysis with national-level outcome or predictor variables. We stopped when we had included 50 articles for the economic development review and 50 articles for the cultural values review.
 
 Within each included article, we exhaustively coded every individual cross-national analysis reported in the main text. We coded mainly correlation or regression analyses, and explicitly excluded meta-analyses, factor analyses, measurement invariance analyses, multidimensional scaling analyses, hierarchical clustering analyses, multiverse analyses, and scale development / validation analyses. We also excluded analyses that compared only two, three, four, five, or six nations. For each included analysis, we recorded the year, impact factor of the journal (retrieved from https://jcr.clarivate.com/jcr/home), outcome variable, all predictor variables, test statistic, p-value, number of nations, number of data points, model type, if the data were available, and whether and how the analysis attempted to control for non-independence.
 
@@ -308,22 +308,22 @@ We fitted these models using the brms R package[@Burkner2017]. Our choice of pri
 
 ## Reproducibility
 
-All data and code are accessible on GitHub (https://github.com/ScottClaessens/crossNationalCorrelations)[@github]. We used the targets R package[@Landau2021] to create a reproducible data analysis pipeline and the papaja R package[@Aust2020] to reproducibly generate the manuscript.
+All data and code are accessible on GitHub[@github]. We used the targets R package[@Landau2021] to create a reproducible data analysis pipeline and the papaja R package[@Aust2020] to reproducibly generate the manuscript.
 
 ## Ethics
 
-Ethical approval was not required for the study as we analysed only secondary and simulated data. We did not apply for ethical approval through an ethics board.
+We did not apply for ethical approval through an ethics board as we analysed only publicly available and simulated data in this study.
 
 \newpage
 \nolinenumbers
 
 # Data Availability
 
-All data can be found on GitHub (https://github.com/ScottClaessens/crossNationalCorrelations). Data on human development were retrieved from the United Nations Development Programme (https://hdr.undp.org/en/content/download-data). Data on GDP per capita, annual GDP per capita growth, and the Gini coefficient were retrieved from the World Bank (https://data.worldbank.org/). Data on traditional vs. secular values and survival vs. self-expression values were retrieved from the World Values Survey (https://www.worldvaluessurvey.org/wvs.jsp). Data on cultural tightness were retrieved from the OSF repository for Gelfand et al. 2021 (https://osf.io/47pe8/). The review data generated in this study are provided in the Supplementary Data file. All other datasets (e.g., for replications) were retrieved from tables and supplementary tables directly from papers cited in the main text[@Adamczyk2009;@Alesina2013;@Beck2003;@Beck2005;@Bockstette2002;@Easterly2003;@Easterly2007;@Fincher2008;@Gelfand2011;@Inglehart2000;@Knack1997;@Skidmore2002] - these datasets can be found in our GitHub repository.
+All data to reproduce the statistical analyses in this manuscript can be found on GitHub[@github]. Data on human development were retrieved from the United Nations Development Programme (https://hdr.undp.org/en/content/download-data). Data on GDP per capita, annual GDP per capita growth, and the Gini coefficient were retrieved from the World Bank (https://data.worldbank.org/). Data on traditional vs. secular values and survival vs. self-expression values were retrieved from the World Values Survey (https://www.worldvaluessurvey.org/wvs.jsp). Data on cultural tightness were retrieved from the OSF repository for ref[@Gelfand2021] (https://osf.io/47pe8/). The review data generated in this study are provided in Supplementary Data 1. All other datasets (e.g., for replications) were retrieved from tables and supplementary tables directly from papers cited in the main text[@Adamczyk2009;@Alesina2013;@Beck2003;@Beck2005;@Bockstette2002;@Easterly2003;@Easterly2007;@Fincher2008;@Gelfand2011;@Inglehart2000;@Knack1997;@Skidmore2002] - these datasets can be found in our GitHub repository[@github].
 
 # Code Availability
 
-All code to reproduce the statistical analyses in this manuscript can be found on GitHub (https://github.com/ScottClaessens/crossNationalCorrelations).
+All code to reproduce the statistical analyses in this manuscript can be found on GitHub[@github].
 
 \newpage
 

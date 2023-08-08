@@ -1,6 +1,6 @@
 # Cross-national analyses require additional controls to account for the non-independence of nations
 
-This repository contains the R code for the manuscript "Cross-national analyses require additional controls to account for the non-independence of nations".
+This repository contains the data and R code for the manuscript "Cross-national analyses require additional controls to account for the non-independence of nations".
 
 ## Getting Started
 
